@@ -1,0 +1,3 @@
+[submodule "lambda-sh"]
+	path = lambda-sh
+	url = https://github.com/C3NZ/lambda-sh
