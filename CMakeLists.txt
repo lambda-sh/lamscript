@@ -28,10 +28,10 @@ project(lamscript)
 file(
     GLOB_RECURSE 
     LAMSCRIPT_SRC 
-    ${CMAKE_SOURCE_DIR}/lamscript/src/Lamscript/*.cpp
-    ${CMAKE_SOURCE_DIR}/lamscript/src/Lamscript/*.h
+    ${CMAKE_SOURCE_DIR}/src/Lamscript/*.cpp
+    ${CMAKE_SOURCE_DIR}/src/Lamscript/*.h
 )
 
 add_executable(lamscript ${LAMSCRIPT_SRC})
 
-target_include_directories(lamscript PUBLIC ${CMAKE_SOURCE_DIR}/lamscript/src)
+target_include_directories(lamscript PUBLIC ${CMAKE_SOURCE_DIR}/src)
