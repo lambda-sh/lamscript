@@ -17,18 +17,18 @@ void Lamscript::Run(const std::string& source) {
 /// This functions throws if it cannot successfully open the file.
 void Lamscript::RunFile(const std::string& file_path)  {
   std::ifstream source_file(file_path, std::ios::in | std::ios::binary);
-  std::string source_as_string;
+  std::string source_code;
 
   if (source_file) {
     source_file.seekg(0, std::ios::end);
-    source_as_string.resize(source_file.tellg());
+    source_code.resize(source_file.tellg());
     source_file.seekg(0, std::ios::beg);
-    source_file.read(&source_as_string[0], source_as_string.size());
+    source_file.read(&source_code[0], source_code.size());
   } else {
     throw "The Input file could not be read";
   }
 
-  Run(source_as_string);
+  Run(source_code);
 }
 
 /// @brief Runs the prompt for the interpreter.
@@ -47,12 +47,12 @@ void Lamscript::RunPrompt() {
   }
 }
 
-// @brief Report an error
+/// @brief Report an error
 void Lamscript::Error(int line, const std::string& message) {
   Lamscript::Report(line, "", message);
 }
 
-// @brief Report function.
+/// @brief Report function.
 void Lamscript::Report(
     int line, const std::string& where, const std::string& message) {
   std::cout << "[line " << "] Error" << where << ":" << message << std::endl; 
