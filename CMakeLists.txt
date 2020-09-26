@@ -21,6 +21,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# ----------------------------------- LAMSCRIPT --------------------------------
+
 project(lamscript)
 
 file(
@@ -29,4 +31,7 @@ file(
     ${CMAKE_SOURCE_DIR}/lamscript/src/Lamscript/*.cpp
     ${CMAKE_SOURCE_DIR}/lamscript/src/Lamscript/*.h
 )
+
 add_executable(lamscript ${LAMSCRIPT_SRC})
+
+target_include_directories(lamscript PUBLIC ${CMAKE_SOURCE_DIR}/lamscript/src)
