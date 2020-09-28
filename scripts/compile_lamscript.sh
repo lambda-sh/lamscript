@@ -23,7 +23,8 @@ elif [ $LAMBDA_build = "Dist" ]; then
         -DCMAKE_BUILD_TYPE="Release" \
         -DDISTRIBUTION_BUILD=True .
 else
-    LAMBDA_FATAL "You need to pass a build type in order to compile lamscript."
+    LAMBDA_FATAL \
+        "You need to pass a valid build type in order to compile lamscript."
 fi
 
 make -j $LAMBDA_cores
