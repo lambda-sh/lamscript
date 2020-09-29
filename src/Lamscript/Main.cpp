@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 
-#include <Lamscript/lamscript.h>
+#include <Lamscript/Lamscript.h>
 
 int main(int argc, char** argv) {
   if (argc > 2) {

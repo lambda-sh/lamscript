@@ -1,6 +1,6 @@
 #include <Lamscript/Lamscript.h>
 
-#include <Lamscript/scanner.h>
+#include <Lamscript/Scanner.h>
 
 namespace lamscript {
 
