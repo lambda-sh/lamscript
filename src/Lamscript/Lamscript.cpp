@@ -1,4 +1,4 @@
-#include <Lamscript/lamscript.h>
+#include <Lamscript/Lamscript.h>
 
 #include <Lamscript/scanner.h>
 
@@ -9,7 +9,7 @@ void Lamscript::Run(const std::string& source) {
   Scanner* scanner = new Scanner(source);
   std::vector<Token> tokens = scanner->ScanTokens();
 
-  for (Token token: tokens) {}
+  for (Token token : tokens) {}
 }
 
 /// @brief Run a given file.
@@ -55,6 +55,6 @@ void Lamscript::Error(int line, const std::string& message) {
 /// @brief Report function.
 void Lamscript::Report(
     int line, const std::string& where, const std::string& message) {
-  std::cout << "[line " << "] Error" << where << ":" << message << std::endl; 
+  std::cout << "[line " << "] Error" << where << ":" << message << std::endl;
 }
 }  // namespace lamscript

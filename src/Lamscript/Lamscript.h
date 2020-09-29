@@ -1,12 +1,12 @@
-#ifndef LAMSCRIPT_SRC_LAMSCRIPT_LAMSCRIPT_H_
-#define LAMSCRIPT_SRC_LAMSCRIPT_ERRORS_H_
+#ifndef SRC_LAMSCRIPT_LAMSCRIPT_H_
+#define SRC_LAMSCRIPT_LAMSCRIPT_H_
 
 #include <fstream>
 #include <ios>
 #include <iostream>
 #include <vector>
 
-#include <Lamscript/scanner.h>
+#include <Lamscript/Scanner.h>
 
 namespace lamscript {
 
@@ -26,4 +26,4 @@ class Lamscript {
 
 }  // namespace lamscript
 
-#endif  // LAMSCRIPT_SRC_LAMSCRIPT_LAMSCRIPT_H_
+#endif  // SRC_LAMSCRIPT_LAMSCRIPT_H_
