@@ -27,7 +27,12 @@ else
         "You need to pass a valid build type in order to compile lamscript."
 fi
 
+LAMBDA_ASSERT_LAST_COMMAND_OK \
+    "Couldn't generate the cmake file necessary for compiling lamscript."
+
 make -j $LAMBDA_cores
+LAMBDA_ASSERT_LAST_COMMAND_OK "Couldn't successfully compile lamscript."
+
 LAMBDA_INFO "Successfully compiled lamscript."
 
 $popd  # ROOT_DIR
