@@ -4,9 +4,10 @@
 #include <string>
 #include <vector>
 
+#include <Lamscript/Token.h>
+
 namespace lamscript {
 
-struct Token {};
 
 /// @brief Lightweight scanner class.
 class Scanner {
