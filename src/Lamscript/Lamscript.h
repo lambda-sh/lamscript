@@ -6,8 +6,6 @@
 #include <iostream>
 #include <vector>
 
-#include <Lamscript/Scanner.h>
-
 namespace lamscript {
 
 class Lamscript {
@@ -21,8 +19,6 @@ class Lamscript {
  private:
   static bool had_error_;
 };
-
-
 
 }  // namespace lamscript
 
