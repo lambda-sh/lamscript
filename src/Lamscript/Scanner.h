@@ -10,12 +10,30 @@
 
 namespace lamscript {
 
-
 /// @brief Lightweight scanner class.
 class Scanner {
  public:
   explicit Scanner(std::string source)
       : source_(source), start_(0), current_(0), line_(1) {}
+
+
+  // Because tokens own the memory of the literals they're storing, the Scanner
+  // should explicitly go through and delete all literals that aren't already
+  // nullptrs to prevent unwanted memory from existing after the Scanner has
+  // been closed.
+  ~Scanner() {
+    for (Token token : tokens_) {
+      if (token.Literal != nullptr) {
+        if (token.Type == STRING) {
+          std::string* temp = static_cast<std::string*>(token.Literal);
+          delete temp;
+        } else if (token.Type == NUMBER) {
+          double* temp = static_cast<double*>(token.Literal);
+          delete temp;
+        }
+      }
+    }
+  }
 
   /// @brief Scan in the tokens of the source that have been provided to the
   /// scanner.
@@ -25,7 +43,7 @@ class Scanner {
       ScanToken();
     }
 
-    tokens_.push_back({END_OF_FILE, "", nullptr, line_ });
+    tokens_.push_back({ END_OF_FILE, "", nullptr, line_ });
     return tokens_;
   }
 
@@ -49,6 +67,9 @@ class Scanner {
   }
 
   /// @brief Add a token with it's literal to the list of tokens.
+  ///
+  /// All literal allocations should be heap allocated, allowing for the Scanner
+  /// to manage the lifetime of the literal.
   void AddToken(TokenType token_type, void* literal) {
     std::string text = source_.substr(start_, current_);
     tokens_.push_back({ token_type, text, literal, line_ });
@@ -71,8 +92,60 @@ class Scanner {
     return source_[current_];
   }
 
+  bool IsDigit(const char& c) {
+    return c >= '0' && c <= '9';
+  }
+
+  /// @brief Parse a String literal.
+  ///
+  /// @todo (C3NZ): Is it possible to allocate a substring on the heap without
+  /// having to create the substring and then store it in the heap allocated
+  /// string?
+  void ParseString() {
+    while (Peek() != '"' && !HasReachedEOF()) {
+      if (Peek() == '\n') {
+        line_++;
+      }
+      Advance();
+    }
+
+    if (HasReachedEOF()) {
+      Lamscript::Error(line_, "Unterminated string.");
+      return;
+    }
+
+    Advance();
+
+    std::string* value = new std::string(
+        source_.substr(start_ + 1, current_ - 1));
+    AddToken(STRING, &value);
+  }
+
+  /// @brief Parses a number
+  void ParseNumber() {
+    while (IsDigit(Peek())) {
+      Advance();
+    }
+
+    if (Peek() == '.' && IsDigit(Peek())) {
+      Advance();
+      while (IsDigit(Peek())) {
+        Advance();
+      }
+    }
+
+    /// @todo Do we need to do allocation for doubles on the heap like this?
+    /// I've never seen this used elsewhere and the syntax seems a bit
+    /// confusing.
+    double* d = new double;
+    *d = std::stod(source_.substr(start_, current_));
+    AddToken(NUMBER, d);
+  }
+
+  /// @brief Scan a single token at a time and determine the type of
+  /// token parsing that should occur.
   void ScanToken() {
-    char c = Advance();
+    const char& c = Advance();
     switch (c) {
       case '(': AddToken(LEFT_PAREN); break;
       case ')': AddToken(RIGHT_PAREN); break;
@@ -89,8 +162,8 @@ class Scanner {
       case '<': AddToken(Match('=') ? LESS_EQUAL : LESS); break;
       case '>': AddToken(Match('=') ? GREATER_EQUAL : GREATER); break;
       case '/':
-        /// If the Next token is going to be another slash, then we ignore the
-        /// current line until a new line character has been found.
+        // If the Next token is going to be another slash, then we ignore the
+        // current line until a new line character has been found.
         if (Match('/')) {
           while (Peek() != '\n' && !HasReachedEOF()) {
             Advance();
@@ -103,8 +176,13 @@ class Scanner {
       case '\r': break;
       case '\t': break;
       case '\n': line_++; break;
+      case '"':  ParseString(); break;
       default:
-        Lamscript::Error(line_, "Encountered an unexpected character.");
+        if (IsDigit(c)) {
+          ParseNumber();
+        } else {
+          Lamscript::Error(line_, "Encountered an unexpected character.");
+        }
         break;
     }
   }
