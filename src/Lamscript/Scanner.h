@@ -1,6 +1,7 @@
 #ifndef SRC_LAMSCRIPT_SCANNER_H_
 #define SRC_LAMSCRIPT_SCANNER_H_
 
+#include <bits/stdc++.h>
 #include <string>
 #include <vector>
 
@@ -15,7 +16,6 @@ class Scanner {
  public:
   explicit Scanner(std::string source)
       : source_(source), start_(0), current_(0), line_(1) {}
-
 
   // Because tokens own the memory of the literals they're storing, the Scanner
   // should explicitly go through and delete all literals that aren't already
@@ -51,6 +51,8 @@ class Scanner {
   int start_, current_, line_;
   std::string source_;
   std::vector<Token> tokens_;
+
+  static std::unordered_map<std::string, TokenType> keywords_;
 
   /// @brief Checks to see if the scanner has reached the end of the file.
   bool HasReachedEOF() { return current_ >= source_.length(); }
@@ -88,12 +90,39 @@ class Scanner {
   /// @brief Peek into what the next token is going to be. Doesn't advance the
   /// scanners current position.
   char Peek() {
-    if (HasReachedEOF()) return '\0';
+    if (HasReachedEOF()) {
+      return '\0';
+    }
+
     return source_[current_];
+  }
+
+  char PeekNext() {
+    int next_position = current_ + 1;
+    if (next_position >= source_.length()) {
+      return '\0';
+    }
+
+    return source_[next_position];
   }
 
   bool IsDigit(const char& c) {
     return c >= '0' && c <= '9';
+  }
+
+  bool IsAlpha(const char& c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_');
+  }
+
+  bool IsAlphaNumeric(const char& c) {
+    return IsAlpha(c) || IsDigit(c);
+  }
+
+  void ParseIdentifier() {
+    while (IsAlphaNumeric(Peek())) {
+      Advance();
+    }
+    AddToken(IDENTIFIER);
   }
 
   /// @brief Parse a String literal.
@@ -127,7 +156,10 @@ class Scanner {
       Advance();
     }
 
-    if (Peek() == '.' && IsDigit(Peek())) {
+    // If theres currently a decimal place and the next value that is going to
+    // be read into our scanner is a digit, then we want to continue to add the
+    // value on to this digit.
+    if (Peek() == '.' && IsDigit(PeekNext())) {
       Advance();
       while (IsDigit(Peek())) {
         Advance();
@@ -180,6 +212,8 @@ class Scanner {
       default:
         if (IsDigit(c)) {
           ParseNumber();
+        } else if (IsAlpha(c)) {
+          ParseIdentifier();
         } else {
           Lamscript::Error(line_, "Encountered an unexpected character.");
         }
@@ -187,6 +221,27 @@ class Scanner {
     }
   }
 };
+
+// Keyword lookup.
+std::unordered_map<std::string, TokenType> Scanner::keywords_ =
+    std::unordered_map<std::string, TokenType>(
+        {
+            {"and", AND},
+            {"class", CLASS},
+            {"else", ELSE},
+            {"false", FALSE},
+            {"for", FOR},
+            {"fun", FUN},
+            {"if", IF},
+            {"nil", NIL},
+            {"or", OR},
+            {"print", PRINT},
+            {"return", RETURN},
+            {"super", SUPER},
+            {"this", THIS},
+            {"true", TRUE},
+            {"var", VAR},
+            {"while", WHILE}});
 
 }  // namespace lamscript
 
