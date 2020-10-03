@@ -122,7 +122,17 @@ class Scanner {
     while (IsAlphaNumeric(Peek())) {
       Advance();
     }
-    AddToken(IDENTIFIER);
+
+    // Fetch the identifier and then perform a lookup to see if the identifier
+    // is a valid keyword.
+    std::string identifier = source_.substr(start_, current_);
+    const auto lookup = keywords_.find(identifier);
+    TokenType type = IDENTIFIER;
+
+    if (lookup != keywords_.end()) {
+      type = lookup->second;
+    }
+    AddToken(type);
   }
 
   /// @brief Parse a String literal.
