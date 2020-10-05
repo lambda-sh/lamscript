@@ -13,7 +13,6 @@ struct Token {
   void* Literal;
   int Line;
 
-
   /// @todo Fix this so that TokenTypes can easily be converted into strings
   /// later down the line.
   std::string ToString() {

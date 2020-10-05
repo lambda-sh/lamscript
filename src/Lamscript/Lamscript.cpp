@@ -9,7 +9,9 @@ void Lamscript::Run(const std::string& source) {
   Scanner* scanner = new Scanner(source);
   std::vector<Token> tokens = scanner->ScanTokens();
 
-  for (Token token : tokens) {}
+  for (Token token : tokens) {
+    std::cout << token.ToString();
+  }
 }
 
 /// @brief Run a given file.
