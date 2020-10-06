@@ -1,7 +1,7 @@
 #ifndef SRC_LAMSCRIPT_EXPRESSION_H_
 #define SRC_LAMSCRIPT_EXPRESSION_H_
 
-#include <vector>Jj
+#include <vector>
 
 #include <Lamscript/Token.h>
 
