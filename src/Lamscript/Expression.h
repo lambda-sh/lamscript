@@ -7,13 +7,15 @@
 
 namespace lamscript {
 
-// Forward declaration for the Visitor interface.
-template<typename ReturnType>
-class Visitor;
-
 /// @brief Base expression class used for allowing expressions to work with one
 /// another
-class Expression {};
+
+class Visitor;
+
+class Expression {
+ public:
+  virtual void Accept(Visitor* visitor) = 0;
+};
 
 /// @brief Binary expression handler.
 class Binary : Expression {
@@ -21,11 +23,11 @@ class Binary : Expression {
   Binary(Expression* left, Token expression_operator, Expression* right)
       : left_(left), operator_(expression_operator), right_(right) {}
 
+  void Accept(Visitor* visitor) override;
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitBinaryExpression(this);
-  }
+  Expression* GetLeftSide() { return left_; }
+  Expression* GetRightSide() { return right_; }
+  const Token& GetOperator() { return operator_; }
 
  private:
   Expression* left_;
@@ -37,10 +39,10 @@ class Assign : Expression {
  public:
   Assign(Token name, Expression* value) : name_(name), value_(value) {}
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitAssignExpression(this);
-  }
+  void Accept(Visitor* visitor) override;
+
+  Expression* GetValue() { return value_; }
+  const Token& GetName() { return name_; }
 
  private:
   Token name_;
@@ -55,10 +57,7 @@ class Call : Expression {
       std::vector<Expression*> arguments)
           : callee_(callee), parentheses_(parentheses), arguments_(arguments) {}
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitCallExpression(this);
-  }
+  void Accept(Visitor* visitor) override;
 
  private:
   Expression* callee_;
@@ -71,10 +70,7 @@ class Get : Expression {
  public:
   Get(Expression* object, Token name) : object_(object), name_(name) {}
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitGetExpression(this);
-  }
+  void Accept(Visitor* visitor) override;
 
  private:
   Expression* object_;
@@ -85,10 +81,7 @@ class Grouping : Expression {
  public:
   explicit Grouping(Expression* expression) : expression_(expression) {}
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitGroupingExpression(this);
-  }
+  void Accept(Visitor* visitor) override;
 
  private:
   Expression* expression_;
@@ -98,10 +91,7 @@ class Literal : Expression {
  public:
   explicit Literal(void* value) : value_(value) {}
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitLiteralExpression(this);
-  }
+  void Accept(Visitor* visitor) override;
 
  private:
   void* value_;
@@ -112,10 +102,7 @@ class Logical : Expression {
   Logical(Expression* left, Token logical_operator, Expression* right)
       : left_(left), logical_operator_(logical_operator), right_(right) {}
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitLogicalExpression(this);
-  }
+  void Accept(Visitor* visitor) override;
 
  private:
   Expression* left_;
@@ -128,10 +115,7 @@ class Set : Expression {
   Set(Expression* object, Token name, Expression* value)
       : object_(object), name_(name), value_(value) {}
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitSetExpression(this);
-  }
+  void Accept(Visitor* visitor) override;
 
  private:
   Expression* object_;
@@ -143,10 +127,7 @@ class Super : Expression {
  public:
   Super(Token keyword, Token method) : keyword_(keyword), method_(method) {}
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitSuperExpression(this);
-  }
+  void Accept(Visitor* visitor) override;
 
  private:
   Token keyword_;
@@ -157,10 +138,7 @@ class This : Expression {
  public:
   explicit This(Token keyword) : keyword_(keyword) {}
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitThisExpression(this);
-  }
+  void Accept(Visitor* visitor) override;
 
  private:
   Token keyword_;
@@ -171,10 +149,7 @@ class Unary : Expression {
   Unary(Token unary_operator, Expression* right)
       : unary_operator_(unary_operator), right_(right) {}
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitUnaryExpression(this);
-  }
+  void Accept(Visitor* visitor) override;
 
  private:
   Token unary_operator_;
@@ -185,31 +160,27 @@ class Variable : Expression {
  public:
   explicit Variable(Token name) : name_(name) {}
 
-  template<typename ReturnType>
-  ReturnType Accept(Visitor<ReturnType> visitor) {
-    visitor.VisitVariableExpression(this);
-  }
+  void Accept(Visitor* visitor) override;
 
  private:
   Token name_;
 };
 
-template<typename ReturnType>
+/// @brief The visitor interface that allows for expressions
 class Visitor {
- protected:
-  friend class Expression;
-  ReturnType VisitAssignExpression(Assign expression);
-  ReturnType VisitBinaryExpression(Binary expression);
-  ReturnType VisitCallExpression(Call expression);
-  ReturnType VisitGetExpression(Get expression);
-  ReturnType VisitGroupingExpression(Grouping expression);
-  ReturnType VisitLiteralExpression(Literal expression);
-  ReturnType VisitLogicalExpression(Logical expression);
-  ReturnType VisitSetExpression(Set expression);
-  ReturnType VisitSuperExpression(Super expression);
-  ReturnType VisitThisExpression(This expression);
-  ReturnType VisitUnaryExpression(Unary expression);
-  ReturnType VisitVariableExpression(Variable expression);
+ public:
+  virtual void VisitAssignExpression(Assign* expression) = 0;
+  virtual void VisitBinaryExpression(Binary* expression) = 0;
+  virtual void VisitCallExpression(Call* expression);
+  virtual void VisitGetExpression(Get* expression);
+  virtual void VisitGroupingExpression(Grouping* expression);
+  virtual void VisitLiteralExpression(Literal* expression);
+  virtual void VisitLogicalExpression(Logical* expression);
+  virtual void VisitSetExpression(Set* expression);
+  virtual void VisitSuperExpression(Super* expression);
+  virtual void VisitThisExpression(This* expression);
+  virtual void VisitUnaryExpression(Unary* expression);
+  virtual void VisitVariableExpression(Variable* expression);
 };
 
 }  // namespace lamscript
