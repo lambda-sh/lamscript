@@ -13,12 +13,14 @@ int main(int argc, char** argv) {
   lamscript::Expression* expression = new lamscript::Binary(
       new lamscript::Unary(
           lamscript::Token{lamscript::MINUS, "-", nullptr, 1},
-          new lamscript::Literal(123)),
+          new lamscript::Literal(static_cast<double>(123))),
       lamscript::Token{lamscript::STAR, "*", nullptr, 1},
       new lamscript::Grouping(
-          new lamscript::Grouping(new lamscript::Literal(45.67))));
+          new lamscript::Literal(45.67)));
 
-  std::cout << (new lamscript::AstPrinter())->Print(expression);
+  std::cout
+      << std::any_cast<std::string>(
+          (new lamscript::AstPrinter())->Print(expression));
 
   exit(0);
 
