@@ -4,6 +4,7 @@
 #include <any>
 #include <initializer_list>
 #include <string>
+#include <iostream>
 
 #include <Lamscript/Expression.h>
 
@@ -12,8 +13,8 @@ namespace lamscript {
 class AstPrinter : Visitor {
  public:
   AstPrinter() {}
-  std::string Print(Expression* expression) {
-    return std::any_cast<std::string>(expression->Accept(this));
+  std::any Print(Expression* expression) {
+    return expression->Accept(this);
   }
 
   std::any VisitAssignExpression(Assign* expression) override {}
@@ -32,18 +33,17 @@ class AstPrinter : Visitor {
   }
 
   std::any VisitLiteralExpression(Literal* expression) override {
-    const std::any& literal = expression->GetValue();
-
+    std::any literal = expression->GetValue();
     if (!literal.has_value()) {
-      return "nil";
+      return std::string("nil");
     }
 
     std::string type(literal.type().name());
-    if (type.compare("double") == 0) {
-      return std::to_string(std::any_cast<double>(literal));
+    if (type.compare("d") == 0) {
+      return std::to_string(std::any_cast<double&>(literal));
     }
 
-    return std::any_cast<std::string>(literal);
+    return literal;
   }
 
   std::any VisitLogicalExpression(Logical* expression) override {}
@@ -61,15 +61,21 @@ class AstPrinter : Visitor {
 
  private:
   std::vector<std::string> results_;
-  std::string Parenthesize(
+  std::any Parenthesize(
       std::string name, std::initializer_list<Expression*> expressions) {
     std::string builder;
 
     builder.append("(").append(name);
-    for (Expression* expr : expressions) {
-      builder.append(" ");
-      builder.append(std::any_cast<std::string>(expr->Accept(this)));
+    try {
+      for (Expression* expr : expressions) {
+        builder.append(" ");
+        builder.append(std::any_cast<std::string>(expr->Accept(this)));
+      }
+    } catch (std::bad_any_cast e) {
+      std::cout << e.what();
     }
+
+    builder.append(")");
 
     return builder;
   }
