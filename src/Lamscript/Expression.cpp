@@ -1,53 +1,55 @@
 #include <Lamscript/Expression.h>
 
+#include <any>
+
 namespace lamscript {
 
-void Binary::Accept(Visitor* visitor) {
-  visitor->VisitBinaryExpression(this);
+std::any Binary::Accept(Visitor* visitor) {
+  return visitor->VisitBinaryExpression(this);
 }
 
-void Assign::Accept(Visitor* visitor) {
-  visitor->VisitAssignExpression(this);
+std::any Assign::Accept(Visitor* visitor) {
+  return visitor->VisitAssignExpression(this);
 }
 
-void Call::Accept(Visitor* visitor) {
-  visitor->VisitCallExpression(this);
+std::any Call::Accept(Visitor* visitor) {
+  return visitor->VisitCallExpression(this);
 }
 
-void Get::Accept(Visitor* visitor) {
-  visitor->VisitGetExpression(this);
+std::any Get::Accept(Visitor* visitor) {
+  return visitor->VisitGetExpression(this);
 }
 
-void Grouping::Accept(Visitor* visitor) {
-  visitor->VisitGroupingExpression(this);
+std::any Grouping::Accept(Visitor* visitor) {
+  return visitor->VisitGroupingExpression(this);
 }
 
-void Literal::Accept(Visitor* visitor) {
-  visitor->VisitLiteralExpression(this);
+std::any Literal::Accept(Visitor* visitor) {
+  return visitor->VisitLiteralExpression(this);
 }
 
-void Logical::Accept(Visitor* visitor) {
-  visitor->VisitLogicalExpression(this);
+std::any Logical::Accept(Visitor* visitor) {
+  return visitor->VisitLogicalExpression(this);
 }
 
-void Set::Accept(Visitor* visitor) {
-  visitor->VisitSetExpression(this);
+std::any Set::Accept(Visitor* visitor) {
+  return visitor->VisitSetExpression(this);
 }
 
-void Super::Accept(Visitor* visitor) {
-  visitor->VisitSuperExpression(this);
+std::any Super::Accept(Visitor* visitor) {
+  return visitor->VisitSuperExpression(this);
 }
 
-void This::Accept(Visitor* visitor) {
-  visitor->VisitThisExpression(this);
+std::any This::Accept(Visitor* visitor) {
+  return visitor->VisitThisExpression(this);
 }
 
-void Unary::Accept(Visitor* visitor) {
-  visitor->VisitUnaryExpression(this);
+std::any Unary::Accept(Visitor* visitor) {
+  return visitor->VisitUnaryExpression(this);
 }
 
-void Variable::Accept(Visitor* visitor) {
-  visitor->VisitVariableExpression(this);
+std::any Variable::Accept(Visitor* visitor) {
+  return visitor->VisitVariableExpression(this);
 }
 
 }  // namespace lamscript
