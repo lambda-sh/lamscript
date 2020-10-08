@@ -90,11 +90,12 @@ class Grouping : public Expression {
 
 class Literal : public Expression {
  public:
-  explicit Literal(std::any value) : value_(value) {}
+  explicit Literal(std::string literal) : value_(literal) {}
+  explicit Literal(double literal) : value_(literal) {}
 
   std::any Accept(Visitor* visitor) override;
 
-  const std::any& GetValue() { return value_; }
+  std::any GetValue() { return value_; }
  private:
   std::any value_;
 };
