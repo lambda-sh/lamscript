@@ -40,7 +40,7 @@ class AstPrinter : Visitor {
 
     std::string type(literal.type().name());
     if (type.compare("d") == 0) {
-      return std::to_string(std::any_cast<double&>(literal));
+      return std::to_string(std::any_cast<double>(literal));
     }
 
     return literal;
@@ -74,7 +74,6 @@ class AstPrinter : Visitor {
     } catch (std::bad_any_cast e) {
       std::cout << e.what();
     }
-
     builder.append(")");
 
     return builder;
