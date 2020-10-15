@@ -1,7 +1,10 @@
 #include <Lamscript/Lamscript.h>
 
+#include <any>
+
 #include <Lamscript/Scanner.h>
 #include <Lamscript/Parser.h>
+#include <Lamscript/AstPrinter.h>
 
 namespace lamscript {
 
@@ -10,9 +13,10 @@ void Lamscript::Run(const std::string& source) {
   Scanner* scanner = new Scanner(source);
   std::vector<Token> tokens = scanner->ScanTokens();
 
-  for (Token token : tokens) {
-    std::cout << token.ToString();
-  }
+  Parser* parser = new Parser(tokens);
+  Expression* expr = parser->Parse();
+  std::cout
+      << std::any_cast<std::string>(AstPrinter().Print(expr)) << std::endl;
 }
 
 /// @brief Run a given file.
