@@ -17,24 +17,6 @@ class Scanner {
   explicit Scanner(std::string source)
       : source_(source), start_(0), current_(0), line_(1) {}
 
-  // Because tokens own the memory of the literals they're storing, the Scanner
-  // should explicitly go through and delete all literals that aren't already
-  // nullptrs to prevent unwanted memory from existing after the Scanner has
-  // been closed.
-  ~Scanner() {
-    for (Token token : tokens_) {
-      if (token.Literal != nullptr) {
-        if (token.Type == STRING) {
-          std::string* temp = static_cast<std::string*>(token.Literal);
-          delete temp;
-        } else if (token.Type == NUMBER) {
-          double* temp = static_cast<double*>(token.Literal);
-          delete temp;
-        }
-      }
-    }
-  }
-
   /// @brief Scan in the tokens of the source that have been provided to the
   /// scanner.
   const std::vector<Token>& ScanTokens() {
