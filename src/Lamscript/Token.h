@@ -1,6 +1,7 @@
 #ifndef SRC_LAMSCRIPT_TOKEN_H_
 #define SRC_LAMSCRIPT_TOKEN_H_
 
+#include <any>
 #include <string>
 
 #include <Lamscript/TokenType.h>
@@ -10,7 +11,7 @@ namespace lamscript {
 struct Token {
   TokenType Type;
   std::string Lexeme;
-  void* Literal;
+  std::any Literal;
   int Line;
 
 
