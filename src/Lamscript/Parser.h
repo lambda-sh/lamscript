@@ -44,7 +44,6 @@ class Parser {
     return Previous();
   }
 
-
   /// @brief Checks if the current token matches the given token type.
   bool CheckToken(TokenType token_type) {
     if (HasReachedEOF()) {
@@ -87,6 +86,17 @@ class Parser {
 
     return expression;
   }
+
+  /// @brief Consumes a token if it matches the type of token being passed in.
+  /// throws an error if the token doesn't match.
+  Token Consume(TokenType type, const std::string& message) {
+    if (CheckToken(type)) {
+      return Advance();
+    }
+
+    throw message;
+  }
+
 
   Expression* ParsePrimary() {
       if (CheckToken(FALSE)) {
