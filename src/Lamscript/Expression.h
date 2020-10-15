@@ -90,6 +90,7 @@ class Grouping : public Expression {
 
 class Literal : public Expression {
  public:
+  Literal() {}
   explicit Literal(std::string literal) : value_(literal) {}
   explicit Literal(double literal) : value_(literal) {}
 
