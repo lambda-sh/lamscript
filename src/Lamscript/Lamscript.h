@@ -6,6 +6,8 @@
 #include <iostream>
 #include <vector>
 
+#include <Lamscript/Token.h>
+
 namespace lamscript {
 
 class Lamscript {
@@ -14,6 +16,7 @@ class Lamscript {
   static void RunFile(const std::string& file_path);
   static void RunPrompt();
   static void Error(int line, const std::string& message);
+  static void Error(Token token, const std::string& message);
   static void Report(
       int line, const std::string& where, const std::string& message);
  private:

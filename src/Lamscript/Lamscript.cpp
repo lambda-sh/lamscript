@@ -1,6 +1,7 @@
 #include <Lamscript/Lamscript.h>
 
 #include <Lamscript/Scanner.h>
+#include <Lamscript/Parser.h>
 
 namespace lamscript {
 
@@ -52,6 +53,14 @@ void Lamscript::RunPrompt() {
 /// @brief Report an error
 void Lamscript::Error(int line, const std::string& message) {
   Lamscript::Report(line, "", message);
+}
+
+void Lamscript::Error(Token token, const std::string& message) {
+  if (token.Type == END_OF_FILE) {
+    Report(token.Line, " at end", message);
+  } else {
+    Report(token.Line, " at '" + token.Lexeme + "'", message);
+  }
 }
 
 /// @brief Report function.
