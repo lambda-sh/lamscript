@@ -1,15 +1,15 @@
 #ifndef SRC_LAMSCRIPT_PARSER_H_
 #define SRC_LAMSCRIPT_PARSER_H_
 
-#include <stdexcept>
 #include <initializer_list>
+#include <stdexcept>
 #include <typeinfo>
 #include <vector>
 
 #include <Lamscript/Expression.h>
+#include <Lamscript/Lamscript.h>
 #include <Lamscript/Token.h>
 #include <Lamscript/TokenType.h>
-#include <Lamscript/Lamscript.h>
 
 namespace lamscript {
 
