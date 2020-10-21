@@ -9,14 +9,15 @@ namespace lamscript {
 
 namespace {
   template<class ReturnType>
-  ReturnType AnyAs(const std::any& any_object) {
-    return std::any_cast<ReturnType>(std::forward<const std::any&>(any_object));
+  ReturnType AnyAs(std::any any_object) {
+    return std::any_cast<ReturnType>(any_object);
   }
 
   const std::type_info& Boolean = typeid(bool);
   const std::type_info& Number = typeid(double);
   const std::type_info& String = typeid(std::string);
-}
+
+}  // namespace
 
 // ---------------------------------- PUBLIC -----------------------------------
 
@@ -126,7 +127,7 @@ std::any Interpreter::Evaluate(Expression* expression) {
 /// 4. Boolean comparison.
 /// 5. Number comparison.
 /// 6. String comparison.
-bool IsEqual(std::any left_side, std::any right_side) {
+bool Interpreter::IsEqual(std::any left_side, std::any right_side) {
   if (!left_side.has_value() && !right_side.has_value()) {
     return true;
   }
