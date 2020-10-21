@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <Lamscript/Token.h>
+#include <Lamscript/RuntimeError.h>
 
 namespace lamscript {
 
@@ -17,6 +18,7 @@ class Lamscript {
   static void RunPrompt();
   static void Error(int line, const std::string& message);
   static void Error(Token token, const std::string& message);
+  static void RuntimeError(RuntimeError);
   static void Report(
       int line, const std::string& where, const std::string& message);
  private:
