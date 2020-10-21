@@ -6,8 +6,9 @@
 #include <iostream>
 #include <vector>
 
-#include <Lamscript/Token.h>
 #include <Lamscript/RuntimeError.h>
+#include <Lamscript/Interpreter.h>
+#include <Lamscript/Token.h>
 
 namespace lamscript {
 
@@ -18,12 +19,14 @@ class Lamscript {
   static void RunPrompt();
   static void Error(int line, const std::string& message);
   static void Error(Token token, const std::string& message);
-  static void RuntimeError(RuntimeError);
+  static void RuntimeError(lamscript::RuntimeError error);
   static void Report(
       int line, const std::string& where, const std::string& message);
  private:
-  static bool had_error_;
+  static Interpreter interpreter_;
+  static bool had_error_, had_runtime_error_;
 };
+
 
 }  // namespace lamscript
 

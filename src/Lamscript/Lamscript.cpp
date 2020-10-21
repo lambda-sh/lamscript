@@ -2,11 +2,18 @@
 
 #include <any>
 
-#include <Lamscript/Scanner.h>
-#include <Lamscript/Parser.h>
 #include <Lamscript/AstPrinter.h>
+#include <Lamscript/Parser.h>
+#include <Lamscript/RuntimeError.h>
+#include <Lamscript/Scanner.h>
 
 namespace lamscript {
+
+Interpreter Lamscript::interpreter_ = Interpreter();
+
+bool Lamscript::had_error_ = false;
+
+bool Lamscript::had_runtime_error_ = false;
 
 /// @brief Run the given source.
 void Lamscript::Run(const std::string& source) {
@@ -36,6 +43,14 @@ void Lamscript::RunFile(const std::string& file_path)  {
   }
 
   Run(source_code);
+
+  if (had_error_) {
+    exit(65);
+  }
+
+  if (had_runtime_error_) {
+    exit(70);
+  }
 }
 
 /// @brief Runs the prompt for the interpreter.
@@ -65,6 +80,11 @@ void Lamscript::Error(Token token, const std::string& message) {
   } else {
     Report(token.Line, " at '" + token.Lexeme + "'", message);
   }
+}
+
+void Lamscript::RuntimeError(lamscript::RuntimeError error) {
+  std::cout << error.what() << "\n[line " << error.GetToken().Line << "]";
+  Lamscript::had_runtime_error_ = true;
 }
 
 /// @brief Report function.
