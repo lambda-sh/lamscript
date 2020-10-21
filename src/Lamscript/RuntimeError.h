@@ -8,10 +8,12 @@
 
 namespace lamscript {
 
-class RuntimeError : std::runtime_error {
+/// @brief Custom runtime error to handle invalid expressions.
+class RuntimeError : public std::runtime_error {
  public:
   RuntimeError(Token token, const std::string& message)
     : std::runtime_error(message), token_(token) {}
+  const Token& GetToken() const { return token_; }
  private:
   Token token_;
 };
