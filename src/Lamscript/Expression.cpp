@@ -2,6 +2,8 @@
 
 #include <any>
 
+#include <Lamscript/Visitor.h>
+
 namespace lamscript {
 
 std::any Binary::Accept(Visitor* visitor) {

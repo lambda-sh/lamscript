@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include <Lamscript/Expression.h>
+#include <Lamscript/Visitor.h>
 
 namespace lamscript {
 
