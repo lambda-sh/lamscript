@@ -22,8 +22,12 @@ void Lamscript::Run(const std::string& source) {
 
   Parser* parser = new Parser(tokens);
   Expression* expr = parser->Parse();
-  std::cout
-      << std::any_cast<std::string>(AstPrinter().Print(expr)) << std::endl;
+
+  if (had_error_) {
+    return;
+  }
+
+  interpreter_.Interpret(expr);
 }
 
 /// @brief Run a given file.
