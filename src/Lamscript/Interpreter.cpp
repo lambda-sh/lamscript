@@ -54,8 +54,11 @@ std::any Interpreter::VisitBinaryExpression(Binary* expression) {
 
     switch (expression->GetOperator().Type) {
       case MINUS:
+      {
         return AnyAs<double>(left_side) - AnyAs<double>(right_side);
+      }
       case PLUS:
+      {
         if (left_side.type() == Number && right_side.type() == Number) {
           return AnyAs<double>(left_side) + AnyAs<double>(right_side);
         }
@@ -67,8 +70,17 @@ std::any Interpreter::VisitBinaryExpression(Binary* expression) {
         throw new RuntimeError(
             expression->GetOperator(),
             "Operands must be two numbers or strings.");
+      }
       case SLASH:
-        return AnyAs<double>(left_side) / AnyAs<double>(right_side);
+      {
+        double divisor = AnyAs<double>(right_side);
+        if (divisor == 0) {
+          throw new RuntimeError(
+              expression->GetOperator(), "Divide by 0 error.");
+        }
+
+        return AnyAs<double>(left_side) / divisor;
+      }
       case STAR:
         return AnyAs<double>(left_side) * AnyAs<double>(right_side);
       case GREATER:
