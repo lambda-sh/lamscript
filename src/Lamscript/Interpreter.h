@@ -41,6 +41,9 @@ class Interpreter : Visitor {
   std::any Evaluate(Expression* expression);
   /// @brief Check to see if two values are equal.
   bool IsEqual(std::any left_side, std::any right_side);
+
+  /// @brief Stringify any given interpreted object.
+  std::string Stringify(std::any value);
 };
 
 }  // namespace lamscript

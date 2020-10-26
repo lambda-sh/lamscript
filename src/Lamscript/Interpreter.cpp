@@ -1,7 +1,10 @@
 #include <Lamscript/Interpreter.h>
 
 #include <any>
+#include <string>
 #include <typeinfo>
+
+#include <Lamscript/Lamscript.h>
 
 namespace lamscript {
 
@@ -45,74 +48,83 @@ std::any Interpreter::VisitUnaryExpression(Unary* expression) {
 }
 
 std::any Interpreter::VisitBinaryExpression(Binary* expression) {
-    std::any left_side = Evaluate(expression->GetLeftSide());
-    std::any right_side = Evaluate(expression->GetRightSide());
+  std::any left_side = Evaluate(expression->GetLeftSide());
+  std::any right_side = Evaluate(expression->GetRightSide());
 
-    if (left_side.type() == Number) {
-      CheckNumberOperands(expression->GetOperator(), left_side, right_side);
-    }
-
-    switch (expression->GetOperator().Type) {
-      case MINUS:
-      {
-        return AnyAs<double>(left_side) - AnyAs<double>(right_side);
-      }
-      case PLUS:
-      {
-        if (left_side.type() == Number && right_side.type() == Number) {
-          return AnyAs<double>(left_side) + AnyAs<double>(right_side);
-        }
-
-        if (left_side.type() == String && right_side.type() == String) {
-          return AnyAs<std::string>(left_side) + AnyAs<std::string>(right_side);
-        }
-
-        throw new RuntimeError(
-            expression->GetOperator(),
-            "Operands must be two numbers or strings.");
-      }
-      case SLASH:
-      {
-        double divisor = AnyAs<double>(right_side);
-        if (divisor == 0) {
-          throw new RuntimeError(
-              expression->GetOperator(), "Divide by 0 error.");
-        }
-
-        return AnyAs<double>(left_side) / divisor;
-      }
-      case STAR:
-      {
-        return AnyAs<double>(left_side) * AnyAs<double>(right_side);
-      }
-      case GREATER:
-      {
-        return AnyAs<double>(left_side) > AnyAs<double>(right_side);
-      }
-      case GREATER_EQUAL:
-      {
-        return AnyAs<double>(left_side) >= AnyAs<double>(right_side);
-      }
-      case LESS:
-      {
-        return AnyAs<double>(left_side) < AnyAs<double>(right_side);
-      }
-      case LESS_EQUAL:
-      {
-        return AnyAs<double>(left_side) <= AnyAs<double>(right_side);
-      }
-      case BANG_EQUAL:
-      {
-        return !IsEqual(left_side, right_side);
-      }
-      case EQUAL_EQUAL:
-      {
-        return IsEqual(left_side, right_side);
-      }
-    }
-
-    return nullptr;
+  if (left_side.type() == Number) {
+    CheckNumberOperands(expression->GetOperator(), left_side, right_side);
   }
+
+  switch (expression->GetOperator().Type) {
+    case MINUS:
+    {
+      return AnyAs<double>(left_side) - AnyAs<double>(right_side);
+    }
+    case PLUS:
+    {
+      if (left_side.type() == Number && right_side.type() == Number) {
+        return AnyAs<double>(left_side) + AnyAs<double>(right_side);
+      }
+
+      if (left_side.type() == String && right_side.type() == String) {
+        return AnyAs<std::string>(left_side) + AnyAs<std::string>(right_side);
+      }
+
+      throw new RuntimeError(
+          expression->GetOperator(),
+          "Operands must be two numbers or strings.");
+    }
+    case SLASH:
+    {
+      double divisor = AnyAs<double>(right_side);
+      if (divisor == 0) {
+        throw new RuntimeError(
+            expression->GetOperator(), "Divide by 0 error.");
+      }
+
+      return AnyAs<double>(left_side) / divisor;
+    }
+    case STAR:
+    {
+      return AnyAs<double>(left_side) * AnyAs<double>(right_side);
+    }
+    case GREATER:
+    {
+      return AnyAs<double>(left_side) > AnyAs<double>(right_side);
+    }
+    case GREATER_EQUAL:
+    {
+      return AnyAs<double>(left_side) >= AnyAs<double>(right_side);
+    }
+    case LESS:
+    {
+      return AnyAs<double>(left_side) < AnyAs<double>(right_side);
+    }
+    case LESS_EQUAL:
+    {
+      return AnyAs<double>(left_side) <= AnyAs<double>(right_side);
+    }
+    case BANG_EQUAL:
+    {
+      return !IsEqual(left_side, right_side);
+    }
+    case EQUAL_EQUAL:
+    {
+      return IsEqual(left_side, right_side);
+    }
+  }
+
+  return nullptr;
+}
+
+void Interpreter::Interpret(Expression* expression) {
+  try {
+    std::any value = Evaluate(expression);
+    std::cout << Stringify(value);
+  } catch (RuntimeError error) {
+    Lamscript::RuntimeError(error);
+  }
+}
 
 // ---------------------------------- PRIVATE ----------------------------------
 
@@ -178,6 +190,22 @@ bool Interpreter::IsEqual(std::any left_side, std::any right_side) {
   }
 
   return false;
+}
+
+std::string Interpreter::Stringify(std::any object) {
+  if (!object.has_value()) {
+    return "nil";
+  }
+
+  if (object.type() == Number) {
+    return std::to_string(AnyAs<double&>(object));
+  }
+
+  if (object.type() == Boolean) {
+    return std::to_string(AnyAs<bool&>(object));
+  }
+
+  return AnyAs<std::string>(object);
 }
 
 }  // namespace lamscript
