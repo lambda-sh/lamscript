@@ -82,24 +82,37 @@ std::any Interpreter::VisitBinaryExpression(Binary* expression) {
         return AnyAs<double>(left_side) / divisor;
       }
       case STAR:
+      {
         return AnyAs<double>(left_side) * AnyAs<double>(right_side);
+      }
       case GREATER:
+      {
         return AnyAs<double>(left_side) > AnyAs<double>(right_side);
+      }
       case GREATER_EQUAL:
+      {
         return AnyAs<double>(left_side) >= AnyAs<double>(right_side);
+      }
       case LESS:
+      {
         return AnyAs<double>(left_side) < AnyAs<double>(right_side);
+      }
       case LESS_EQUAL:
+      {
         return AnyAs<double>(left_side) <= AnyAs<double>(right_side);
+      }
       case BANG_EQUAL:
+      {
         return !IsEqual(left_side, right_side);
+      }
       case EQUAL_EQUAL:
+      {
         return IsEqual(left_side, right_side);
+      }
     }
 
     return nullptr;
   }
-
 
 // ---------------------------------- PRIVATE ----------------------------------
 

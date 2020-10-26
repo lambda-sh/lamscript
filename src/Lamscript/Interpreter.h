@@ -28,7 +28,6 @@ class Interpreter : Visitor {
   std::any VisitThisExpression(This* expression) override {};
   std::any VisitVariableExpression(Variable* expression) override {};
 
-
   void Interpret(Expression* expression);
 
  private:
