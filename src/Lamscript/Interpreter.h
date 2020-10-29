@@ -10,9 +10,9 @@
 
 namespace lamscript {
 
-class Interpreter : Visitor {
+class Interpreter : ExpressionVisitor {
  public:
-  std::any VisitLiteralExpression(Literal* expresesion) override;
+  std::any VisitLiteralExpression(Literal* expression) override;
   std::any VisitGroupingExpression(Grouping* expression) override;
   std::any VisitUnaryExpression(Unary* expression) override;
   std::any VisitBinaryExpression(Binary* expression) override;

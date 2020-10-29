@@ -11,7 +11,7 @@
 
 namespace lamscript {
 
-class AstPrinter : Visitor {
+class AstPrinter : ExpressionVisitor {
  public:
   AstPrinter() {}
   std::any Print(Expression* expression) {
