@@ -5,6 +5,7 @@
 #include <typeinfo>
 
 #include <Lamscript/Lamscript.h>
+#include <Lamscript/Statement.h>
 
 namespace lamscript {
 
@@ -23,6 +24,8 @@ namespace {
 }  // namespace
 
 // ---------------------------------- PUBLIC -----------------------------------
+
+// --------------------------------- EXPRESSIONS -------------------------------
 
 std::any Interpreter::VisitLiteralExpression(Literal* expression) {
   return expression->GetValue();
@@ -117,14 +120,33 @@ std::any Interpreter::VisitBinaryExpression(Binary* expression) {
   return nullptr;
 }
 
-void Interpreter::Interpret(Expression* expression) {
+// --------------------------------- STATEMENTS --------------------------------
+
+std::any Interpreter::VisitPrintStatement(Print* statement) {
+  std::any value = Evaluate(statement->GetExpression());
+  std::cout << Stringify(value) << std::endl;
+  return NULL;
+}
+
+std::any Interpreter::VisitExpressionStatement(ExpressionStatement *statement) {
+  Evaluate(statement->GetExpression());
+  return NULL;
+}
+
+void Interpreter::Interpret(std::vector<Statement*> statements) {
   try {
-    std::any value = Evaluate(expression);
-    std::cout << Stringify(value);
+    for (Statement* statement : statements) {
+      Execute(statement);
+    }
   } catch (RuntimeError error) {
     Lamscript::RuntimeError(error);
   }
 }
+
+void Interpreter::Execute(Statement* statement) {
+  statement->Accept(this);
+}
+
 
 // ---------------------------------- PRIVATE ----------------------------------
 

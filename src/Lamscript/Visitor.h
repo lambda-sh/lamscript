@@ -2,6 +2,7 @@
 #define SRC_LAMSCRIPT_VISITOR_H_
 
 #include <Lamscript/Expression.h>
+#include <Lamscript/Statement.h>
 
 namespace lamscript {
 
@@ -25,15 +26,15 @@ class ExpressionVisitor {
 /// @brief The visitor interface for evaluating statements.
 class StatementVisitor {
  public:
-  virtual std::any VisitBlockStatement() = 0;
-  virtual std::any VisitClassStatement() = 0;
-  virtual std::any VisitExpressionStatement() = 0;
-  virtual std::any VisitFunctionStatement() = 0;
-  virtual std::any VisitIfStatement() = 0;
-  virtual std::any VisitPrintStatement() = 0;
-  virtual std::any VisitReturnStatement() = 0;
-  virtual std::any VisitVarStatement() = 0;
-  virtual std::any VisitWhileStatement() = 0;
+  virtual std::any VisitBlockStatement(Block* statement) = 0;
+  virtual std::any VisitClassStatement(Class* statement) = 0;
+  virtual std::any VisitExpressionStatement(ExpressionStatement* statement) = 0;
+  virtual std::any VisitFunctionStatement(Function* statement) = 0;
+  virtual std::any VisitIfStatement(If* statement) = 0;
+  virtual std::any VisitPrintStatement(Print* statement) = 0;
+  virtual std::any VisitReturnStatement(Return* statement) = 0;
+  virtual std::any VisitVariableStatement(Variable* statement) = 0;
+  virtual std::any VisitWhileStatement(While* statement) = 0;
 };
 
 

@@ -10,6 +10,7 @@
 #include <Lamscript/Lamscript.h>
 #include <Lamscript/Token.h>
 #include <Lamscript/TokenType.h>
+#include <Lamscript/Statement.h>
 
 namespace lamscript {
 
@@ -27,11 +28,11 @@ class Parser {
   explicit Parser(std::vector<Token>& tokens) : tokens_(tokens) {}
 
   /// @brief Begins parsing all tokens provided to the Parser.
-  Expression* Parse() {
-    try {
-      return ParseExpression();
-    } catch (ParseError error) {
-      return nullptr;
+  std::vector<Statement*> Parse() {
+    std::vector<Statement*> statements;
+
+    while (!HasReachedEOF()) {
+      statements.push_back(ParseStatement());
     }
   }
 
@@ -87,6 +88,21 @@ class Parser {
   Expression* ParseExpression() {
     return ParseEquality();
   }
+
+  Statement* ParseStatement() {
+    if (CheckToken(PRINT)) {
+      return ParsePrintStatement();
+    }
+
+    return ParseExpressionStatement();
+  }
+
+  Statement* ParsePrintStatement() {
+    Expression* value = ParseExpression();
+    Consume(SEMICOLON, "Expect ';' after value.");
+    return new Print(value);
+  }
+  Statement* ParseExpressionStatement() {}
 
   /// @brief Parses an equality for as long as there are equal signs and
   /// continually chain the previous expression

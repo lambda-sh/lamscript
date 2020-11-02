@@ -10,8 +10,10 @@
 
 namespace lamscript {
 
-class Interpreter : ExpressionVisitor {
+class Interpreter : ExpressionVisitor, StatementVisitor {
  public:
+  // Expressions.
+
   std::any VisitLiteralExpression(Literal* expression) override;
   std::any VisitGroupingExpression(Grouping* expression) override;
   std::any VisitUnaryExpression(Unary* expression) override;
@@ -28,7 +30,21 @@ class Interpreter : ExpressionVisitor {
   std::any VisitThisExpression(This* expression) override {};
   std::any VisitVariableExpression(Variable* expression) override {};
 
-  void Interpret(Expression* expression);
+  // Statements
+  std::any VisitBlockStatement(Block* statement) override;
+  std::any VisitClassStatement(Class* statement) override;
+  std::any VisitExpressionStatement(ExpressionStatement* statement) override;
+  std::any VisitFunctionStatement(Function* statement) override;
+  std::any VisitIfStatement(If* statement) override;
+  std::any VisitPrintStatement(Print* statement) override;
+  std::any VisitReturnStatement(Return* statement) override;
+  std::any VisitVariableStatement(Variable* statement) override;
+  std::any VisitWhileStatement(While* statement) override;
+
+  // Primary external API
+
+  void Interpret(std::vector<Statement*> statements);
+  void Execute(Statement* statement);
 
  private:
   /// @brief Validates that a unary operand is indeed a number.

@@ -11,6 +11,7 @@ namespace lamscript {
 class StatementVisitor;
 
 class Statement {
+ public:
   virtual std::any Accept(StatementVisitor* visitor) = 0;
 };
 
@@ -34,6 +35,7 @@ class ExpressionStatement : public Statement {
 
   std::any Accept(StatementVisitor* visitor) override;
 
+  Expression* GetExpression() { return expression_; }
  private:
   Expression* expression_;
 };
@@ -93,6 +95,7 @@ class Print : public Statement {
 
   std::any Accept(StatementVisitor* visitor) override;
 
+  Expression* GetExpression() { return expression_; }
  private:
   Expression* expression_;
 };
