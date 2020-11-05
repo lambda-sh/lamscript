@@ -21,13 +21,13 @@ void Lamscript::Run(const std::string& source) {
   std::vector<Token> tokens = scanner->ScanTokens();
 
   Parser* parser = new Parser(tokens);
-  Expression* expr = parser->Parse();
+  std::vector<Statement*> statements = parser->Parse();
 
   if (had_error_) {
     return;
   }
 
-  interpreter_.Interpret(expr);
+  interpreter_.Interpret(statements);
 }
 
 /// @brief Run a given file.
