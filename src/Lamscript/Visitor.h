@@ -33,7 +33,7 @@ class StatementVisitor {
   virtual std::any VisitIfStatement(If* statement) = 0;
   virtual std::any VisitPrintStatement(Print* statement) = 0;
   virtual std::any VisitReturnStatement(Return* statement) = 0;
-  virtual std::any VisitVariableStatement(Variable* statement) = 0;
+  virtual std::any VisitVariableStatement(VariableStatement* statement) = 0;
   virtual std::any VisitWhileStatement(While* statement) = 0;
 };
 
