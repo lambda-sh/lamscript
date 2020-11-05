@@ -5,39 +5,39 @@
 namespace lamscript {
 
 std::any Block::Accept(StatementVisitor* visitor) {
-  return visitor->VisitBlockStatement();
+  return visitor->VisitBlockStatement(this);
 }
 
 std::any ExpressionStatement::Accept(StatementVisitor* visitor) {
-  return visitor->VisitExpressionStatement();
+  return visitor->VisitExpressionStatement(this);
 }
 
 std::any Function::Accept(StatementVisitor* visitor) {
-  return visitor->VisitFunctionStatement();
+  return visitor->VisitFunctionStatement(this);
 }
 
 std::any Class::Accept(StatementVisitor* visitor) {
-  return visitor->VisitClassStatement();
+  return visitor->VisitClassStatement(this);
 }
 
 std::any If::Accept(StatementVisitor* visitor) {
-  return visitor->VisitIfStatement();
+  return visitor->VisitIfStatement(this);
 }
 
 std::any Print::Accept(StatementVisitor* visitor) {
-  return visitor->VisitPrintStatement();
+  return visitor->VisitPrintStatement(this);
 }
 
 std::any Return::Accept(StatementVisitor* visitor) {
-  return visitor->VisitReturnStatement();
+  return visitor->VisitReturnStatement(this);
 }
 
 std::any VariableStatement::Accept(StatementVisitor* visitor) {
-  return visitor->VisitVarStatement();
+  return visitor->VisitVariableStatement(this);
 }
 
 std::any While::Accept(StatementVisitor* visitor) {
-  return visitor->VisitWhileStatement();
+  return visitor->VisitWhileStatement(this);
 }
 
 }  // namespace lamscript
