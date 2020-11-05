@@ -31,15 +31,15 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitVariableExpression(Variable* expression) override {};
 
   // Statements
-  std::any VisitBlockStatement(Block* statement) override;
-  std::any VisitClassStatement(Class* statement) override;
+  std::any VisitBlockStatement(Block* statement) override {};
+  std::any VisitClassStatement(Class* statement) override {};
   std::any VisitExpressionStatement(ExpressionStatement* statement) override;
-  std::any VisitFunctionStatement(Function* statement) override;
-  std::any VisitIfStatement(If* statement) override;
+  std::any VisitFunctionStatement(Function* statement) override {};
+  std::any VisitIfStatement(If* statement) override {};
   std::any VisitPrintStatement(Print* statement) override;
-  std::any VisitReturnStatement(Return* statement) override;
-  std::any VisitVariableStatement(Variable* statement) override;
-  std::any VisitWhileStatement(While* statement) override;
+  std::any VisitReturnStatement(Return* statement) override {};
+  std::any VisitVariableStatement(VariableStatement* statement) override {};
+  std::any VisitWhileStatement(While* statement) override {};
 
   // Primary external API
 
