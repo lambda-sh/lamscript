@@ -1,7 +1,11 @@
-ROOT_DIR="$(git rev-parse --show-toplevel)"
-pushd $ROOT_DIR
+# compile_lamscript.sh
+#
+# This script is used to configure and compile lamscript.
 
-# Source the lambda compiler
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+pushd $ROOT_DIR > /dev/null
+
+# ----------------------------- LAMBDA-SH & ARGS ------------------------------
 source lambda-sh/lambda.sh
 
 LAMBDA_PARSE_ARG build Release "The type of build to produce."
@@ -13,6 +17,8 @@ LAMBDA_COMPILE_ARGS $@
 export CXX=$LAMBDA_cpp_compiler
 
 LAMBDA_INFO "Attempting to Compile a $LAMBDA_build for lamscript."
+
+# ----------------------------------- CMAKE ------------------------------------
 
 if [ $LAMBDA_build = "Release" ] || [ $LAMBDA_build = "Debug" ]; then
     cmake \
@@ -29,6 +35,8 @@ fi
 
 LAMBDA_ASSERT_LAST_COMMAND_OK \
     "Couldn't generate the cmake file necessary for compiling lamscript."
+
+# ----------------------------------- BUILD ------------------------------------
 
 make -j $LAMBDA_cores
 LAMBDA_ASSERT_LAST_COMMAND_OK "Couldn't successfully compile lamscript."
