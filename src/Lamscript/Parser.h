@@ -34,6 +34,8 @@ class Parser {
     while (!HasReachedEOF()) {
       statements.push_back(ParseStatement());
     }
+
+    return statements;
   }
 
  private:
