@@ -94,6 +94,13 @@ void Lamscript::RuntimeError(lamscript::RuntimeError error) {
 /// @brief Report function.
 void Lamscript::Report(
     int line, const std::string& where, const std::string& message) {
-  std::cout << "[line " << "] Error" << where << ":" << message << std::endl;
+  std::cout
+      << "[line "
+      << line
+      << "] Error"
+      << where
+      << ":"
+      << message
+      << std::endl;
 }
 }  // namespace lamscript
