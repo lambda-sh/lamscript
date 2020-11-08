@@ -25,7 +25,8 @@ class ParseError : std::runtime_error {
 
 class Parser {
  public:
-  explicit Parser(std::vector<Token>& tokens) : tokens_(tokens) {}
+  explicit Parser(const std::vector<Token>& tokens)
+      : tokens_(tokens), current_token_(0) {}
 
   /// @brief Begins parsing all tokens provided to the Parser.
   std::vector<Statement*> Parse() {
@@ -54,6 +55,7 @@ class Parser {
 
   /// @brief Check to see if the end of the file has been reached.
   bool HasReachedEOF() {
+    if (current_token_ == 0) { return false; }
     return Peek().Type == END_OF_FILE;
   }
 
