@@ -37,12 +37,13 @@ std::string ConvertTokenTypeToString(TokenType token_type) {
     case FOR:           return "for";
     case IF:            return "if";
     case NIL:           return "nil";
-    case OR:            return "print";
+    case OR:            return "OR";
     case RETURN:        return "return";
     case SUPER:         return "super";
     case THIS:          return "this";
     case VAR:           return "var";
     case WHILE:         return "while";
+    case PRINT:         return "print";
     case END_OF_FILE:   return "eof";
     default:            return "";
   }
