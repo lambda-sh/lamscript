@@ -1,7 +1,9 @@
 #ifndef SRC_LAMSCRIPT_SCANNER_H_
 #define SRC_LAMSCRIPT_SCANNER_H_
 
+
 #include <bits/stdc++.h>
+#include <cctype>
 #include <string>
 #include <vector>
 
@@ -54,8 +56,8 @@ class Scanner {
   ///
   /// All literal allocations should be heap allocated, allowing for the Scanner
   /// to manage the lifetime of the literal.
-  void AddToken(TokenType token_type, void* literal) {
-    std::string text = source_.substr(start_, current_);
+  void AddToken(TokenType token_type, std::any literal) {
+    std::string text = source_.substr(start_, current_ - start_);
     tokens_.push_back({ token_type, text, literal, line_ });
   }
 
@@ -93,7 +95,7 @@ class Scanner {
   }
 
   bool IsAlpha(const char& c) {
-    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_');
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')  || (c == '_');
   }
 
   bool IsAlphaNumeric(const char& c) {
@@ -107,8 +109,8 @@ class Scanner {
 
     // Fetch the identifier and then perform a lookup to see if the identifier
     // is a valid keyword.
-    std::string identifier = source_.substr(start_, current_);
-    const auto lookup = keywords_.find(identifier);
+    std::string identifier = source_.substr(start_, current_ - start_);
+    auto lookup = keywords_.find(identifier);
     TokenType type = IDENTIFIER;
 
     if (lookup != keywords_.end()) {
@@ -137,9 +139,8 @@ class Scanner {
 
     Advance();
 
-    std::string* value = new std::string(
-        source_.substr(start_ + 1, current_ - 1));
-    AddToken(STRING, &value);
+    std::string value = source_.substr(start_, current_ - start_);
+    AddToken(STRING, value);
   }
 
   /// @brief Parses a number
@@ -161,8 +162,7 @@ class Scanner {
     /// @todo Do we need to do allocation for doubles on the heap like this?
     /// I've never seen this used elsewhere and the syntax seems a bit
     /// confusing.
-    double* d = new double;
-    *d = std::stod(source_.substr(start_, current_));
+    double d = std::stod(source_.substr(start_, current_ - start_));
     AddToken(NUMBER, d);
   }
 
