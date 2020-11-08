@@ -8,9 +8,9 @@
 
 #include <Lamscript/Expression.h>
 #include <Lamscript/Lamscript.h>
+#include <Lamscript/Statement.h>
 #include <Lamscript/Token.h>
 #include <Lamscript/TokenType.h>
-#include <Lamscript/Statement.h>
 
 namespace lamscript {
 
@@ -32,7 +32,7 @@ class Parser {
     std::vector<Statement*> statements;
 
     while (!HasReachedEOF()) {
-      statements.push_back(ParseStatement());
+      statements.push_back(ParseDeclaration());
     }
 
     return statements;
@@ -68,7 +68,7 @@ class Parser {
   }
 
   /// @brief Checks if the current token matches the given token type.
-  bool CheckToken(TokenType token_type) {
+  bool CheckToken(const TokenType& token_type) {
     if (HasReachedEOF()) {
       return false;
     }
@@ -77,7 +77,7 @@ class Parser {
   }
 
   /// @brief validates that the current token matches any given set of types.
-  bool CheckTokens(std::initializer_list<TokenType> token_types) {
+  bool CheckTokens(const std::initializer_list<TokenType>& token_types) {
     for (TokenType token_type : token_types) {
       if (CheckToken(token_type)) {
         Advance();
@@ -87,12 +87,43 @@ class Parser {
     return false;
   }
 
-  Expression* ParseExpression() {
-    return ParseEquality();
+
+  // ----------------------------- PARSE STATEMENTS ----------------------------
+
+  /// @brief Attempts to parse a variable declaration statement. If a variable
+  /// declaration isn't found, it will continue trying to parse other types of
+  /// statements.
+  ///
+  /// Synchronizes to the next valid statement when it runs into an invalid
+  /// statement.
+  Statement* ParseDeclaration() {
+    try {
+      if (CheckTokens({VAR})) {
+          return ParseVariableDeclaration();
+      }
+
+      return ParseStatement();
+    } catch (ParseError error) {
+      Synchronize();
+      return nullptr;
+    }
+  }
+
+  Statement* ParseVariableDeclaration() {
+    Token name = Consume(IDENTIFIER, "Expect a variable name.");
+    Expression* initializer;
+
+    // Variables can be optionally initialized.
+    if (CheckTokens({EQUAL})) {
+      initializer = ParseExpression();
+    }
+
+    Consume(SEMICOLON, "Expect ';' after variable declaration.");
+    return new VariableStatement(name, initializer);
   }
 
   Statement* ParseStatement() {
-    if (CheckToken(PRINT)) {
+    if (CheckTokens({PRINT})) {
       return ParsePrintStatement();
     }
 
@@ -102,9 +133,18 @@ class Parser {
   Statement* ParsePrintStatement() {
     Expression* value = ParseExpression();
     Consume(SEMICOLON, "Expect ';' after value.");
+
     return new Print(value);
   }
-  Statement* ParseExpressionStatement() {}
+
+  Statement* ParseExpressionStatement() {
+    Expression* value = ParseExpression();
+    Consume(SEMICOLON, "Expect ';' after value.");
+
+    return new ExpressionStatement(value);
+  }
+
+  // ---------------------------- PARSE EXPRESSIONS ----------------------------
 
   /// @brief Parses an equality for as long as there are equal signs and
   /// continually chain the previous expression
@@ -125,33 +165,21 @@ class Parser {
     return expression;
   }
 
-
-  /// @brief Returns an error that propagates up through the stack for hh
-  ParseError Error(Token token, const std::string& message) {
-    Lamscript::Error(token, message);
-    return ParseError(message);
-  }
-  /// @brief Consumes a token if it matches the type of token being passed in.
-  /// throws an error if the token doesn't match.
-  Token Consume(TokenType type, const std::string& message) {
-    if (CheckToken(type)) {
-      return Advance();
-    }
-
-    throw message;
+  Expression* ParseExpression() {
+    return ParseEquality();
   }
 
   /// @brief Parses primary expressions into literals.
   Expression* ParsePrimary() {
-      if (CheckToken(FALSE)) {
+      if (CheckTokens({FALSE})) {
         return new Literal(false);
       }
 
-      if (CheckToken(TRUE)) {
+      if (CheckTokens({TRUE})) {
         return new Literal(true);
       }
 
-      if (CheckToken(NIL)) {
+      if (CheckTokens({NIL})) {
         return new Literal();
       }
 
@@ -162,10 +190,14 @@ class Parser {
           return new Literal(std::any_cast<double>(token.Literal));
         }
 
-        return new Literal(std::any_cast<std::string>(token.Literal));
+        return new Literal(std::any_cast<std::string&>(token.Literal));
       }
 
-      if (CheckToken(LEFT_PAREN)) {
+      if (CheckTokens({IDENTIFIER})) {
+        return new Variable(Previous());
+      }
+
+      if (CheckTokens({LEFT_PAREN})) {
         Expression* expression = ParseExpression();
         Consume(RIGHT_PAREN, "Expect ')' after expression");
         return new Grouping(expression);
@@ -257,7 +289,24 @@ class Parser {
       Advance();
     }
   }
+
+  /// @brief Returns an error that propagates up through the stack for hh
+  ParseError Error(Token token, const std::string& message) {
+    Lamscript::Error(token, message);
+    return ParseError(message);
+  }
+
+  /// @brief Consumes a token if it matches the type of token being passed in.
+  /// throws an error if the token doesn't match.
+  Token Consume(TokenType type, const std::string& message) {
+    if (CheckToken(type)) {
+      return Advance();
+    }
+
+    throw message;
+  }
 };
+
 
 }  // namespace lamscript
 
