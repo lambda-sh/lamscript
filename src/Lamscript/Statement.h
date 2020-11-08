@@ -118,6 +118,9 @@ class VariableStatement : public Statement {
 
   std::any Accept(StatementVisitor* visitor) override;
 
+  const Token& GetName() const { return name_; }
+  Expression* GetInitializer() const { return initializer_; }
+
  private:
   Token name_;
   Expression* initializer_;
