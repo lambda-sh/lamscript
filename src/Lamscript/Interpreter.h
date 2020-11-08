@@ -4,6 +4,7 @@
 #include <any>
 #include <typeinfo>
 
+#include <Lamscript/Environment.h>
 #include <Lamscript/Expression.h>
 #include <Lamscript/RuntimeError.h>
 #include <Lamscript/Visitor.h>
@@ -18,6 +19,7 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitGroupingExpression(Grouping* expression) override;
   std::any VisitUnaryExpression(Unary* expression) override;
   std::any VisitBinaryExpression(Binary* expression) override;
+  std::any VisitVariableExpression(Variable* expression) override;
 
   /// @todo (C3NZ) Implement the rest of the visitor pattern.
 
@@ -28,7 +30,6 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitSetExpression(Set* expression) override {};
   std::any VisitSuperExpression(Super* expression) override {};
   std::any VisitThisExpression(This* expression) override {};
-  std::any VisitVariableExpression(Variable* expression) override {};
 
   // Statements
   std::any VisitBlockStatement(Block* statement) override {};
@@ -38,7 +39,7 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitIfStatement(If* statement) override {};
   std::any VisitPrintStatement(Print* statement) override;
   std::any VisitReturnStatement(Return* statement) override {};
-  std::any VisitVariableStatement(VariableStatement* statement) override {};
+  std::any VisitVariableStatement(VariableStatement* statement) override;
   std::any VisitWhileStatement(While* statement) override {};
 
   // Primary external API
@@ -47,6 +48,8 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   void Execute(Statement* statement);
 
  private:
+  Environment environment_;
+
   /// @brief Validates that a unary operand is indeed a number.
   void CheckNumberOperand(Token operator_used, std::any operand);
   /// @brief Validates that binary operands are indeed both numbers.

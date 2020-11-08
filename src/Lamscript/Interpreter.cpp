@@ -35,6 +35,9 @@ std::any Interpreter::VisitGroupingExpression(Grouping* expression) {
   return Evaluate(expression->GetExpression());
 }
 
+std::any Interpreter::VisitVariableExpression(Variable* variable) {
+  return environment_.GetVariable(variable->GetName());
+}
 
 std::any Interpreter::VisitUnaryExpression(Unary* expression) {
   std::any right_side = Evaluate(expression);
@@ -128,8 +131,20 @@ std::any Interpreter::VisitPrintStatement(Print* statement) {
   return NULL;
 }
 
-std::any Interpreter::VisitExpressionStatement(ExpressionStatement *statement) {
+std::any Interpreter::VisitExpressionStatement(ExpressionStatement* statement) {
   Evaluate(statement->GetExpression());
+  return NULL;
+}
+
+std::any Interpreter::VisitVariableStatement(VariableStatement* statement) {
+  std::any value;
+  Expression* initializer = statement->GetInitializer();
+
+  if (initializer != nullptr) {
+    value = Evaluate(initializer);
+  }
+
+  environment_.SetVariable(statement->GetName().Lexeme, value);
   return NULL;
 }
 
