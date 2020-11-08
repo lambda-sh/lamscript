@@ -169,6 +169,8 @@ class Variable : public Expression {
 
   std::any Accept(ExpressionVisitor* visitor) override;
 
+  const Token& GetName() { return name_; }
+
  private:
   Token name_;
 };
