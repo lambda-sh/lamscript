@@ -5,7 +5,7 @@
 
 namespace lamscript {
 
-void Environment::SetVariable(std::string name, std::any value) {
+void Environment::SetVariable(const std::string& name, std::any value) {
   values_[name] = value;
 }
 

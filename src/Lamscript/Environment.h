@@ -12,7 +12,7 @@ namespace lamscript {
 class Environment {
  public:
   /// @brief Defines a variable within the current environment.
-  void SetVariable(std::string name, std::any value);
+  void SetVariable(const std::string& name, std::any value);
   std::any GetVariable(Token token);
  private:
   std::unordered_map<std::string, std::any> values_;
