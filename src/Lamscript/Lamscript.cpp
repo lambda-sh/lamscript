@@ -88,7 +88,14 @@ void Lamscript::Error(Token token, const std::string& message) {
 }
 
 void Lamscript::RuntimeError(lamscript::RuntimeError error) {
-  std::cout << error.what() << "\n[line " << error.GetToken().Line << "]";
+  std::cout
+      << "[line "
+      << error.GetToken().Line
+      << "] RuntimeError"
+      << ": "
+      << error.what()
+      << std::endl;
+
   Lamscript::had_runtime_error_ = true;
 }
 
@@ -101,7 +108,7 @@ void Lamscript::Report(
       << line
       << "] Error"
       << where
-      << ":"
+      << ": "
       << message
       << std::endl;
 }
