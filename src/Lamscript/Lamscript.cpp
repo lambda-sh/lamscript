@@ -17,13 +17,14 @@ bool Lamscript::had_runtime_error_ = false;
 
 /// @brief Run the given source.
 void Lamscript::Run(const std::string& source) {
-  Scanner* scanner = new Scanner(source);
-  std::vector<Token> tokens = scanner->ScanTokens();
+  Scanner scanner = Scanner(source);
+  std::vector<Token> tokens = scanner.ScanTokens();
 
-  Parser* parser = new Parser(tokens);
-  std::vector<Statement*> statements = parser->Parse();
+  Parser parser = Parser(tokens);
+  std::vector<Statement*> statements = parser.Parse();
 
   if (had_error_) {
+    had_error_ = false;
     return;
   }
 
@@ -94,6 +95,7 @@ void Lamscript::RuntimeError(lamscript::RuntimeError error) {
 /// @brief Report function.
 void Lamscript::Report(
     int line, const std::string& where, const std::string& message) {
+  had_error_ = true;
   std::cout
       << "[line "
       << line
