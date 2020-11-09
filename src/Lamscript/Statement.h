@@ -23,6 +23,8 @@ class Block : public Statement {
 
   std::any Accept(StatementVisitor* visitor) override;
 
+  const std::vector<Statement*>& GetStatements() { return statements_; }
+
  private:
   std::vector<Statement*> statements_;
 };
