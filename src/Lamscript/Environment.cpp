@@ -19,7 +19,7 @@ void Environment::AssignVariable(const Token& name, std::any value) {
     parent_->AssignVariable(name, value);
   }
 
-  throw new RuntimeError(name, "Undefined Variable '" + name.Lexeme + "'.");
+  throw RuntimeError(name, "Undefined Variable '" + name.Lexeme + "'.");
 }
 
 std::any Environment::GetVariable(const Token& name) {
@@ -31,7 +31,7 @@ std::any Environment::GetVariable(const Token& name) {
     return parent_->GetVariable(name);
   }
 
-  throw new RuntimeError(name, "Undefined variable: '" + name.Lexeme + "'." );
+  throw RuntimeError(name, "Undefined variable: '" + name.Lexeme + "'.");
 }
 
 }  // namespace lamscript
