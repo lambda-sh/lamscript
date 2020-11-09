@@ -18,9 +18,7 @@ namespace lamscript {
 /// expression/statement.
 class ParseError : std::runtime_error {
  public:
-  explicit ParseError(const std::string& what_arg)
-      : std::runtime_error(what_arg) {}
-  explicit ParseError(const char* what_arg) : std::runtime_error(what_arg) {}
+  explicit ParseError(const char* what_arg) : std::runtime_error(what_arg){}
 };
 
 class Parser {
@@ -328,7 +326,7 @@ class Parser {
   /// @brief Returns an error that propagates up through the stack for hh
   ParseError Error(Token token, const std::string& message) {
     Lamscript::Error(token, message);
-    return ParseError(message);
+    return ParseError(message.c_str());
   }
 
   /// @brief Consumes a token if it matches the type of token being passed in.
@@ -338,7 +336,7 @@ class Parser {
       return Advance();
     }
 
-    throw message;
+    throw Error(Peek(), message);
   }
 };
 
