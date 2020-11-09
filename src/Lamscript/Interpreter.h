@@ -13,17 +13,25 @@ namespace lamscript {
 
 class Interpreter : ExpressionVisitor, StatementVisitor {
  public:
-  // Expressions.
+  Interpreter() : environment_(new Environment()) {}
+  // Implemented Expressions.
 
+  std::any VisitAssignExpression(Assign* expression) override;
   std::any VisitLiteralExpression(Literal* expression) override;
   std::any VisitGroupingExpression(Grouping* expression) override;
   std::any VisitUnaryExpression(Unary* expression) override;
   std::any VisitBinaryExpression(Binary* expression) override;
   std::any VisitVariableExpression(Variable* expression) override;
 
+  // Implemented Statements
+
+  std::any VisitBlockStatement(Block* statement) override;
+  std::any VisitExpressionStatement(ExpressionStatement* statement) override;
+  std::any VisitPrintStatement(Print* statement) override;
+  std::any VisitVariableStatement(VariableStatement* statement) override;
+
   /// @todo (C3NZ) Implement the rest of the visitor pattern.
 
-  std::any VisitAssignExpression(Assign* expression) override {};
   std::any VisitCallExpression(Call* expression) override {};
   std::any VisitGetExpression(Get* expression) override {};
   std::any VisitLogicalExpression(Logical* expression) override {};
@@ -32,23 +40,21 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitThisExpression(This* expression) override {};
 
   // Statements
-  std::any VisitBlockStatement(Block* statement) override {};
   std::any VisitClassStatement(Class* statement) override {};
-  std::any VisitExpressionStatement(ExpressionStatement* statement) override;
   std::any VisitFunctionStatement(Function* statement) override {};
   std::any VisitIfStatement(If* statement) override {};
-  std::any VisitPrintStatement(Print* statement) override;
   std::any VisitReturnStatement(Return* statement) override {};
-  std::any VisitVariableStatement(VariableStatement* statement) override;
   std::any VisitWhileStatement(While* statement) override {};
 
   // Primary external API
 
   void Interpret(std::vector<Statement*> statements);
   void Execute(Statement* statement);
+  void ExecuteBlock(
+      std::vector<Statement*> statements, Environment* current_env);
 
  private:
-  Environment environment_;
+  Environment* environment_;
 
   /// @brief Validates that a unary operand is indeed a number.
   void CheckNumberOperand(Token operator_used, std::any operand);

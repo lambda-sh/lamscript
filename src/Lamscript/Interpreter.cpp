@@ -27,6 +27,12 @@ namespace {
 
 // --------------------------------- EXPRESSIONS -------------------------------
 
+std::any Interpreter::VisitAssignExpression(Assign* expression) {
+  std::any value = Evaluate(expression->GetValue());
+  environment_->AssignVariable(expression->GetName(), value);
+  return value;
+}
+
 std::any Interpreter::VisitLiteralExpression(Literal* expression) {
   return expression->GetValue();
 }
@@ -36,7 +42,7 @@ std::any Interpreter::VisitGroupingExpression(Grouping* expression) {
 }
 
 std::any Interpreter::VisitVariableExpression(Variable* variable) {
-  return environment_.GetVariable(variable->GetName());
+  return environment_->GetVariable(variable->GetName());
 }
 
 std::any Interpreter::VisitUnaryExpression(Unary* expression) {
@@ -125,6 +131,11 @@ std::any Interpreter::VisitBinaryExpression(Binary* expression) {
 
 // --------------------------------- STATEMENTS --------------------------------
 
+std::any Interpreter::VisitBlockStatement(Block* statement) {
+  ExecuteBlock(statement->GetStatements(), new Environment(environment_));
+  return NULL;
+}
+
 std::any Interpreter::VisitPrintStatement(Print* statement) {
   std::any value = Evaluate(statement->GetExpression());
   std::cout << Stringify(value) << std::endl;
@@ -144,7 +155,7 @@ std::any Interpreter::VisitVariableStatement(VariableStatement* statement) {
     value = Evaluate(initializer);
   }
 
-  environment_.SetVariable(statement->GetName().Lexeme, value);
+  environment_->SetVariable(statement->GetName(), value);
   return NULL;
 }
 
@@ -160,6 +171,23 @@ void Interpreter::Interpret(std::vector<Statement*> statements) {
 
 void Interpreter::Execute(Statement* statement) {
   statement->Accept(this);
+}
+
+void Interpreter::ExecuteBlock(
+    std::vector<Statement*> statements, Environment* current_env) {
+  Environment* previous = environment_;
+
+  try {
+    environment_ = current_env;
+
+    for (Statement* statement : statements) {
+      Execute(statement);
+    }
+  } catch(...) {
+    std::cout << "Some error happened in a local scope lol." << std::endl;
+  }
+
+  environment_ = previous;
 }
 
 
