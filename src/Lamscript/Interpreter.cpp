@@ -63,7 +63,7 @@ std::any Interpreter::VisitBinaryExpression(Binary* expression) {
   std::any left_side = Evaluate(expression->GetLeftSide());
   std::any right_side = Evaluate(expression->GetRightSide());
 
-  if (left_side.type() == Number) {
+  if (left_side.type() == Number || right_side.type() == Number) {
     CheckNumberOperands(expression->GetOperator(), left_side, right_side);
   }
 
@@ -82,7 +82,7 @@ std::any Interpreter::VisitBinaryExpression(Binary* expression) {
         return AnyAs<std::string>(left_side) + AnyAs<std::string>(right_side);
       }
 
-      throw new RuntimeError(
+      throw RuntimeError(
           expression->GetOperator(),
           "Operands must be two numbers or strings.");
     }
@@ -90,7 +90,7 @@ std::any Interpreter::VisitBinaryExpression(Binary* expression) {
     {
       double divisor = AnyAs<double>(right_side);
       if (divisor == 0) {
-        throw new RuntimeError(
+        throw RuntimeError(
             expression->GetOperator(), "Divide by 0 error.");
       }
 
@@ -195,14 +195,14 @@ void Interpreter::ExecuteBlock(
 
 void Interpreter::CheckNumberOperand(Token operator_used, std::any operand) {
   if (operand.type() != Number) {
-    throw new RuntimeError(operator_used, "Operand must be a number.");
+    throw RuntimeError(operator_used, "Operand must be a number.");
   }
 }
 
 void Interpreter::CheckNumberOperands(
     Token operator_used, std::any left_side, std::any right_side) {
   if (left_side.type() != Number || right_side.type() != Number) {
-    throw new RuntimeError(operator_used, "Operands must both be numbers.");
+    throw RuntimeError(operator_used, "Operands must both be numbers.");
   }
 }
 
