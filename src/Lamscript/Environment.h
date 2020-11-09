@@ -11,10 +11,19 @@ namespace lamscript {
 
 class Environment {
  public:
+  /// @brief Create a new environment with no parent (Usually the global
+  /// environment).
+  Environment() : parent_(nullptr) {}
+
+  /// @brief Create an environment within a parent environment.
+  explicit Environment(Environment* parent) : parent_(parent) {}
+
   /// @brief Defines a variable within the current environment.
-  void SetVariable(const std::string& name, std::any value);
-  std::any GetVariable(Token token);
+  void SetVariable(const Token& name, std::any value);
+  void AssignVariable(const Token& name, std::any value);
+  std::any GetVariable(const Token& token);
  private:
+  Environment* parent_;
   std::unordered_map<std::string, std::any> values_;
 };
 
