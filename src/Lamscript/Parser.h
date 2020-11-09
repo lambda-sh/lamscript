@@ -124,9 +124,25 @@ class Parser {
     return new VariableStatement(name, initializer);
   }
 
+  std::vector<Statement*> ParseBlockStatements() {
+    std::vector<Statement*> statements;
+
+    // Check for right side braces without consuming any tokens.
+    while (!CheckToken(RIGHT_BRACE) && !HasReachedEOF()) {
+      statements.push_back(ParseDeclaration());
+    }
+
+    Consume(RIGHT_BRACE, "Expect '}' after block.");
+    return statements;
+  }
+
   Statement* ParseStatement() {
     if (CheckTokens({PRINT})) {
       return ParsePrintStatement();
+    }
+
+    if (CheckTokens({LEFT_BRACE})) {
+      return new Block(ParseBlockStatements());
     }
 
     return ParseExpressionStatement();
@@ -167,8 +183,25 @@ class Parser {
     return expression;
   }
 
+  Expression* ParseAssignment() {
+    Expression* expression = ParseEquality();
+
+    if (CheckTokens({EQUAL})) {
+      Token equals = Previous();
+      Expression* value = ParseAssignment();
+
+      if (Variable* var = dynamic_cast<Variable*>(expression)) {
+        return new Assign(var->GetName(), value);
+      }
+
+      Error(equals, "Ivalid assignment target");
+    }
+
+    return expression;
+  }
+
   Expression* ParseExpression() {
-    return ParseEquality();
+    return ParseAssignment();
   }
 
   /// @brief Parses primary expressions into literals.
@@ -308,7 +341,6 @@ class Parser {
     throw message;
   }
 };
-
 
 }  // namespace lamscript
 
