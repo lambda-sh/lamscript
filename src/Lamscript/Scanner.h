@@ -139,7 +139,7 @@ class Scanner {
 
     Advance();
 
-    std::string value = source_.substr(start_, current_ - start_);
+    std::string value = source_.substr(start_ + 1, current_ - start_ - 2);
     AddToken(STRING, value);
   }
 
