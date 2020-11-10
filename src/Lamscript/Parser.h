@@ -120,6 +120,12 @@ class Parser {
 
   /// @brief Parse the current comparison being made.
   Expression* ParseComparison();
+
+  /// @brief Parse Or comparisons. e.g. `10 or nil;`.
+  Expression* ParseOr();
+
+  /// @brief Parse And comparisons. e.g. `10 and nil;`.
+  Expression* ParseAnd();
 };
 
 }  // namespace lamscript

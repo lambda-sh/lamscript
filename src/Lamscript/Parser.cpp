@@ -323,6 +323,28 @@ Expression* Parser::ParseComparison() {
   return expression;
 }
 
+Expression* Parser::ParseOr() {
+  Expression* expression = ParseAnd();
 
+  while (CheckTokens({OR})) {
+    Token or_operator = Previous();
+    Expression* right_operand = ParseAnd();
+    expression = new Logical(expression, or_operator, right_operand);
+  }
+
+  return expression;
+}
+
+Expression* Parser::ParseAnd() {
+  Expression* expression = ParseEquality();
+
+  while (CheckTokens({AND})) {
+    Token and_operator = Previous();
+    Expression* right_operand = ParseEquality();
+    expression = new Logical(expression, and_operator, right_operand);
+  }
+
+  return expression;
+}
 
 }  // namespace lamscript
