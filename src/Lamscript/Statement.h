@@ -84,6 +84,10 @@ class If : public Statement {
 
   std::any Accept(StatementVisitor* visitor) override;
 
+  Expression* GetCondition() { return condition_; }
+  Statement* GetThenBranch() { return then_branch_; }
+  Statement* GetElseBranch() { return else_branch_; }
+
  private:
   Expression* condition_;
   Statement* then_branch_;
