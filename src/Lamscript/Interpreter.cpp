@@ -183,6 +183,7 @@ void Interpreter::ExecuteBlock(
       Execute(statement);
     }
   } catch(...) {
+    /// @todo Implement actual error handling inside of blocks.
     std::cout << "Some error happened in a local scope lol." << std::endl;
   }
 
@@ -266,7 +267,7 @@ std::string Interpreter::Stringify(std::any object) {
   }
 
   if (object.type() == Boolean) {
-    return std::to_string(AnyAs<bool&>(object));
+    return AnyAs<bool&>(object) ? "true" : "false";
   }
 
   return AnyAs<std::string>(object);
