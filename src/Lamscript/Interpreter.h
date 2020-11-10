@@ -29,6 +29,7 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitExpressionStatement(ExpressionStatement* statement) override;
   std::any VisitPrintStatement(Print* statement) override;
   std::any VisitVariableStatement(VariableStatement* statement) override;
+  std::any VisitIfStatement(If* statement) override;
 
   /// @todo (C3NZ) Implement the rest of the visitor pattern.
 
@@ -42,7 +43,6 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   // Statements
   std::any VisitClassStatement(Class* statement) override {};
   std::any VisitFunctionStatement(Function* statement) override {};
-  std::any VisitIfStatement(If* statement) override {};
   std::any VisitReturnStatement(Return* statement) override {};
   std::any VisitWhileStatement(While* statement) override {};
 

@@ -158,6 +158,16 @@ std::any Interpreter::VisitVariableStatement(VariableStatement* statement) {
   return NULL;
 }
 
+std::any Interpreter::VisitIfStatement(If* statement) {
+  if (IsTruthy(Evaluate(statement->GetCondition()))) {
+    Execute(statement->GetThenBranch());
+  } else if (statement->GetElseBranch() != nullptr) {
+    Execute(statement->GetElseBranch());
+  }
+
+  return NULL;
+}
+
 void Interpreter::Interpret(std::vector<Statement*> statements) {
   try {
     for (Statement* statement : statements) {
@@ -210,9 +220,16 @@ bool Interpreter::IsTruthy(std::any object) {
   if (!object.has_value()) {
     return false;
   }
+  if (object.type() == Boolean) {
+    return AnyAs<bool&>(object);
+  }
 
   if (object.type() == Number) {
-    return AnyAs<bool>(object);
+    return AnyAs<double&>(object) != 0;
+  }
+
+  if (object.type() == String) {
+    return !AnyAs<std::string&>(object).empty();
   }
 
   return true;
