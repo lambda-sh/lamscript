@@ -216,7 +216,7 @@ Expression* Parser::ParseEquality() {
 }
 
 Expression* Parser::ParseAssignment() {
-  Expression* expression = ParseEquality();
+  Expression* expression = ParseOr();
 
   if (CheckTokens({EQUAL})) {
     Token equals = Previous();
