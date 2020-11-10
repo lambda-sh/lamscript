@@ -129,6 +129,23 @@ std::any Interpreter::VisitBinaryExpression(Binary* expression) {
   return nullptr;
 }
 
+std::any Interpreter::VisitLogicalExpression(Logical* expression) {
+  std::any left_side = Evaluate(expression->GetLeftOperand());
+  bool left_is_truthy = IsTruthy(left_side);
+
+  if (expression->GetLogicalOperator().Type == OR) {
+    if (left_is_truthy) {
+      return left_side;
+    }
+  } else {
+    if (!left_is_truthy) {
+      return left_side;
+    }
+  }
+
+  return Evaluate(expression->GetRightOperand());
+}
+
 // --------------------------------- STATEMENTS --------------------------------
 
 std::any Interpreter::VisitBlockStatement(Block* statement) {
