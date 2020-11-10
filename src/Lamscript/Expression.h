@@ -108,6 +108,10 @@ class Logical : public Expression {
 
   std::any Accept(ExpressionVisitor* visitor) override;
 
+  Expression* GetLeftOperand() { return left_; }
+  const Token& GetLogicalOperator() { return logical_operator_; }
+  Expression* GetRightOperand() { return right_; }
+
  private:
   Expression* left_;
   Token logical_operator_;
