@@ -111,7 +111,7 @@ class Parser {
 
   Statement* ParseVariableDeclaration() {
     Token name = Consume(IDENTIFIER, "Expect a variable name.");
-    Expression* initializer;
+    Expression* initializer = nullptr;
 
     // Variables can be optionally initialized.
     if (CheckTokens({EQUAL})) {

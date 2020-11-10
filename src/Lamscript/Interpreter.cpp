@@ -149,10 +149,9 @@ std::any Interpreter::VisitExpressionStatement(ExpressionStatement* statement) {
 
 std::any Interpreter::VisitVariableStatement(VariableStatement* statement) {
   std::any value;
-  Expression* initializer = statement->GetInitializer();
 
-  if (initializer != nullptr) {
-    value = Evaluate(initializer);
+  if (statement->GetInitializer() != nullptr) {
+    value = Evaluate(statement->GetInitializer());
   }
 
   environment_->SetVariable(statement->GetName(), value);
