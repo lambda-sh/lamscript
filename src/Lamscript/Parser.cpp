@@ -147,10 +147,15 @@ std::vector<Statement*> Parser::ParseBlockStatements() {
 }
 
 /// This function checks in list order for:
-/// 1. Print statements.
-/// 2. Block statements.
-/// 3. Expression statements.
+/// * If statements.
+/// * Print statements.
+/// * Block statements.
+/// * Expression statements.
 Statement* Parser::ParseStatement() {
+  if (CheckTokens({IF})) {
+    return ParseIfStatement();
+  }
+
   if (CheckTokens({PRINT})) {
     return ParsePrintStatement();
   }
@@ -174,7 +179,23 @@ Statement* Parser::ParseExpressionStatement() {
     Consume(SEMICOLON, "Expect ';' after value.");
 
     return new ExpressionStatement(value);
+}
+
+
+Statement* Parser::ParseIfStatement() {
+  Consume(LEFT_PAREN, "Expect '(' after 'if'.");
+  Expression* condition = ParseExpression();
+  Consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+  Statement* then_branch = ParseStatement();
+  Statement* else_branch = nullptr;
+
+  if (CheckTokens({ELSE})) {
+    else_branch = ParseStatement();
   }
+
+  return new If(condition, then_branch, else_branch);
+}
 
 // -------------------------------- EXPRESSIONS --------------------------------
 
