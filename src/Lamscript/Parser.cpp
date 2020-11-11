@@ -349,7 +349,7 @@ Expression* Parser::ParseUnary() {
     return new Unary(unary_operator, right_side);
   }
 
-  return ParsePrimary();
+  return ParseCall();
 }
 
 /// Checks for subtraction first and then addition after.
@@ -368,7 +368,7 @@ Expression* Parser::ParseTerm() {
 Expression* Parser::ParseFactor() {
   Expression* expression = ParseUnary();
 
-  while (CheckTokens({SLASH, STAR})) {
+  while (CheckTokens({SLASH, STAR, MODULUS})) {
     Token expr_operator = Previous();
     Expression* right_side = ParseUnary();
     expression = new Binary(expression, expr_operator, right_side);
@@ -413,6 +413,37 @@ Expression* Parser::ParseAnd() {
   }
 
   return expression;
+}
+
+Expression* Parser::ParseCall() {
+  Expression* expression = ParsePrimary();
+
+  while (true) {
+    if (CheckTokens({LEFT_PAREN})) {
+      expression = FinishCall(expression);
+    } else {
+      break;
+    }
+  }
+
+  return expression;
+}
+
+Expression* Parser::FinishCall(Expression* callee) {
+  std::vector<Expression*> arguments;
+
+  if (!CheckToken(RIGHT_PAREN)) {
+    do {
+      if (arguments.size() >= 255) {
+        Error(Peek(), "Can't have more than 255 arguments.");
+      }
+      arguments.push_back(ParseExpression());
+    } while (CheckTokens({COMMA}));
+  }
+
+  Token parent = Consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+  return new Call(callee, parent, arguments);
 }
 
 }  // namespace lamscript

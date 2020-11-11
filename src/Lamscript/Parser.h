@@ -132,6 +132,12 @@ class Parser {
 
   /// @brief Parse And comparisons. e.g. `10 and nil;`.
   Expression* ParseAnd();
+
+  /// @brief Parse a function or method call.
+  Expression* ParseCall();
+
+  /// @brief Finishes up a function or method call.
+  Expression* FinishCall(Expression* callee);
 };
 
 }  // namespace lamscript
