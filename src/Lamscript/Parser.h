@@ -94,6 +94,12 @@ class Parser {
   /// @brief Parses conditional if/then/else statements.
   Statement* ParseIfStatement();
 
+  /// @brief Parses while statements.
+  Statement* ParseWhileStatement();
+
+  /// @brief Parses for statements.
+  Statement* ParseForStatement();
+
   // ---------------------------- PARSE EXPRESSIONS ----------------------------
 
   /// @brief Parses an equality for as long as there are equal signs and

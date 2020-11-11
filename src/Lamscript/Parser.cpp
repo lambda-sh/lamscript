@@ -160,6 +160,10 @@ Statement* Parser::ParseStatement() {
     return ParsePrintStatement();
   }
 
+  if (CheckTokens({WHILE})) {
+    return ParseWhileStatement();
+  }
+
   if (CheckTokens({LEFT_BRACE})) {
     return new Block(ParseBlockStatements());
   }
@@ -195,6 +199,16 @@ Statement* Parser::ParseIfStatement() {
   }
 
   return new If(condition, then_branch, else_branch);
+}
+
+Statement* Parser::ParseWhileStatement() {
+  Consume(LEFT_PAREN, "Expect '(' after 'while'.");
+  Expression* condition = ParseExpression();
+  Consume(RIGHT_PAREN, "Expect ')' after condition.");
+
+  Statement* body = ParseStatement();
+
+  return new While(condition, body);
 }
 
 // -------------------------------- EXPRESSIONS --------------------------------
