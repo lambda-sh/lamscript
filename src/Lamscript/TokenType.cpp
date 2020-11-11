@@ -18,6 +18,7 @@ std::string ConvertTokenTypeToString(TokenType token_type) {
     case SLASH:         return "/";
     case STAR:          return "*";
     case BANG:          return "!";
+    case MODULUS:       return "%";
     case BANG_EQUAL:    return "!=";
     case EQUAL:         return "=";
     case EQUAL_EQUAL:   return "==";
