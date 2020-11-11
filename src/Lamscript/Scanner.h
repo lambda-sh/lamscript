@@ -181,6 +181,7 @@ class Scanner {
       case '+': AddToken(PLUS); break;
       case ';': AddToken(SEMICOLON); break;
       case '*': AddToken(STAR); break;
+      case '%': AddToken(MODULUS); break;
       case '!': AddToken(Match('=') ? BANG_EQUAL : BANG); break;
       case '=': AddToken(Match('=') ? EQUAL_EQUAL : EQUAL); break;
       case '<': AddToken(Match('=') ? LESS_EQUAL : LESS); break;
