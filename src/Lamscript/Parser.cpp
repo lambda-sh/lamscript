@@ -147,11 +147,17 @@ std::vector<Statement*> Parser::ParseBlockStatements() {
 }
 
 /// This function checks in list order for:
+/// * For statements.
 /// * If statements.
 /// * Print statements.
+/// * While statements.
 /// * Block statements.
 /// * Expression statements.
 Statement* Parser::ParseStatement() {
+  if (CheckTokens({FOR})) {
+    return ParseForStatement();
+  }
+
   if (CheckTokens({IF})) {
     return ParseIfStatement();
   }
@@ -209,6 +215,54 @@ Statement* Parser::ParseWhileStatement() {
   Statement* body = ParseStatement();
 
   return new While(condition, body);
+}
+
+Statement* Parser::ParseForStatement() {
+  Consume(LEFT_PAREN, "Expect '(' after 'while'.");
+  Statement* initializer = nullptr;
+
+  // Parse the initializer.
+  if (CheckTokens({SEMICOLON})) {
+    initializer = nullptr;
+  } else if (CheckTokens({VAR})) {
+    initializer = ParseVariableDeclaration();
+  } else {
+    initializer = ParseExpressionStatement();
+  }
+
+  // Parse the condition.
+  Expression* condition = nullptr;
+  if (!CheckToken(SEMICOLON)) {
+    condition = ParseExpression();
+  }
+  Consume(SEMICOLON, "Expect ';' after loop condition.");
+
+  // Parse the increment.
+  Expression* increment = nullptr;
+  if (!CheckToken(RIGHT_PAREN)) {
+    increment = ParseExpression();
+  }
+  Consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+  Statement* body = ParseStatement();
+
+  // If there's an increment, move it into the for loops local scope and
+  if (increment != nullptr) {
+    body = new Block(
+        std::vector<Statement*>({body, new ExpressionStatement(increment)}));
+  }
+
+  if (condition == nullptr) {
+    condition = new Literal(true);
+  }
+
+  body = new While(condition, body);
+
+  if (initializer != nullptr) {
+    body = new Block(std::vector<Statement*>({initializer, body}));
+  }
+
+  return body;
 }
 
 // -------------------------------- EXPRESSIONS --------------------------------
