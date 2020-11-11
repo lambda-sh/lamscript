@@ -15,8 +15,8 @@ void Environment::AssignVariable(const Token& name, std::any value) {
     return;
   }
 
-  if (parent_) {
-    parent_->AssignVariable(name, value);
+  if (parent_ != nullptr) {
+    return parent_->AssignVariable(name, value);
   }
 
   throw RuntimeError(name, "Undefined Variable '" + name.Lexeme + "'.");
@@ -27,7 +27,7 @@ std::any Environment::GetVariable(const Token& name) {
     return values_[name.Lexeme];
   }
 
-  if (parent_) {
+  if (parent_ != nullptr) {
     return parent_->GetVariable(name);
   }
 
