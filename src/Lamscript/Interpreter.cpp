@@ -1,6 +1,7 @@
 #include <Lamscript/Interpreter.h>
 
 #include <any>
+#include <math.h>
 #include <string>
 #include <typeinfo>
 
@@ -99,6 +100,10 @@ std::any Interpreter::VisitBinaryExpression(Binary* expression) {
     case STAR:
     {
       return AnyAs<double>(left_side) * AnyAs<double>(right_side);
+    }
+    case MODULUS:
+    {
+      return fmod(AnyAs<double>(left_side), AnyAs<double>(right_side));
     }
     case GREATER:
     {
@@ -219,10 +224,6 @@ void Interpreter::ExecuteBlock(
     }
   } catch(const RuntimeError& error) {
     Lamscript::RuntimeError(error);
-  } catch (...) {
-    std::cout
-      << "Some error happened that should most likely be fixed asap."
-      << std::endl;
   }
 
   environment_ = previous;
