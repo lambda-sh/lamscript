@@ -139,6 +139,9 @@ class While : public Statement {
 
   std::any Accept(StatementVisitor* visitor) override;
 
+  Expression* GetCondition() { return condition_; }
+  Statement* GetBody() { return body_; }
+
  private:
   Expression* condition_;
   Statement* body_;
