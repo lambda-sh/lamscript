@@ -185,12 +185,20 @@ std::any Interpreter::VisitIfStatement(If* statement) {
   return NULL;
 }
 
+std::any Interpreter::VisitWhileStatement(While* statement) {
+  while (IsTruthy(Evaluate(statement->GetCondition()))) {
+    Execute(statement->GetBody());
+  }
+
+  return NULL;
+}
+
 void Interpreter::Interpret(std::vector<Statement*> statements) {
   try {
     for (Statement* statement : statements) {
       Execute(statement);
     }
-  } catch (RuntimeError error) {
+  } catch (const RuntimeError& error) {
     Lamscript::RuntimeError(error);
   }
 }
@@ -209,9 +217,12 @@ void Interpreter::ExecuteBlock(
     for (Statement* statement : statements) {
       Execute(statement);
     }
-  } catch(...) {
-    /// @todo Implement actual error handling inside of blocks.
-    std::cout << "Some error happened in a local scope lol." << std::endl;
+  } catch(const RuntimeError& error) {
+    Lamscript::RuntimeError(error);
+  } catch (...) {
+    std::cout
+      << "Some error happened that should most likely be fixed asap."
+      << std::endl;
   }
 
   environment_ = previous;
