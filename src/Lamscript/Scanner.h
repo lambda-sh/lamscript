@@ -224,7 +224,7 @@ std::unordered_map<std::string, TokenType> Scanner::keywords_ =
             {"else", ELSE},
             {"false", FALSE},
             {"for", FOR},
-            {"fun", FUN},
+            {"func", FUN},
             {"if", IF},
             {"nil", NIL},
             {"or", OR},
