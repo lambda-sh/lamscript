@@ -5,6 +5,9 @@
 #include <string>
 #include <typeinfo>
 
+#include <Lamscript/Callable.h>
+#include <Lamscript/Function.h>
+#include <Lamscript/Globals.h>
 #include <Lamscript/Lamscript.h>
 #include <Lamscript/Statement.h>
 
@@ -13,18 +16,26 @@ namespace lamscript {
 // ---------------------------------- INTERNAL ---------------------------------
 
 namespace {
-  template<class ReturnType>
-  ReturnType AnyAs(std::any any_object) {
-    return std::any_cast<ReturnType>(any_object);
-  }
 
-  const std::type_info& Boolean = typeid(bool);
-  const std::type_info& Number = typeid(double);
-  const std::type_info& String = typeid(std::string);
+template<class ReturnType>
+ReturnType AnyAs(std::any any_object) {
+  return std::any_cast<ReturnType>(any_object);
+}
+
+const std::type_info& Boolean = typeid(bool);
+const std::type_info& Number = typeid(double);
+const std::type_info& String = typeid(std::string);
 
 }  // namespace
 
 // ---------------------------------- PUBLIC -----------------------------------
+Interpreter::Interpreter()
+    : globals_(new Environment()), environment_(globals_) {
+  globals_->SetVariable(
+      Token{FUN, "clock", nullptr, 0},
+      reinterpret_cast<LamscriptCallable*>(new Clock()));
+}
+
 
 // --------------------------------- EXPRESSIONS -------------------------------
 
@@ -151,6 +162,32 @@ std::any Interpreter::VisitLogicalExpression(Logical* expression) {
   return Evaluate(expression->GetRightOperand());
 }
 
+std::any Interpreter::VisitCallExpression(Call* expression) {
+  std::any callee = Evaluate(expression->GetCallee());
+  std::vector<std::any> arguments;
+
+  for (Expression* argument : expression->GetArguments()) {
+    arguments.push_back(Evaluate(argument));
+  }
+
+  try {
+    LamscriptCallable* callable = AnyAs<LamscriptCallable*>(callee);
+
+    if (callable->Arity() != arguments.size()) {
+      throw RuntimeError(
+          expression->GetParentheses(),
+          "Expected " + std::to_string(callable->Arity())
+              + " arguments but got " + std::to_string(arguments.size()) + ".");
+    }
+
+    return callable->Call(this, arguments);
+  } catch (std::bad_any_cast error) {
+    throw RuntimeError(
+        expression->GetParentheses(),
+        "Can only call functions and classes;");
+  }
+}
+
 // --------------------------------- STATEMENTS --------------------------------
 
 std::any Interpreter::VisitBlockStatement(Block* statement) {
@@ -198,6 +235,12 @@ std::any Interpreter::VisitWhileStatement(While* statement) {
   return NULL;
 }
 
+std::any Interpreter::VisitFunctionStatement(Function* statement) {
+  LamscriptCallable* func = new LamscriptFunction(statement);
+  environment_->SetVariable(statement->GetName(), func);
+  return NULL;
+}
+
 void Interpreter::Interpret(std::vector<Statement*> statements) {
   try {
     for (Statement* statement : statements) {
@@ -228,7 +271,6 @@ void Interpreter::ExecuteBlock(
 
   environment_ = previous;
 }
-
 
 // ---------------------------------- PRIVATE ----------------------------------
 
@@ -315,6 +357,15 @@ std::string Interpreter::Stringify(std::any object) {
   if (object.type() == Boolean) {
     return AnyAs<bool&>(object) ? "true" : "false";
   }
+
+  if (object.type() == typeid(LamscriptCallable*)) {
+    return AnyAs<LamscriptCallable*>(object)->ToString();
+  }
+
+  if (object.type() == typeid(LamscriptFunction*)) {
+    return AnyAs<LamscriptFunction*>(object)->ToString();
+  }
+
 
   return AnyAs<std::string>(object);
 }

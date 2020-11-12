@@ -13,7 +13,7 @@ namespace lamscript {
 
 class Interpreter : ExpressionVisitor, StatementVisitor {
  public:
-  Interpreter() : environment_(new Environment()) {}
+  Interpreter();
   // Implemented Expressions.
 
   std::any VisitAssignExpression(Assign* expression) override;
@@ -23,6 +23,7 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitBinaryExpression(Binary* expression) override;
   std::any VisitVariableExpression(Variable* expression) override;
   std::any VisitLogicalExpression(Logical* expression) override;
+  std::any VisitCallExpression(Call* expression) override;
 
   // Implemented Statements
 
@@ -32,10 +33,10 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitVariableStatement(VariableStatement* statement) override;
   std::any VisitIfStatement(If* statement) override;
   std::any VisitWhileStatement(While* statement) override;
+  std::any VisitFunctionStatement(Function* statement) override;
 
   /// @todo (C3NZ) Implement the rest of the visitor pattern.
 
-  std::any VisitCallExpression(Call* expression) override {};
   std::any VisitGetExpression(Get* expression) override {};
   std::any VisitSetExpression(Set* expression) override {};
   std::any VisitSuperExpression(Super* expression) override {};
@@ -43,7 +44,6 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
 
   // Statements
   std::any VisitClassStatement(Class* statement) override {};
-  std::any VisitFunctionStatement(Function* statement) override {};
   std::any VisitReturnStatement(Return* statement) override {};
 
   // Primary external API
@@ -53,7 +53,10 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   void ExecuteBlock(
       std::vector<Statement*> statements, Environment* current_env);
 
+  Environment* GetGlobalEnvironment() const { return globals_; }
+
  private:
+  Environment* globals_;
   Environment* environment_;
 
   /// @brief Validates that a unary operand is indeed a number.
