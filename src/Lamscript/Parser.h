@@ -100,6 +100,9 @@ class Parser {
   /// @brief Parses for statements.
   Statement* ParseForStatement();
 
+  /// @brief Parses function statements.
+  Statement* ParseFunction(const std::string& kind);
+
   // ---------------------------- PARSE EXPRESSIONS ----------------------------
 
   /// @brief Parses an equality for as long as there are equal signs and

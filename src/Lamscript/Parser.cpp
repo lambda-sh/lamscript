@@ -110,6 +110,10 @@ Token Parser::Consume(TokenType type, const std::string& message) {
 /// statement.
 Statement* Parser::ParseDeclaration() {
   try {
+    if (CheckTokens({FUN})) {
+      return ParseFunction("function");
+    }
+
     if (CheckTokens({VAR})) {
         return ParseVariableDeclaration();
     }
@@ -191,7 +195,6 @@ Statement* Parser::ParseExpressionStatement() {
     return new ExpressionStatement(value);
 }
 
-
 Statement* Parser::ParseIfStatement() {
   Consume(LEFT_PAREN, "Expect '(' after 'if'.");
   Expression* condition = ParseExpression();
@@ -263,6 +266,30 @@ Statement* Parser::ParseForStatement() {
   }
 
   return body;
+}
+
+Statement* Parser::ParseFunction(const std::string& kind) {
+  Token name = Consume(IDENTIFIER, "Expect " + kind + " name.");
+  Consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+
+  std::vector<Token> parameters;
+
+  // Parse function arguments.
+  if (!CheckToken(RIGHT_PAREN)) {
+    do {
+      if (parameters.size() > 255) {
+        Error(Peek(), "Can't have more than 255 parameters.");
+      }
+
+      parameters.push_back(Consume(IDENTIFIER, "Expect parameter name."));
+    } while (CheckTokens({COMMA}));
+  }
+  Consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+  Consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+  std::vector<Statement*> body = ParseBlockStatements();
+
+  return new Function(name, parameters, body);
 }
 
 // -------------------------------- EXPRESSIONS --------------------------------
