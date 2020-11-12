@@ -52,6 +52,10 @@ class Function : public Statement {
 
   std::any Accept(StatementVisitor* visitor) override;
 
+  const Token& GetName() const { return name_; }
+  const std::vector<Token>& GetParams() const { return params_; }
+  const std::vector<Statement*>& GetBody() const {return body_; }
+
  private:
   Token name_;
   std::vector<Token> params_;
