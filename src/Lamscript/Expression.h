@@ -58,6 +58,9 @@ class Call : public Expression {
           : callee_(callee), parentheses_(parentheses), arguments_(arguments) {}
 
   std::any Accept(ExpressionVisitor* visitor) override;
+  Expression* GetCallee() { return callee_; }
+  const Token& GetParentheses() { return parentheses_; }
+  const std::vector<Expression*>& GetArguments() { return arguments_; }
 
  private:
   Expression* callee_;
