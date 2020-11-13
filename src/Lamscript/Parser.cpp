@@ -3,6 +3,7 @@
 #include <initializer_list>
 #include <typeinfo>
 #include <vector>
+#include <memory>
 
 #include <Lamscript/Expression.h>
 #include <Lamscript/Lamscript.h>
@@ -14,11 +15,11 @@ namespace lamscript {
 
 // ---------------------------------- PUBLIC -----------------------------------
 
-std::vector<Statement*> Parser::Parse() {
-  std::vector<Statement*> statements;
+std::vector<std::unique_ptr<Statement>> Parser::Parse() {
+  std::vector<std::unique_ptr<Statement>> statements;
 
   while (!HasReachedEOF()) {
-    statements.push_back(ParseDeclaration());
+    statements.emplace_back(std::move(ParseDeclaration()));
   }
 
   return statements;
@@ -108,26 +109,26 @@ Token Parser::Consume(TokenType type, const std::string& message) {
 
 /// Synchronizes to the next valid statement when it runs into an invalid
 /// statement.
-Statement* Parser::ParseDeclaration() {
+std::unique_ptr<Statement> Parser::ParseDeclaration() {
   try {
     if (CheckTokens({FUN})) {
-      return ParseFunction("function");
+      return std::move(ParseFunction("function"));
     }
 
     if (CheckTokens({VAR})) {
-        return ParseVariableDeclaration();
+        return std::move(ParseVariableDeclaration());
     }
 
-    return ParseStatement();
+    return std::move(ParseStatement());
   } catch (ParseError error) {
     Synchronize();
     return nullptr;
   }
 }
 
-Statement* Parser::ParseVariableDeclaration() {
+std::unique_ptr<Statement> Parser::ParseVariableDeclaration() {
   Token name = Consume(IDENTIFIER, "Expect a variable name.");
-  Expression* initializer = nullptr;
+  std::unique_ptr<Expression> initializer = nullptr;
 
   // Variables can be optionally initialized.
   if (CheckTokens({EQUAL})) {
@@ -135,15 +136,18 @@ Statement* Parser::ParseVariableDeclaration() {
   }
 
   Consume(SEMICOLON, "Expect ';' after variable declaration.");
-  return new VariableStatement(name, initializer);
+
+  std::unique_ptr<Statement> statement;
+  statement.reset(new VariableStatement(name, std::move(initializer)));
+  return std::move(statement);
 }
 
-std::vector<Statement*> Parser::ParseBlockStatements() {
-  std::vector<Statement*> statements;
+std::vector<std::unique_ptr<Statement>> Parser::ParseBlockStatements() {
+  std::vector<std::unique_ptr<Statement>> statements;
 
   // Check for right side braces without consuming any tokens.
   while (!CheckToken(RIGHT_BRACE) && !HasReachedEOF()) {
-    statements.push_back(ParseDeclaration());
+    statements.emplace_back(std::move(ParseDeclaration()));
   }
 
   Consume(RIGHT_BRACE, "Expect '}' after block.");
@@ -157,72 +161,86 @@ std::vector<Statement*> Parser::ParseBlockStatements() {
 /// * While statements.
 /// * Block statements.
 /// * Expression statements.
-Statement* Parser::ParseStatement() {
+std::unique_ptr<Statement> Parser::ParseStatement() {
   if (CheckTokens({FOR})) {
-    return ParseForStatement();
+    return std::move(ParseForStatement());
   }
 
   if (CheckTokens({IF})) {
-    return ParseIfStatement();
+    return std::move(ParseIfStatement());
   }
 
   if (CheckTokens({PRINT})) {
-    return ParsePrintStatement();
+    return std::move(ParsePrintStatement());
   }
 
   if (CheckTokens({WHILE})) {
-    return ParseWhileStatement();
+    return std::move(ParseWhileStatement());
   }
 
   if (CheckTokens({LEFT_BRACE})) {
-    return new Block(ParseBlockStatements());
+    std::unique_ptr<Statement> statement;
+    statement.reset(new Block(ParseBlockStatements()));
+    return std::move(statement);
   }
 
-  return ParseExpressionStatement();
+  return std::move(ParseExpressionStatement());
 }
 
-Statement* Parser::ParsePrintStatement() {
-  Expression* value = ParseExpression();
+std::unique_ptr<Statement> Parser::ParsePrintStatement() {
+  std::unique_ptr<Expression> value = ParseExpression();
   Consume(SEMICOLON, "Expect ';' after value.");
 
-  return new Print(value);
+  std::unique_ptr<Statement> statement;
+  statement.reset(new Print(std::move(value)));
+  return std::move(statement);
 }
 
-Statement* Parser::ParseExpressionStatement() {
-    Expression* value = ParseExpression();
-    Consume(SEMICOLON, "Expect ';' after value.");
+std::unique_ptr<Statement> Parser::ParseExpressionStatement() {
+  std::unique_ptr<Expression> value = ParseExpression();
+  Consume(SEMICOLON, "Expect ';' after value.");
 
-    return new ExpressionStatement(value);
+
+  std::unique_ptr<Statement> statement;
+  statement.reset(new ExpressionStatement(std::move(value)));
+  return std::move(statement);
 }
 
-Statement* Parser::ParseIfStatement() {
+std::unique_ptr<Statement> Parser::ParseIfStatement() {
   Consume(LEFT_PAREN, "Expect '(' after 'if'.");
-  Expression* condition = ParseExpression();
+  std::unique_ptr<Expression> condition = ParseExpression();
   Consume(RIGHT_PAREN, "Expect ')' after if condition.");
 
-  Statement* then_branch = ParseStatement();
-  Statement* else_branch = nullptr;
+  std::unique_ptr<Statement> then_branch = ParseStatement();
+  std::unique_ptr<Statement> else_branch = nullptr;
 
   if (CheckTokens({ELSE})) {
     else_branch = ParseStatement();
   }
 
-  return new If(condition, then_branch, else_branch);
+  std::unique_ptr<Statement> statement;
+  statement.reset(
+      new If(
+        std::move(condition), std::move(then_branch), std::move(else_branch)));
+  return std::move(statement);
 }
 
-Statement* Parser::ParseWhileStatement() {
+std::unique_ptr<Statement> Parser::ParseWhileStatement() {
   Consume(LEFT_PAREN, "Expect '(' after 'while'.");
-  Expression* condition = ParseExpression();
+  std::unique_ptr<Expression> condition = ParseExpression();
   Consume(RIGHT_PAREN, "Expect ')' after condition.");
 
-  Statement* body = ParseStatement();
+  std::unique_ptr<Statement> body = ParseStatement();
 
-  return new While(condition, body);
+  std::unique_ptr<Statement> statement;
+  statement.reset(new While(std::move(condition), std::move(body)));
+
+  return std::move(statement);
 }
 
-Statement* Parser::ParseForStatement() {
+std::unique_ptr<Statement> Parser::ParseForStatement() {
   Consume(LEFT_PAREN, "Expect '(' after 'while'.");
-  Statement* initializer = nullptr;
+  std::unique_ptr<Statement> initializer = nullptr;
 
   // Parse the initializer.
   if (CheckTokens({SEMICOLON})) {
@@ -234,41 +252,49 @@ Statement* Parser::ParseForStatement() {
   }
 
   // Parse the condition.
-  Expression* condition = nullptr;
+  std::unique_ptr<Expression> condition = nullptr;
   if (!CheckToken(SEMICOLON)) {
     condition = ParseExpression();
   }
   Consume(SEMICOLON, "Expect ';' after loop condition.");
 
   // Parse the increment.
-  Expression* increment = nullptr;
+  std::unique_ptr<Expression> increment = nullptr;
   if (!CheckToken(RIGHT_PAREN)) {
     increment = ParseExpression();
   }
   Consume(RIGHT_PAREN, "Expect ')' after for clauses.");
 
-  Statement* body = ParseStatement();
+  std::unique_ptr<Statement> body = ParseStatement();
 
   // If there's an increment, move it into the for loops local scope and
   if (increment != nullptr) {
-    body = new Block(
-        std::vector<Statement*>({body, new ExpressionStatement(increment)}));
+    std::unique_ptr<Statement> expression;
+    expression.reset(new ExpressionStatement(std::move(increment)));
+
+    std::vector<std::unique_ptr<Statement>> statements;
+    statements.emplace_back(std::move(body));
+    statements.emplace_back(std::move(expression));
+    body.reset(new Block(std::move(statements)));
   }
 
   if (condition == nullptr) {
-    condition = new Literal(true);
+    condition.reset(new Literal(true));
   }
 
-  body = new While(condition, body);
+  body.reset(new While(std::move(condition), std::move(body)));
 
   if (initializer != nullptr) {
-    body = new Block(std::vector<Statement*>({initializer, body}));
+    std::vector<std::unique_ptr<Statement>> statements;
+    statements.emplace_back(std::move(initializer));
+    statements.emplace_back(std::move(body));
+    body.reset(new Block(std::move(statements)));
   }
 
-  return body;
+  return std::move(body);
 }
 
-Statement* Parser::ParseFunction(const std::string& kind) {
+std::unique_ptr<Statement> Parser::ParseFunction(const std::string& kind) {
   Token name = Consume(IDENTIFIER, "Expect " + kind + " name.");
   Consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
 
@@ -287,9 +313,11 @@ Statement* Parser::ParseFunction(const std::string& kind) {
   Consume(RIGHT_PAREN, "Expect ')' after parameters.");
 
   Consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
-  std::vector<Statement*> body = ParseBlockStatements();
+  std::vector<std::unique_ptr<Statement>> body = ParseBlockStatements();
 
-  return new Function(name, parameters, body);
+  std::unique_ptr<Statement> statement;
+  statement.reset(new Function(name, parameters, std::move(body)));
+  return std::move(statement);
 }
 
 // -------------------------------- EXPRESSIONS --------------------------------
@@ -298,179 +326,205 @@ Statement* Parser::ParseFunction(const std::string& kind) {
 /// initial pointer expression is being passed into the binary expression and
 /// that the binary expression isn't holding a reference to itself after
 /// assignment.
-Expression* Parser::ParseEquality() {
-  Expression* expression = ParseComparison();
+std::unique_ptr<Expression> Parser::ParseEquality() {
+  std::unique_ptr<Expression> expression = ParseComparison();
 
   while (CheckTokens({BANG_EQUAL, EQUAL_EQUAL})) {
     Token expr_operator = Previous();
-    Expression* right_side = ParseComparison();
-    expression = new Binary(expression, expr_operator, right_side);
+    std::unique_ptr<Expression> right_side = ParseComparison();
+    expression.reset(
+        new Binary(
+            std::move(expression), expr_operator, std::move(right_side)));
   }
 
-  return expression;
+  return std::move(expression);
 }
 
-Expression* Parser::ParseAssignment() {
-  Expression* expression = ParseOr();
+std::unique_ptr<Expression> Parser::ParseAssignment() {
+  std::unique_ptr<Expression> expression = ParseOr();
 
   if (CheckTokens({EQUAL})) {
     Token equals = Previous();
-    Expression* value = ParseAssignment();
+    std::unique_ptr<Expression> value = ParseAssignment();
 
-    if (Variable* var = dynamic_cast<Variable*>(expression)) {
-      return new Assign(var->GetName(), value);
+    if (Variable* var = dynamic_cast<Variable*>(expression.get())) {
+      expression.reset(new Assign(var->GetName(), std::move(value)));
+      return std::move(expression);
     }
 
     Error(equals, "Ivalid assignment target");
   }
 
-  return expression;
+  return std::move(expression);
 }
 
-Expression* Parser::ParseExpression() {
-  return ParseAssignment();
+std::unique_ptr<Expression> Parser::ParseExpression() {
+  return std::move(ParseAssignment());
 }
 
 /// @brief Parses primary expressions into literals.
-Expression* Parser::ParsePrimary() {
+std::unique_ptr<Expression> Parser::ParsePrimary() {
+  std::unique_ptr<Expression> expression;
+
     if (CheckTokens({FALSE})) {
-      return new Literal(false);
+      expression.reset(new Literal(false));
+      return std::move(expression);
     }
 
     if (CheckTokens({TRUE})) {
-      return new Literal(true);
+      expression.reset(new Literal(true));
+      return std::move(expression);
     }
 
     if (CheckTokens({NIL})) {
-      return new Literal();
+      expression.reset(new Literal());
+      return std::move(expression);
     }
 
     if (CheckTokens({NUMBER, STRING})) {
       Token token = Previous();
 
       if (token.Literal.type() == typeid(double)) {
-        return new Literal(std::any_cast<double>(token.Literal));
+        expression.reset(new Literal(std::any_cast<double>(token.Literal)));
+        return std::move(expression);
       }
 
-      return new Literal(std::any_cast<std::string&>(token.Literal));
+      expression.reset(new Literal(std::any_cast<std::string&>(token.Literal)));
+      return std::move(expression);
     }
 
     if (CheckTokens({IDENTIFIER})) {
-      return new Variable(Previous());
+      expression.reset(new Variable(Previous()));
+      return std::move(expression);
     }
 
     if (CheckTokens({LEFT_PAREN})) {
-      Expression* expression = ParseExpression();
+      std::unique_ptr<Expression> expression = ParseExpression();
       Consume(RIGHT_PAREN, "Expect ')' after expression");
-      return new Grouping(expression);
+      expression.reset(new Grouping(std::move(expression)));
+      return std::move(expression);
     }
 
     throw Error(Peek(), "Expect expression.");
 }
 
 /// Precedence will have ! parsed first and then - afterwards.
-Expression* Parser::ParseUnary() {
+std::unique_ptr<Expression> Parser::ParseUnary() {
   if (CheckTokens({BANG, MINUS})) {
     Token unary_operator = Previous();
-    Expression* right_side = ParseUnary();
-    return new Unary(unary_operator, right_side);
+    std::unique_ptr<Expression> right_side = ParseUnary();
+    right_side.reset(new Unary(unary_operator, std::move(right_side)));
+    return std::move(right_side);
   }
 
-  return ParseCall();
+  return std::move(ParseCall());
 }
 
 /// Checks for subtraction first and then addition after.
-Expression* Parser::ParseTerm() {
-  Expression* expression = ParseFactor();
+std::unique_ptr<Expression> Parser::ParseTerm() {
+  std::unique_ptr<Expression> expression = ParseFactor();
 
   while (CheckTokens({MINUS, PLUS})) {
     Token expr_operator = Previous();
-    Expression* right_side = ParseUnary();
-    expression = new Binary(expression, expr_operator, right_side);
+    std::unique_ptr<Expression> right_side = ParseUnary();
+    expression.reset(
+        new Binary(
+            std::move(expression), expr_operator, std::move(right_side)));
   }
 
-  return expression;
+  return std::move(expression);
 }
 
-Expression* Parser::ParseFactor() {
-  Expression* expression = ParseUnary();
+std::unique_ptr<Expression> Parser::ParseFactor() {
+  std::unique_ptr<Expression> expression = ParseUnary();
 
   while (CheckTokens({SLASH, STAR, MODULUS})) {
     Token expr_operator = Previous();
-    Expression* right_side = ParseUnary();
-    expression = new Binary(expression, expr_operator, right_side);
+    std::unique_ptr<Expression> right_side = ParseUnary();
+    expression.reset(
+        new Binary(
+            std::move(expression), expr_operator, std::move(right_side)));
   }
 
-  return expression;
+  return std::move(expression);
 }
 
 /// This matches >, >=, <, <= and creates a Binary expression from the
 /// result of the parse.
-Expression* Parser::ParseComparison() {
-  Expression* expression = ParseTerm();
+std::unique_ptr<Expression> Parser::ParseComparison() {
+  std::unique_ptr<Expression> expression = ParseTerm();
 
   while (CheckTokens({GREATER, GREATER_EQUAL, LESS, LESS_EQUAL})) {
     Token expr_operator = Previous();
-    Expression* right_side = ParseTerm();
-    expression = new Binary(expression, expr_operator, right_side);
+    std::unique_ptr<Expression> right_side = ParseTerm();
+    expression.reset(
+        new Binary(
+            std::move(expression), expr_operator, std::move(right_side)));
   }
 
-  return expression;
+  return std::move(expression);
 }
 
-Expression* Parser::ParseOr() {
-  Expression* expression = ParseAnd();
+std::unique_ptr<Expression> Parser::ParseOr() {
+  std::unique_ptr<Expression> expression = ParseAnd();
 
   while (CheckTokens({OR})) {
     Token or_operator = Previous();
-    Expression* right_operand = ParseAnd();
-    expression = new Logical(expression, or_operator, right_operand);
+    std::unique_ptr<Expression> right_operand = ParseAnd();
+    expression.reset(
+        new Logical(
+            std::move(expression), or_operator, std::move(right_operand)));
   }
 
-  return expression;
+  return std::move(expression);
 }
 
-Expression* Parser::ParseAnd() {
-  Expression* expression = ParseEquality();
+std::unique_ptr<Expression> Parser::ParseAnd() {
+  std::unique_ptr<Expression> expression = ParseEquality();
 
   while (CheckTokens({AND})) {
     Token and_operator = Previous();
-    Expression* right_operand = ParseEquality();
-    expression = new Logical(expression, and_operator, right_operand);
+    std::unique_ptr<Expression> right_operand = ParseEquality();
+    expression.reset(
+        new Logical(
+            std::move(expression), and_operator, std::move(right_operand)));
   }
 
-  return expression;
+  return std::move(expression);
 }
 
-Expression* Parser::ParseCall() {
-  Expression* expression = ParsePrimary();
+std::unique_ptr<Expression> Parser::ParseCall() {
+  std::unique_ptr<Expression> expression = ParsePrimary();
 
   while (true) {
     if (CheckTokens({LEFT_PAREN})) {
-      expression = FinishCall(expression);
+      expression = FinishCall(std::move(expression));
     } else {
       break;
     }
   }
 
-  return expression;
+  return std::move(expression);
 }
 
-Expression* Parser::FinishCall(Expression* callee) {
-  std::vector<Expression*> arguments;
+std::unique_ptr<Expression> Parser::FinishCall(
+    std::unique_ptr<Expression> callee) {
+  std::vector<std::unique_ptr<Expression>> arguments;
 
   if (!CheckToken(RIGHT_PAREN)) {
     do {
       if (arguments.size() >= 255) {
         Error(Peek(), "Can't have more than 255 arguments.");
       }
-      arguments.push_back(ParseExpression());
+      arguments.emplace_back(std::move(ParseExpression()));
     } while (CheckTokens({COMMA}));
   }
 
   Token parent = Consume(RIGHT_PAREN, "Expect ')' after arguments.");
 
-  return new Call(callee, parent, arguments);
+  std::unique_ptr<Expression> expression;
+  expression.reset(new Call(std::move(callee), parent, std::move(arguments)));
+  return std::move(expression);
 }
 
 }  // namespace lamscript

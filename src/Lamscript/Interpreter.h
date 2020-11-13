@@ -2,6 +2,7 @@
 #define SRC_LAMSCRIPT_INTERPRETER_H_
 
 #include <any>
+#include <memory>
 #include <typeinfo>
 
 #include <Lamscript/Environment.h>
@@ -48,10 +49,11 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
 
   // Primary external API
 
-  void Interpret(std::vector<Statement*> statements);
+  void Interpret(const std::vector<std::unique_ptr<Statement>>& statements);
   void Execute(Statement* statement);
   void ExecuteBlock(
-      std::vector<Statement*> statements, Environment* current_env);
+      const std::vector<std::unique_ptr<Statement>>& statements,
+      Environment* current_env);
 
   Environment* GetGlobalEnvironment() const { return globals_; }
 

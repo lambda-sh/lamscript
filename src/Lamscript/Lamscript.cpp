@@ -1,6 +1,7 @@
 #include <Lamscript/Lamscript.h>
 
 #include <any>
+#include <memory>
 
 #include <Lamscript/AstPrinter.h>
 #include <Lamscript/Parser.h>
@@ -21,7 +22,7 @@ void Lamscript::Run(const std::string& source) {
   std::vector<Token> tokens = scanner.ScanTokens();
 
   Parser parser = Parser(tokens);
-  std::vector<Statement*> statements = parser.Parse();
+  std::vector<std::unique_ptr<Statement>> statements = parser.Parse();
 
   if (had_error_) {
     had_error_ = false;

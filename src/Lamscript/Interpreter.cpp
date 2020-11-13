@@ -166,8 +166,8 @@ std::any Interpreter::VisitCallExpression(Call* expression) {
   std::any callee = Evaluate(expression->GetCallee());
   std::vector<std::any> arguments;
 
-  for (Expression* argument : expression->GetArguments()) {
-    arguments.push_back(Evaluate(argument));
+  for (auto&& argument : expression->GetArguments()) {
+    arguments.push_back(Evaluate(argument.get()));
   }
 
   try {
@@ -241,10 +241,11 @@ std::any Interpreter::VisitFunctionStatement(Function* statement) {
   return NULL;
 }
 
-void Interpreter::Interpret(std::vector<Statement*> statements) {
+void Interpreter::Interpret(
+    const std::vector<std::unique_ptr<Statement>>& statements) {
   try {
-    for (Statement* statement : statements) {
-      Execute(statement);
+    for (auto&& statement : statements) {
+      Execute(statement.get());
     }
   } catch (const RuntimeError& error) {
     Lamscript::RuntimeError(error);
@@ -256,14 +257,15 @@ void Interpreter::Execute(Statement* statement) {
 }
 
 void Interpreter::ExecuteBlock(
-    std::vector<Statement*> statements, Environment* current_env) {
+    const std::vector<std::unique_ptr<Statement>>& statements,
+    Environment* current_env) {
   Environment* previous = environment_;
 
   try {
     environment_ = current_env;
 
-    for (Statement* statement : statements) {
-      Execute(statement);
+    for (auto&& statement : statements) {
+      Execute(statement.get());
     }
   } catch(const RuntimeError& error) {
     Lamscript::RuntimeError(error);

@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <typeinfo>
 #include <vector>
+#include <memory>
 
 #include <Lamscript/Expression.h>
 #include <Lamscript/Statement.h>
@@ -29,7 +30,7 @@ class Parser {
       : tokens_(tokens), current_token_(0) {}
 
   /// @brief Begins parsing all tokens provided to the Parser.
-  std::vector<Statement*> Parse();
+  std::vector<std::unique_ptr<Statement>> Parse();
 
  private:
   std::vector<Token> tokens_;
@@ -70,77 +71,77 @@ class Parser {
   /// @brief Attempts to parse a variable declaration statement. If a variable
   /// declaration isn't found, it will continue trying to parse other types of
   /// statements.
-  Statement* ParseDeclaration();
+  std::unique_ptr<Statement> ParseDeclaration();
 
   /// @brief Parse Variable declaration and returns a VariableStatement when
   /// successfully done.
-  Statement* ParseVariableDeclaration();
+  std::unique_ptr<Statement> ParseVariableDeclaration();
 
   /// @brief Parses block statements produced from bracket {} tokens and returns
   /// the list of statements that belong to that scope.
-  std::vector<Statement*> ParseBlockStatements();
+  std::vector<std::unique_ptr<Statement>> ParseBlockStatements();
 
   /// @brief Generic statement parsing that parses for more generic statements.
   /// See the docs or cpp file for more information on precedence/order.
-  Statement* ParseStatement();
+  std::unique_ptr<Statement> ParseStatement();
 
   /// @brief Parses the current print and the expression that is being printed.
-  Statement* ParsePrintStatement();
+  std::unique_ptr<Statement> ParsePrintStatement();
 
   /// @brief Parses the current expression statement. This is the simplest type
   /// of statement that can be produced.
-  Statement* ParseExpressionStatement();
+  std::unique_ptr<Statement> ParseExpressionStatement();
 
   /// @brief Parses conditional if/then/else statements.
-  Statement* ParseIfStatement();
+  std::unique_ptr<Statement> ParseIfStatement();
 
   /// @brief Parses while statements.
-  Statement* ParseWhileStatement();
+  std::unique_ptr<Statement> ParseWhileStatement();
 
   /// @brief Parses for statements.
-  Statement* ParseForStatement();
+  std::unique_ptr<Statement> ParseForStatement();
 
   /// @brief Parses function statements.
-  Statement* ParseFunction(const std::string& kind);
+  std::unique_ptr<Statement> ParseFunction(const std::string& kind);
 
   // ---------------------------- PARSE EXPRESSIONS ----------------------------
 
   /// @brief Parses an equality for as long as there are equal signs and
   /// continually chain the previous expression e.g. `true == false;`
-  Expression* ParseEquality();
+  std::unique_ptr<Expression> ParseEquality();
 
   /// @brief Parses an assignment expression e.g. `x = 4;`
-  Expression* ParseAssignment();
+  std::unique_ptr<Expression> ParseAssignment();
 
   /// @brief Generically parses an expression. Starts off with assignment.
-  Expression* ParseExpression();
+  std::unique_ptr<Expression> ParseExpression();
 
   /// @brief Parses primary expressions into literals. e.g. `"hello, world!"`
-  Expression* ParsePrimary();
+  std::unique_ptr<Expression> ParsePrimary();
 
   /// @brief Parse Unary Tokens. e.g. `-x || !x;`
-  Expression* ParseUnary();
+  std::unique_ptr<Expression> ParseUnary();
 
   /// @brief Parse subtraction and addition terms. e.g. `x + 5;`
-  Expression* ParseTerm();
+  std::unique_ptr<Expression> ParseTerm();
 
   /// @brief Parses division and multiplication. e.g. `x * 5;`
-  Expression* ParseFactor();
+  std::unique_ptr<Expression> ParseFactor();
 
   /// @brief Parse the current comparison being made.
-  Expression* ParseComparison();
+  std::unique_ptr<Expression> ParseComparison();
 
   /// @brief Parse Or comparisons. e.g. `10 or nil;`.
-  Expression* ParseOr();
+  std::unique_ptr<Expression> ParseOr();
 
   /// @brief Parse And comparisons. e.g. `10 and nil;`.
-  Expression* ParseAnd();
+  std::unique_ptr<Expression> ParseAnd();
 
   /// @brief Parse a function or method call.
-  Expression* ParseCall();
+  std::unique_ptr<Expression> ParseCall();
 
   /// @brief Finishes up a function or method call.
-  Expression* FinishCall(Expression* callee);
+  std::unique_ptr<Expression> FinishCall(std::unique_ptr<Expression> callee);
 };
 
 }  // namespace lamscript
