@@ -2,10 +2,10 @@
 #define SRC_LAMSCRIPT_PARSER_H_
 
 #include <initializer_list>
+#include <memory>
 #include <stdexcept>
 #include <typeinfo>
 #include <vector>
-#include <memory>
 
 #include <Lamscript/Expression.h>
 #include <Lamscript/Statement.h>
@@ -53,7 +53,8 @@ class Parser {
   bool CheckToken(const TokenType& token_type);
 
   /// @brief validates that the current token matches any given set of types.
-  bool CheckTokens(const std::initializer_list<TokenType>& token_types);
+  bool CheckAndConsumeTokens(
+      const std::initializer_list<TokenType>& token_types);
 
   /// @brief Upon an error occurring, we synchronize the parser to get to the
   /// next potentially valid expression/statement.

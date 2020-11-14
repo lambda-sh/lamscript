@@ -56,8 +56,8 @@ bool Parser::CheckToken(const TokenType& token_type) {
   return Peek().Type == token_type;
 }
 
-/// @brief validates that the current token matches any given set of types.
-bool Parser::CheckTokens(const std::initializer_list<TokenType>& token_types) {
+bool Parser::CheckAndConsumeTokens(
+    const std::initializer_list<TokenType>& token_types) {
   for (TokenType token_type : token_types) {
     if (CheckToken(token_type)) {
       Advance();
@@ -111,11 +111,11 @@ Token Parser::Consume(TokenType type, const std::string& message) {
 /// statement.
 std::unique_ptr<Statement> Parser::ParseDeclaration() {
   try {
-    if (CheckTokens({FUN})) {
+    if (CheckAndConsumeTokens({FUN})) {
       return std::move(ParseFunction("function"));
     }
 
-    if (CheckTokens({VAR})) {
+    if (CheckAndConsumeTokens({VAR})) {
         return std::move(ParseVariableDeclaration());
     }
 
@@ -131,7 +131,7 @@ std::unique_ptr<Statement> Parser::ParseVariableDeclaration() {
   std::unique_ptr<Expression> initializer = nullptr;
 
   // Variables can be optionally initialized.
-  if (CheckTokens({EQUAL})) {
+  if (CheckAndConsumeTokens({EQUAL})) {
     initializer = ParseExpression();
   }
 
@@ -162,23 +162,23 @@ std::vector<std::unique_ptr<Statement>> Parser::ParseBlockStatements() {
 /// * Block statements.
 /// * Expression statements.
 std::unique_ptr<Statement> Parser::ParseStatement() {
-  if (CheckTokens({FOR})) {
+  if (CheckAndConsumeTokens({FOR})) {
     return std::move(ParseForStatement());
   }
 
-  if (CheckTokens({IF})) {
+  if (CheckAndConsumeTokens({IF})) {
     return std::move(ParseIfStatement());
   }
 
-  if (CheckTokens({PRINT})) {
+  if (CheckAndConsumeTokens({PRINT})) {
     return std::move(ParsePrintStatement());
   }
 
-  if (CheckTokens({WHILE})) {
+  if (CheckAndConsumeTokens({WHILE})) {
     return std::move(ParseWhileStatement());
   }
 
-  if (CheckTokens({LEFT_BRACE})) {
+  if (CheckAndConsumeTokens({LEFT_BRACE})) {
     std::unique_ptr<Statement> statement;
     statement.reset(new Block(ParseBlockStatements()));
     return std::move(statement);
@@ -214,7 +214,7 @@ std::unique_ptr<Statement> Parser::ParseIfStatement() {
   std::unique_ptr<Statement> then_branch = ParseStatement();
   std::unique_ptr<Statement> else_branch = nullptr;
 
-  if (CheckTokens({ELSE})) {
+  if (CheckAndConsumeTokens({ELSE})) {
     else_branch = ParseStatement();
   }
 
@@ -243,9 +243,9 @@ std::unique_ptr<Statement> Parser::ParseForStatement() {
   std::unique_ptr<Statement> initializer = nullptr;
 
   // Parse the initializer.
-  if (CheckTokens({SEMICOLON})) {
+  if (CheckAndConsumeTokens({SEMICOLON})) {
     initializer = nullptr;
-  } else if (CheckTokens({VAR})) {
+  } else if (CheckAndConsumeTokens({VAR})) {
     initializer = ParseVariableDeclaration();
   } else {
     initializer = ParseExpressionStatement();
@@ -308,7 +308,7 @@ std::unique_ptr<Statement> Parser::ParseFunction(const std::string& kind) {
       }
 
       parameters.push_back(Consume(IDENTIFIER, "Expect parameter name."));
-    } while (CheckTokens({COMMA}));
+    } while (CheckAndConsumeTokens({COMMA}));
   }
   Consume(RIGHT_PAREN, "Expect ')' after parameters.");
 
@@ -329,7 +329,7 @@ std::unique_ptr<Statement> Parser::ParseFunction(const std::string& kind) {
 std::unique_ptr<Expression> Parser::ParseEquality() {
   std::unique_ptr<Expression> expression = ParseComparison();
 
-  while (CheckTokens({BANG_EQUAL, EQUAL_EQUAL})) {
+  while (CheckAndConsumeTokens({BANG_EQUAL, EQUAL_EQUAL})) {
     Token expr_operator = Previous();
     std::unique_ptr<Expression> right_side = ParseComparison();
     expression.reset(
@@ -343,7 +343,7 @@ std::unique_ptr<Expression> Parser::ParseEquality() {
 std::unique_ptr<Expression> Parser::ParseAssignment() {
   std::unique_ptr<Expression> expression = ParseOr();
 
-  if (CheckTokens({EQUAL})) {
+  if (CheckAndConsumeTokens({EQUAL})) {
     Token equals = Previous();
     std::unique_ptr<Expression> value = ParseAssignment();
 
@@ -366,22 +366,22 @@ std::unique_ptr<Expression> Parser::ParseExpression() {
 std::unique_ptr<Expression> Parser::ParsePrimary() {
   std::unique_ptr<Expression> expression;
 
-    if (CheckTokens({FALSE})) {
+    if (CheckAndConsumeTokens({FALSE})) {
       expression.reset(new Literal(false));
       return std::move(expression);
     }
 
-    if (CheckTokens({TRUE})) {
+    if (CheckAndConsumeTokens({TRUE})) {
       expression.reset(new Literal(true));
       return std::move(expression);
     }
 
-    if (CheckTokens({NIL})) {
+    if (CheckAndConsumeTokens({NIL})) {
       expression.reset(new Literal());
       return std::move(expression);
     }
 
-    if (CheckTokens({NUMBER, STRING})) {
+    if (CheckAndConsumeTokens({NUMBER, STRING})) {
       Token token = Previous();
 
       if (token.Literal.type() == typeid(double)) {
@@ -393,12 +393,12 @@ std::unique_ptr<Expression> Parser::ParsePrimary() {
       return std::move(expression);
     }
 
-    if (CheckTokens({IDENTIFIER})) {
+    if (CheckAndConsumeTokens({IDENTIFIER})) {
       expression.reset(new Variable(Previous()));
       return std::move(expression);
     }
 
-    if (CheckTokens({LEFT_PAREN})) {
+    if (CheckAndConsumeTokens({LEFT_PAREN})) {
       std::unique_ptr<Expression> expression = ParseExpression();
       Consume(RIGHT_PAREN, "Expect ')' after expression");
       expression.reset(new Grouping(std::move(expression)));
@@ -410,7 +410,7 @@ std::unique_ptr<Expression> Parser::ParsePrimary() {
 
 /// Precedence will have ! parsed first and then - afterwards.
 std::unique_ptr<Expression> Parser::ParseUnary() {
-  if (CheckTokens({BANG, MINUS})) {
+  if (CheckAndConsumeTokens({BANG, MINUS})) {
     Token unary_operator = Previous();
     std::unique_ptr<Expression> right_side = ParseUnary();
     right_side.reset(new Unary(unary_operator, std::move(right_side)));
@@ -424,7 +424,7 @@ std::unique_ptr<Expression> Parser::ParseUnary() {
 std::unique_ptr<Expression> Parser::ParseTerm() {
   std::unique_ptr<Expression> expression = ParseFactor();
 
-  while (CheckTokens({MINUS, PLUS})) {
+  while (CheckAndConsumeTokens({MINUS, PLUS})) {
     Token expr_operator = Previous();
     std::unique_ptr<Expression> right_side = ParseUnary();
     expression.reset(
@@ -438,7 +438,7 @@ std::unique_ptr<Expression> Parser::ParseTerm() {
 std::unique_ptr<Expression> Parser::ParseFactor() {
   std::unique_ptr<Expression> expression = ParseUnary();
 
-  while (CheckTokens({SLASH, STAR, MODULUS})) {
+  while (CheckAndConsumeTokens({SLASH, STAR, MODULUS})) {
     Token expr_operator = Previous();
     std::unique_ptr<Expression> right_side = ParseUnary();
     expression.reset(
@@ -454,7 +454,7 @@ std::unique_ptr<Expression> Parser::ParseFactor() {
 std::unique_ptr<Expression> Parser::ParseComparison() {
   std::unique_ptr<Expression> expression = ParseTerm();
 
-  while (CheckTokens({GREATER, GREATER_EQUAL, LESS, LESS_EQUAL})) {
+  while (CheckAndConsumeTokens({GREATER, GREATER_EQUAL, LESS, LESS_EQUAL})) {
     Token expr_operator = Previous();
     std::unique_ptr<Expression> right_side = ParseTerm();
     expression.reset(
@@ -468,7 +468,7 @@ std::unique_ptr<Expression> Parser::ParseComparison() {
 std::unique_ptr<Expression> Parser::ParseOr() {
   std::unique_ptr<Expression> expression = ParseAnd();
 
-  while (CheckTokens({OR})) {
+  while (CheckAndConsumeTokens({OR})) {
     Token or_operator = Previous();
     std::unique_ptr<Expression> right_operand = ParseAnd();
     expression.reset(
@@ -482,7 +482,7 @@ std::unique_ptr<Expression> Parser::ParseOr() {
 std::unique_ptr<Expression> Parser::ParseAnd() {
   std::unique_ptr<Expression> expression = ParseEquality();
 
-  while (CheckTokens({AND})) {
+  while (CheckAndConsumeTokens({AND})) {
     Token and_operator = Previous();
     std::unique_ptr<Expression> right_operand = ParseEquality();
     expression.reset(
@@ -497,7 +497,7 @@ std::unique_ptr<Expression> Parser::ParseCall() {
   std::unique_ptr<Expression> expression = ParsePrimary();
 
   while (true) {
-    if (CheckTokens({LEFT_PAREN})) {
+    if (CheckAndConsumeTokens({LEFT_PAREN})) {
       expression = FinishCall(std::move(expression));
     } else {
       break;
@@ -517,7 +517,7 @@ std::unique_ptr<Expression> Parser::FinishCall(
         Error(Peek(), "Can't have more than 255 arguments.");
       }
       arguments.emplace_back(std::move(ParseExpression()));
-    } while (CheckTokens({COMMA}));
+    } while (CheckAndConsumeTokens({COMMA}));
   }
 
   Token parent = Consume(RIGHT_PAREN, "Expect ')' after arguments.");
