@@ -5,7 +5,7 @@
 
 #include <Lamscript/Environment.h>
 #include <Lamscript/Interpreter.h>
-#include <Lamscript/parsable/Callable.h>
+#include <Lamscript/parsable/LamscriptCallable.h>
 #include <Lamscript/parsable/Statement.h>
 
 namespace lamscript {
