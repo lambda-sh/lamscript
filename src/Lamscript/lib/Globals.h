@@ -5,12 +5,12 @@
 #include <chrono>
 #include <vector>
 
-#include <Lamscript/parsable/LamscriptCallable.h>
+#include <Lamscript/parsed/LamscriptCallable.h>
 
 namespace lamscript {
 namespace lib {
 
-class Clock : public parsable::LamscriptCallable {
+class Clock : public parsed::LamscriptCallable {
  public:
   int Arity() const override { return 0; }
   std::any Call(

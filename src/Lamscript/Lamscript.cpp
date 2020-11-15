@@ -3,8 +3,8 @@
 #include <any>
 #include <memory>
 
-#include <Lamscript/parsing/Parser.h>
 #include <Lamscript/RuntimeError.h>
+#include <Lamscript/parsing/Parser.h>
 #include <Lamscript/parsing/Scanner.h>
 
 namespace lamscript {
@@ -21,7 +21,7 @@ void Lamscript::Run(const std::string& source) {
   std::vector<parsing::Token> tokens = scanner.ScanTokens();
 
   parsing::Parser parser = parsing::Parser(tokens);
-  std::vector<std::unique_ptr<parsable::Statement>> statements = parser.Parse();
+  std::vector<std::unique_ptr<parsed::Statement>> statements = parser.Parse();
 
   if (had_error_) {
     had_error_ = false;
