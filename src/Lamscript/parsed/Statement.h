@@ -1,11 +1,11 @@
-#ifndef SRC_LAMSCRIPT_PARSABLE_STATEMENT_H_
-#define SRC_LAMSCRIPT_PARSABLE_STATEMENT_H_
+#ifndef SRC_LAMSCRIPT_PARSED_STATEMENT_H_
+#define SRC_LAMSCRIPT_PARSED_STATEMENT_H_
 
 #include <any>
 #include <memory>
 #include <vector>
 
-#include <Lamscript/parsable/Expression.h>
+#include <Lamscript/parsed/Expression.h>
 
 namespace lamscript {
 
@@ -13,7 +13,7 @@ namespace lamscript {
 // file.
 class StatementVisitor;
 
-namespace parsable {
+namespace parsed {
 
 class Statement {
  public:
@@ -168,7 +168,7 @@ class While : public Statement {
   std::unique_ptr<Statement> body_;
 };
 
-}  // namespace parsable
+}  // namespace parsed
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_PARSABLE_STATEMENT_H_
+#endif  // SRC_LAMSCRIPT_PARSED_STATEMENT_H_

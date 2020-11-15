@@ -1,9 +1,9 @@
-#include <Lamscript/parsable/Statement.h>
+#include <Lamscript/parsed/Statement.h>
 
 #include <Lamscript/Visitor.h>
 
 namespace lamscript {
-namespace parsable {
+namespace parsed {
 
 std::any Block::Accept(StatementVisitor* visitor) {
   return visitor->VisitBlockStatement(this);
@@ -41,5 +41,5 @@ std::any While::Accept(StatementVisitor* visitor) {
   return visitor->VisitWhileStatement(this);
 }
 
-}  // namespace parsable
+}  // namespace parsed
 }  // namespace lamscript

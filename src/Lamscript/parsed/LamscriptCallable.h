@@ -1,5 +1,5 @@
-#ifndef SRC_LAMSCRIPT_PARSABLE_LAMSCRIPTCALLABLE_H_
-#define SRC_LAMSCRIPT_PARSABLE_LAMSCRIPTCALLABLE_H_
+#ifndef SRC_LAMSCRIPT_PARSED_LAMSCRIPTCALLABLE_H_
+#define SRC_LAMSCRIPT_PARSED_LAMSCRIPTCALLABLE_H_
 
 #include <any>
 #include <vector>
@@ -8,7 +8,7 @@
 #include <Lamscript/Interpreter.h>
 
 namespace lamscript {
-namespace parsable {
+namespace parsed {
 
 class LamscriptCallable {
  public:
@@ -18,7 +18,7 @@ class LamscriptCallable {
   virtual std::string ToString() const = 0;
 };
 
-}  // namespace parsable
+}  // namespace parsed
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_PARSABLE_LAMSCRIPTCALLABLE_H_
+#endif  // SRC_LAMSCRIPT_PARSED_LAMSCRIPTCALLABLE_H_

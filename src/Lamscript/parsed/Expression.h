@@ -1,5 +1,5 @@
-#ifndef SRC_LAMSCRIPT_PARSABLE_EXPRESSION_H_
-#define SRC_LAMSCRIPT_PARSABLE_EXPRESSION_H_
+#ifndef SRC_LAMSCRIPT_PARSED_EXPRESSION_H_
+#define SRC_LAMSCRIPT_PARSED_EXPRESSION_H_
 
 #include <any>
 #include <memory>
@@ -13,7 +13,7 @@ namespace lamscript {
 /// another
 class ExpressionVisitor;
 
-namespace parsable {
+namespace parsed {
 
 class Expression {
  public:
@@ -214,7 +214,7 @@ class Variable : public Expression {
 };
 
 
-}  // namespace parsable
+}  // namespace parsed
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_PARSABLE_EXPRESSION_H_
+#endif  // SRC_LAMSCRIPT_PARSED_EXPRESSION_H_

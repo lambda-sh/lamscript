@@ -1,11 +1,11 @@
-#include <Lamscript/parsable/Expression.h>
+#include <Lamscript/parsed/Expression.h>
 
 #include <any>
 
 #include <Lamscript/Visitor.h>
 
 namespace lamscript {
-namespace parsable {
+namespace parsed {
 
 std::any Binary::Accept(ExpressionVisitor* visitor) {
   return visitor->VisitBinaryExpression(this);
@@ -55,5 +55,5 @@ std::any Variable::Accept(ExpressionVisitor* visitor) {
   return visitor->VisitVariableExpression(this);
 }
 
-}  // namespace parsable
+}  // namespace parsed
 }  // namespace lamscript
