@@ -5,11 +5,11 @@
 #include <string>
 #include <typeinfo>
 
-#include <Lamscript/Callable.h>
-#include <Lamscript/Function.h>
-#include <Lamscript/Globals.h>
 #include <Lamscript/Lamscript.h>
-#include <Lamscript/Statement.h>
+#include <Lamscript/lib/Globals.h>
+#include <Lamscript/parsable/LamscriptCallable.h>
+#include <Lamscript/parsable/LamscriptFunction.h>
+#include <Lamscript/parsable/Statement.h>
 
 namespace lamscript {
 
@@ -33,31 +33,31 @@ Interpreter::Interpreter()
     : globals_(new Environment()), environment_(globals_) {
   globals_->SetVariable(
       Token{FUN, "clock", nullptr, 0},
-      reinterpret_cast<LamscriptCallable*>(new Clock()));
+      reinterpret_cast<parsable::LamscriptCallable*>(new lib::Clock()));
 }
 
 
 // --------------------------------- EXPRESSIONS -------------------------------
 
-std::any Interpreter::VisitAssignExpression(Assign* expression) {
+std::any Interpreter::VisitAssignExpression(parsable::Assign* expression) {
   std::any value = Evaluate(expression->GetValue());
   environment_->AssignVariable(expression->GetName(), value);
   return value;
 }
 
-std::any Interpreter::VisitLiteralExpression(Literal* expression) {
+std::any Interpreter::VisitLiteralExpression(parsable::Literal* expression) {
   return expression->GetValue();
 }
 
-std::any Interpreter::VisitGroupingExpression(Grouping* expression) {
+std::any Interpreter::VisitGroupingExpression(parsable::Grouping* expression) {
   return Evaluate(expression->GetExpression());
 }
 
-std::any Interpreter::VisitVariableExpression(Variable* variable) {
+std::any Interpreter::VisitVariableExpression(parsable::Variable* variable) {
   return environment_->GetVariable(variable->GetName());
 }
 
-std::any Interpreter::VisitUnaryExpression(Unary* expression) {
+std::any Interpreter::VisitUnaryExpression(parsable::Unary* expression) {
   std::any right_side = Evaluate(expression);
 
   switch (expression->GetUnaryOperator().Type) {
@@ -71,7 +71,7 @@ std::any Interpreter::VisitUnaryExpression(Unary* expression) {
   return nullptr;
 }
 
-std::any Interpreter::VisitBinaryExpression(Binary* expression) {
+std::any Interpreter::VisitBinaryExpression(parsable::Binary* expression) {
   std::any left_side = Evaluate(expression->GetLeftSide());
   std::any right_side = Evaluate(expression->GetRightSide());
 
@@ -145,7 +145,7 @@ std::any Interpreter::VisitBinaryExpression(Binary* expression) {
   return nullptr;
 }
 
-std::any Interpreter::VisitLogicalExpression(Logical* expression) {
+std::any Interpreter::VisitLogicalExpression(parsable::Logical* expression) {
   std::any left_side = Evaluate(expression->GetLeftOperand());
   bool left_is_truthy = IsTruthy(left_side);
 
@@ -162,7 +162,7 @@ std::any Interpreter::VisitLogicalExpression(Logical* expression) {
   return Evaluate(expression->GetRightOperand());
 }
 
-std::any Interpreter::VisitCallExpression(Call* expression) {
+std::any Interpreter::VisitCallExpression(parsable::Call* expression) {
   std::any callee = Evaluate(expression->GetCallee());
   std::vector<std::any> arguments;
 
@@ -171,7 +171,8 @@ std::any Interpreter::VisitCallExpression(Call* expression) {
   }
 
   try {
-    LamscriptCallable* callable = AnyAs<LamscriptCallable*>(callee);
+    parsable::LamscriptCallable* callable = AnyAs<
+        parsable::LamscriptCallable*>(callee);
 
     if (callable->Arity() != arguments.size()) {
       throw RuntimeError(
@@ -190,23 +191,25 @@ std::any Interpreter::VisitCallExpression(Call* expression) {
 
 // --------------------------------- STATEMENTS --------------------------------
 
-std::any Interpreter::VisitBlockStatement(Block* statement) {
+std::any Interpreter::VisitBlockStatement(parsable::Block* statement) {
   ExecuteBlock(statement->GetStatements(), new Environment(environment_));
   return NULL;
 }
 
-std::any Interpreter::VisitPrintStatement(Print* statement) {
+std::any Interpreter::VisitPrintStatement(parsable::Print* statement) {
   std::any value = Evaluate(statement->GetExpression());
   std::cout << Stringify(value) << std::endl;
   return NULL;
 }
 
-std::any Interpreter::VisitExpressionStatement(ExpressionStatement* statement) {
+std::any Interpreter::VisitExpressionStatement(
+    parsable::ExpressionStatement* statement) {
   Evaluate(statement->GetExpression());
   return NULL;
 }
 
-std::any Interpreter::VisitVariableStatement(VariableStatement* statement) {
+std::any Interpreter::VisitVariableStatement(
+    parsable::VariableStatement* statement) {
   std::any value;
 
   if (statement->GetInitializer() != nullptr) {
@@ -217,7 +220,7 @@ std::any Interpreter::VisitVariableStatement(VariableStatement* statement) {
   return NULL;
 }
 
-std::any Interpreter::VisitIfStatement(If* statement) {
+std::any Interpreter::VisitIfStatement(parsable::If* statement) {
   if (IsTruthy(Evaluate(statement->GetCondition()))) {
     Execute(statement->GetThenBranch());
   } else if (statement->GetElseBranch() != nullptr) {
@@ -227,7 +230,7 @@ std::any Interpreter::VisitIfStatement(If* statement) {
   return NULL;
 }
 
-std::any Interpreter::VisitWhileStatement(While* statement) {
+std::any Interpreter::VisitWhileStatement(parsable::While* statement) {
   while (IsTruthy(Evaluate(statement->GetCondition()))) {
     Execute(statement->GetBody());
   }
@@ -235,14 +238,15 @@ std::any Interpreter::VisitWhileStatement(While* statement) {
   return NULL;
 }
 
-std::any Interpreter::VisitFunctionStatement(Function* statement) {
-  LamscriptCallable* func = new LamscriptFunction(statement);
+std::any Interpreter::VisitFunctionStatement(parsable::Function* statement) {
+  parsable::LamscriptCallable* func = new parsable::LamscriptFunction(
+      statement);
   environment_->SetVariable(statement->GetName(), func);
   return NULL;
 }
 
 void Interpreter::Interpret(
-    const std::vector<std::unique_ptr<Statement>>& statements) {
+    const std::vector<std::unique_ptr<parsable::Statement>>& statements) {
   try {
     for (auto&& statement : statements) {
       Execute(statement.get());
@@ -252,12 +256,12 @@ void Interpreter::Interpret(
   }
 }
 
-void Interpreter::Execute(Statement* statement) {
+void Interpreter::Execute(parsable::Statement* statement) {
   statement->Accept(this);
 }
 
 void Interpreter::ExecuteBlock(
-    const std::vector<std::unique_ptr<Statement>>& statements,
+    const std::vector<std::unique_ptr<parsable::Statement>>& statements,
     Environment* current_env) {
   Environment* previous = environment_;
 
@@ -308,7 +312,7 @@ bool Interpreter::IsTruthy(std::any object) {
   return true;
 }
 
-std::any Interpreter::Evaluate(Expression* expression) {
+std::any Interpreter::Evaluate(parsable::Expression* expression) {
   return expression->Accept(this);
 }
 
@@ -360,14 +364,13 @@ std::string Interpreter::Stringify(std::any object) {
     return AnyAs<bool&>(object) ? "true" : "false";
   }
 
-  if (object.type() == typeid(LamscriptCallable*)) {
-    return AnyAs<LamscriptCallable*>(object)->ToString();
+  if (object.type() == typeid(parsable::LamscriptCallable*)) {
+    return AnyAs<parsable::LamscriptCallable*>(object)->ToString();
   }
 
-  if (object.type() == typeid(LamscriptFunction*)) {
-    return AnyAs<LamscriptFunction*>(object)->ToString();
+  if (object.type() == typeid(parsable::LamscriptFunction*)) {
+    return AnyAs<parsable::LamscriptFunction*>(object)->ToString();
   }
-
 
   return AnyAs<std::string>(object);
 }

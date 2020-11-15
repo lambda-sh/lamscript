@@ -3,11 +3,10 @@
 #include <iostream>
 #include <vector>
 
-#include <Lamscript/AstPrinter.h>
-#include <Lamscript/Expression.h>
 #include <Lamscript/Lamscript.h>
 #include <Lamscript/Token.h>
 #include <Lamscript/TokenType.h>
+#include <Lamscript/parsable/Expression.h>
 
 int main(int argc, char** argv) {
   if (argc > 2) {
