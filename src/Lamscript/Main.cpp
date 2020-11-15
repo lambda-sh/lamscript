@@ -4,8 +4,8 @@
 #include <vector>
 
 #include <Lamscript/Lamscript.h>
-#include <Lamscript/Token.h>
-#include <Lamscript/TokenType.h>
+#include <Lamscript/parsing/Token.h>
+#include <Lamscript/parsing/TokenType.h>
 #include <Lamscript/parsable/Expression.h>
 
 int main(int argc, char** argv) {

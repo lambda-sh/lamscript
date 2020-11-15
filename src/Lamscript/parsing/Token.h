@@ -1,10 +1,10 @@
-#ifndef SRC_LAMSCRIPT_TOKEN_H_
-#define SRC_LAMSCRIPT_TOKEN_H_
+#ifndef SRC_LAMSCRIPT_PARSING_TOKEN_H_
+#define SRC_LAMSCRIPT_PARSING_TOKEN_H_
 
 #include <any>
 #include <string>
 
-#include <Lamscript/TokenType.h>
+#include <Lamscript/parsing/TokenType.h>
 
 namespace lamscript {
 
@@ -13,7 +13,6 @@ struct Token {
   std::string Lexeme;
   std::any Literal;
   int Line;
-
 
   /// @todo Fix this so that TokenTypes can easily be converted into strings
   /// later down the line.
@@ -24,4 +23,4 @@ struct Token {
 
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_TOKEN_H_
+#endif  // SRC_LAMSCRIPT_PARSING_TOKEN_H_

@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_map>
 
-#include <Lamscript/Token.h>
+#include <Lamscript/parsing/Token.h>
 
 namespace lamscript {
 

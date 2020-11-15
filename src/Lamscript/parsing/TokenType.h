@@ -1,5 +1,5 @@
-#ifndef SRC_LAMSCRIPT_TOKENTYPE_H_
-#define SRC_LAMSCRIPT_TOKENTYPE_H_
+#ifndef SRC_LAMSCRIPT_PARSING_TOKENTYPE_H_
+#define SRC_LAMSCRIPT_PARSING_TOKENTYPE_H_
 
 #include <string>
 
@@ -30,4 +30,4 @@ std::string ConvertTokenTypeToString(TokenType token_type);
 
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_TOKENTYPE_H_
+#endif  // SRC_LAMSCRIPT_PARSING_TOKENTYPE_H_

@@ -8,7 +8,7 @@
 
 #include <Lamscript/RuntimeError.h>
 #include <Lamscript/Interpreter.h>
-#include <Lamscript/Token.h>
+#include <Lamscript/parsing/Token.h>
 
 namespace lamscript {
 

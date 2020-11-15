@@ -1,6 +1,5 @@
-#ifndef SRC_LAMSCRIPT_SCANNER_H_
-#define SRC_LAMSCRIPT_SCANNER_H_
-
+#ifndef SRC_LAMSCRIPT_PARSING_SCANNER_H_
+#define SRC_LAMSCRIPT_PARSING_SCANNER_H_
 
 #include <bits/stdc++.h>
 #include <cctype>
@@ -8,8 +7,8 @@
 #include <vector>
 
 #include <Lamscript/Lamscript.h>
-#include <Lamscript/Token.h>
-#include <Lamscript/TokenType.h>
+#include <Lamscript/parsing/Token.h>
+#include <Lamscript/parsing/TokenType.h>
 
 namespace lamscript {
 
@@ -238,4 +237,4 @@ std::unordered_map<std::string, TokenType> Scanner::keywords_ =
 
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_SCANNER_H_
+#endif  // SRC_LAMSCRIPT_PARSING_SCANNER_H_

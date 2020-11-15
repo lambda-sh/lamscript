@@ -3,9 +3,9 @@
 #include <any>
 #include <memory>
 
-#include <Lamscript/Parser.h>
+#include <Lamscript/parsing/Parser.h>
 #include <Lamscript/RuntimeError.h>
-#include <Lamscript/Scanner.h>
+#include <Lamscript/parsing/Scanner.h>
 
 namespace lamscript {
 

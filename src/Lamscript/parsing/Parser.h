@@ -1,5 +1,5 @@
-#ifndef SRC_LAMSCRIPT_PARSER_H_
-#define SRC_LAMSCRIPT_PARSER_H_
+#ifndef SRC_LAMSCRIPT_PARSING_PARSER_H_
+#define SRC_LAMSCRIPT_PARSING_PARSER_H_
 
 #include <initializer_list>
 #include <memory>
@@ -9,8 +9,8 @@
 
 #include <Lamscript/parsable/Expression.h>
 #include <Lamscript/parsable/Statement.h>
-#include <Lamscript/Token.h>
-#include <Lamscript/TokenType.h>
+#include <Lamscript/parsing/Token.h>
+#include <Lamscript/parsing/TokenType.h>
 
 namespace lamscript {
 
@@ -148,4 +148,4 @@ class Parser {
 
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_PARSER_H_
+#endif  // SRC_LAMSCRIPT_PARSING_PARSER_H_

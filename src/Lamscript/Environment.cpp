@@ -1,7 +1,7 @@
 #include <Lamscript/Environment.h>
 
 #include <Lamscript/RuntimeError.h>
-#include <Lamscript/Token.h>
+#include <Lamscript/parsing/Token.h>
 
 namespace lamscript {
 

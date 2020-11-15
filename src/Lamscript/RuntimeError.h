@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <Lamscript/Token.h>
+#include <Lamscript/parsing/Token.h>
 
 namespace lamscript {
 

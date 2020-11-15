@@ -1,4 +1,4 @@
-#include <Lamscript/Parser.h>
+#include <Lamscript/parsing/Parser.h>
 
 #include <initializer_list>
 #include <typeinfo>
@@ -6,10 +6,10 @@
 #include <memory>
 
 #include <Lamscript/Lamscript.h>
-#include <Lamscript/Token.h>
-#include <Lamscript/TokenType.h>
 #include <Lamscript/parsable/Expression.h>
 #include <Lamscript/parsable/Statement.h>
+#include <Lamscript/parsing/Token.h>
+#include <Lamscript/parsing/TokenType.h>
 
 namespace lamscript {
 

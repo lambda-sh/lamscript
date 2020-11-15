@@ -1,4 +1,6 @@
-#include <Lamscript/TokenType.h>
+#include <Lamscript/parsing/TokenType.h>
+
+#include <string>
 
 namespace lamscript {
 

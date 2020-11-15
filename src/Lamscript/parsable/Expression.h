@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include <Lamscript/Token.h>
+#include <Lamscript/parsing/Token.h>
 
 namespace lamscript {
 
