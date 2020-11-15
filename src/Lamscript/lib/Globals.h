@@ -5,7 +5,7 @@
 #include <chrono>
 #include <vector>
 
-#include <Lamscript/parsable/Callable.h>
+#include <Lamscript/parsable/LamscriptCallable.h>
 
 namespace lamscript {
 namespace lib {
