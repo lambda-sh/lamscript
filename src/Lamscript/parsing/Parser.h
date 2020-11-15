@@ -13,6 +13,8 @@
 #include <Lamscript/parsing/TokenType.h>
 
 namespace lamscript {
+namespace parsing {
+
 
 /// @brief Custom Parse error for when the parser encounters an invalid
 /// expression/statement.
@@ -146,6 +148,7 @@ class Parser {
       std::unique_ptr<parsable::Expression> callee);
 };
 
+}  // namespace parsing
 }  // namespace lamscript
 
 #endif  // SRC_LAMSCRIPT_PARSING_PARSER_H_

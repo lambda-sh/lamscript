@@ -11,11 +11,11 @@ namespace lamscript {
 /// @brief Custom runtime error to handle invalid expressions.
 class RuntimeError : public std::runtime_error {
  public:
-  RuntimeError(Token token, const std::string& message)
+  RuntimeError(parsing::Token token, const std::string& message)
     : std::runtime_error(message), token_(token) {}
-  const Token& GetToken() const { return token_; }
+  const parsing::Token& GetToken() const { return token_; }
  private:
-  Token token_;
+  parsing::Token token_;
 };
 
 }  // namespace lamscript

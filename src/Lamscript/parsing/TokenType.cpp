@@ -3,6 +3,8 @@
 #include <string>
 
 namespace lamscript {
+namespace parsing {
+
 
 /// @brief Convert TokenType enum values into their corresponding string
 /// representations.
@@ -52,4 +54,5 @@ std::string ConvertTokenTypeToString(TokenType token_type) {
   }
 }
 
+}  // namespace parsing
 }  // namespace lamscript

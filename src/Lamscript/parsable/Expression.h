@@ -26,7 +26,7 @@ class Binary : public Expression {
  public:
   Binary(
       std::unique_ptr<Expression> left,
-      Token expression_operator,
+      parsing::Token expression_operator,
       std::unique_ptr<Expression> right)
           : left_(std::move(left)),
           operator_(expression_operator),
@@ -36,27 +36,27 @@ class Binary : public Expression {
 
   Expression* GetLeftSide() const { return left_.get(); }
   Expression* GetRightSide() const { return right_.get(); }
-  const Token& GetOperator() const { return operator_; }
+  const parsing::Token& GetOperator() const { return operator_; }
 
  private:
   std::unique_ptr<Expression> left_;
-  Token operator_;
+  parsing::Token operator_;
   std::unique_ptr<Expression> right_;
 };
 
 class Assign : public Expression {
  public:
   Assign(
-      Token name, std::unique_ptr<Expression> value)
+      parsing::Token name, std::unique_ptr<Expression> value)
           : name_(name), value_(std::move(value)) {}
 
   std::any Accept(ExpressionVisitor* visitor) override;
 
   Expression* GetValue() const { return value_.get(); }
-  const Token& GetName() const { return name_; }
+  const parsing::Token& GetName() const { return name_; }
 
  private:
-  Token name_;
+  parsing::Token name_;
   std::unique_ptr<Expression> value_;
 };
 
@@ -64,7 +64,7 @@ class Call : public Expression {
  public:
   Call(
       std::unique_ptr<Expression> callee,
-      Token parentheses,
+      parsing::Token parentheses,
       std::vector<std::unique_ptr<Expression>>&& arguments)
           : callee_(std::move(callee)),
           parentheses_(parentheses),
@@ -73,13 +73,13 @@ class Call : public Expression {
   std::any Accept(ExpressionVisitor* visitor) override;
 
   Expression* GetCallee() { return callee_.get(); }
-  const Token& GetParentheses() { return parentheses_; }
+  const parsing::Token& GetParentheses() { return parentheses_; }
   const std::vector<std::unique_ptr<Expression>>& GetArguments() {
       return arguments_; }
 
  private:
   std::unique_ptr<Expression> callee_;
-  Token parentheses_;
+  parsing::Token parentheses_;
   std::vector<std::unique_ptr<Expression>> arguments_;
 };
 
@@ -88,14 +88,14 @@ class Get : public Expression {
  public:
   Get(
       std::unique_ptr<Expression> object,
-      Token name)
+      parsing::Token name)
           : object_(std::move(object)), name_(name) {}
 
   std::any Accept(ExpressionVisitor* visitor) override;
 
  private:
   std::unique_ptr<Expression> object_;
-  Token name_;
+  parsing::Token name_;
 };
 
 class Grouping : public Expression {
@@ -128,7 +128,7 @@ class Logical : public Expression {
  public:
   Logical(
       std::unique_ptr<Expression> left,
-      Token logical_operator,
+      parsing::Token logical_operator,
       std::unique_ptr<Expression> right)
         : left_(std::move(left)),
         logical_operator_(logical_operator),
@@ -137,12 +137,12 @@ class Logical : public Expression {
   std::any Accept(ExpressionVisitor* visitor) override;
 
   Expression* GetLeftOperand() { return left_.get(); }
-  const Token& GetLogicalOperator() { return logical_operator_; }
+  const parsing::Token& GetLogicalOperator() { return logical_operator_; }
   Expression* GetRightOperand() { return right_.get(); }
 
  private:
   std::unique_ptr<Expression> left_;
-  Token logical_operator_;
+  parsing::Token logical_operator_;
   std::unique_ptr<Expression> right_;
 };
 
@@ -150,7 +150,7 @@ class Set : public Expression {
  public:
   Set(
       std::unique_ptr<Expression> object,
-      Token name,
+      parsing::Token name,
       std::unique_ptr<Expression> value)
           : object_(std::move(object)), name_(name), value_(std::move(value)) {}
 
@@ -158,58 +158,59 @@ class Set : public Expression {
 
  private:
   std::unique_ptr<Expression> object_;
-  Token name_;
+  parsing::Token name_;
   std::unique_ptr<Expression> value_;
 };
 
 class Super : public Expression {
  public:
-  Super(Token keyword, Token method) : keyword_(keyword), method_(method) {}
+  Super(parsing::Token keyword, parsing::Token method)
+      : keyword_(keyword), method_(method) {}
 
   std::any Accept(ExpressionVisitor* visitor) override;
 
  private:
-  Token keyword_;
-  Token method_;
+  parsing::Token keyword_;
+  parsing::Token method_;
 };
 
 class This : public Expression {
  public:
-  explicit This(Token keyword) : keyword_(keyword) {}
+  explicit This(parsing::Token keyword) : keyword_(keyword) {}
 
   std::any Accept(ExpressionVisitor* visitor) override;
 
  private:
-  Token keyword_;
+  parsing::Token keyword_;
 };
 
 class Unary : public Expression {
  public:
   Unary(
-      Token unary_operator,
+      parsing::Token unary_operator,
       std::unique_ptr<Expression> right)
           : unary_operator_(unary_operator), right_(std::move(right)) {}
 
   std::any Accept(ExpressionVisitor* visitor) override;
 
   Expression* GetRightExpression() const { return right_.get(); }
-  const Token& GetUnaryOperator() const { return unary_operator_; }
+  const parsing::Token& GetUnaryOperator() const { return unary_operator_; }
 
  private:
-  Token unary_operator_;
+  parsing::Token unary_operator_;
   std::unique_ptr<Expression> right_;
 };
 
 class Variable : public Expression {
  public:
-  explicit Variable(Token name) : name_(name) {}
+  explicit Variable(parsing::Token name) : name_(name) {}
 
   std::any Accept(ExpressionVisitor* visitor) override;
 
-  const Token& GetName() { return name_; }
+  const parsing::Token& GetName() { return name_; }
 
  private:
-  Token name_;
+  parsing::Token name_;
 };
 
 

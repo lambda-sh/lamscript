@@ -32,7 +32,7 @@ const std::type_info& String = typeid(std::string);
 Interpreter::Interpreter()
     : globals_(new Environment()), environment_(globals_) {
   globals_->SetVariable(
-      Token{FUN, "clock", nullptr, 0},
+      parsing::Token{parsing::FUN, "clock", nullptr, 0},
       reinterpret_cast<parsable::LamscriptCallable*>(new lib::Clock()));
 }
 
@@ -61,9 +61,9 @@ std::any Interpreter::VisitUnaryExpression(parsable::Unary* expression) {
   std::any right_side = Evaluate(expression);
 
   switch (expression->GetUnaryOperator().Type) {
-    case BANG:
+    case parsing::BANG:
       return !IsTruthy(right_side);
-    case MINUS:
+    case parsing::MINUS:
       CheckNumberOperand(expression->GetUnaryOperator(), right_side);
       return -(AnyAs<double>(right_side));
   }
@@ -80,11 +80,11 @@ std::any Interpreter::VisitBinaryExpression(parsable::Binary* expression) {
   }
 
   switch (expression->GetOperator().Type) {
-    case MINUS:
+    case parsing::MINUS:
     {
       return AnyAs<double>(left_side) - AnyAs<double>(right_side);
     }
-    case PLUS:
+    case parsing::PLUS:
     {
       if (left_side.type() == Number && right_side.type() == Number) {
         return AnyAs<double>(left_side) + AnyAs<double>(right_side);
@@ -98,7 +98,7 @@ std::any Interpreter::VisitBinaryExpression(parsable::Binary* expression) {
           expression->GetOperator(),
           "Operands must be two numbers or strings.");
     }
-    case SLASH:
+    case parsing::SLASH:
     {
       double divisor = AnyAs<double>(right_side);
       if (divisor == 0) {
@@ -108,35 +108,35 @@ std::any Interpreter::VisitBinaryExpression(parsable::Binary* expression) {
 
       return AnyAs<double>(left_side) / divisor;
     }
-    case STAR:
+    case parsing::STAR:
     {
       return AnyAs<double>(left_side) * AnyAs<double>(right_side);
     }
-    case MODULUS:
+    case parsing::MODULUS:
     {
       return fmod(AnyAs<double>(left_side), AnyAs<double>(right_side));
     }
-    case GREATER:
+    case parsing::GREATER:
     {
       return AnyAs<double>(left_side) > AnyAs<double>(right_side);
     }
-    case GREATER_EQUAL:
+    case parsing::GREATER_EQUAL:
     {
       return AnyAs<double>(left_side) >= AnyAs<double>(right_side);
     }
-    case LESS:
+    case parsing::LESS:
     {
       return AnyAs<double>(left_side) < AnyAs<double>(right_side);
     }
-    case LESS_EQUAL:
+    case parsing::LESS_EQUAL:
     {
       return AnyAs<double>(left_side) <= AnyAs<double>(right_side);
     }
-    case BANG_EQUAL:
+    case parsing::BANG_EQUAL:
     {
       return !IsEqual(left_side, right_side);
     }
-    case EQUAL_EQUAL:
+    case parsing::EQUAL_EQUAL:
     {
       return IsEqual(left_side, right_side);
     }
@@ -149,7 +149,7 @@ std::any Interpreter::VisitLogicalExpression(parsable::Logical* expression) {
   std::any left_side = Evaluate(expression->GetLeftOperand());
   bool left_is_truthy = IsTruthy(left_side);
 
-  if (expression->GetLogicalOperator().Type == OR) {
+  if (expression->GetLogicalOperator().Type == parsing::OR) {
     if (left_is_truthy) {
       return left_side;
     }
@@ -280,14 +280,15 @@ void Interpreter::ExecuteBlock(
 
 // ---------------------------------- PRIVATE ----------------------------------
 
-void Interpreter::CheckNumberOperand(Token operator_used, std::any operand) {
+void Interpreter::CheckNumberOperand(
+    parsing::Token operator_used, std::any operand) {
   if (operand.type() != Number) {
     throw RuntimeError(operator_used, "Operand must be a number.");
   }
 }
 
 void Interpreter::CheckNumberOperands(
-    Token operator_used, std::any left_side, std::any right_side) {
+    parsing::Token operator_used, std::any left_side, std::any right_side) {
   if (left_side.type() != Number || right_side.type() != Number) {
     throw RuntimeError(operator_used, "Operands must both be numbers.");
   }

@@ -7,6 +7,8 @@
 #include <Lamscript/parsing/TokenType.h>
 
 namespace lamscript {
+namespace parsing {
+
 
 struct Token {
   TokenType Type;
@@ -21,6 +23,7 @@ struct Token {
   }
 };
 
+}  // namespace parsing
 }  // namespace lamscript
 
 #endif  // SRC_LAMSCRIPT_PARSING_TOKEN_H_

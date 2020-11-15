@@ -66,10 +66,10 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   Environment* environment_;
 
   /// @brief Validates that a unary operand is indeed a number.
-  void CheckNumberOperand(Token operator_used, std::any operand);
+  void CheckNumberOperand(parsing::Token operator_used, std::any operand);
   /// @brief Validates that binary operands are indeed both numbers.
   void CheckNumberOperands(
-      Token operator_used, std::any left_side, std::any right_side);
+      parsing::Token operator_used, std::any left_side, std::any right_side);
   bool IsTruthy(std::any object);
   /// @brief Evaluate a given expression.
   std::any Evaluate(parsable::Expression* expression);

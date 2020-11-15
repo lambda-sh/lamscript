@@ -11,6 +11,8 @@
 #include <Lamscript/parsing/TokenType.h>
 
 namespace lamscript {
+namespace parsing {
+
 
 /// @brief Lightweight scanner class.
 class Scanner {
@@ -235,6 +237,7 @@ std::unordered_map<std::string, TokenType> Scanner::keywords_ =
             {"var", VAR},
             {"while", WHILE}});
 
+}  // namespace parsing
 }  // namespace lamscript
 
 #endif  // SRC_LAMSCRIPT_PARSING_SCANNER_H_

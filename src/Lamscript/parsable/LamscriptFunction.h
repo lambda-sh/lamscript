@@ -23,7 +23,7 @@ class LamscriptFunction : public LamscriptCallable {
     Environment* function_env = new Environment(
         interpreter->GetGlobalEnvironment());
 
-    const std::vector<Token>& params = declaration_->GetParams();
+    const std::vector<parsing::Token>& params = declaration_->GetParams();
     for (size_t i = 0; i < params.size(); i++) {
       function_env->SetVariable(params[i], arguments[i]);
     }

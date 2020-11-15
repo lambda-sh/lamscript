@@ -17,10 +17,10 @@ bool Lamscript::had_runtime_error_ = false;
 
 /// @brief Run the given source.
 void Lamscript::Run(const std::string& source) {
-  Scanner scanner = Scanner(source);
-  std::vector<Token> tokens = scanner.ScanTokens();
+  parsing::Scanner scanner = parsing::Scanner(source);
+  std::vector<parsing::Token> tokens = scanner.ScanTokens();
 
-  Parser parser = Parser(tokens);
+  parsing::Parser parser = parsing::Parser(tokens);
   std::vector<std::unique_ptr<parsable::Statement>> statements = parser.Parse();
 
   if (had_error_) {
@@ -79,8 +79,8 @@ void Lamscript::Error(int line, const std::string& message) {
   Lamscript::Report(line, "", message);
 }
 
-void Lamscript::Error(Token token, const std::string& message) {
-  if (token.Type == END_OF_FILE) {
+void Lamscript::Error(parsing::Token token, const std::string& message) {
+  if (token.Type == parsing::END_OF_FILE) {
     Report(token.Line, " at end", message);
   } else {
     Report(token.Line, " at '" + token.Lexeme + "'", message);

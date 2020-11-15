@@ -5,11 +5,11 @@
 
 namespace lamscript {
 
-void Environment::SetVariable(const Token& name, std::any value) {
+void Environment::SetVariable(const parsing::Token& name, std::any value) {
   values_[name.Lexeme] = value;
 }
 
-void Environment::AssignVariable(const Token& name, std::any value) {
+void Environment::AssignVariable(const parsing::Token& name, std::any value) {
   if (values_.contains(name.Lexeme)) {
     values_[name.Lexeme] = value;
     return;
@@ -22,7 +22,7 @@ void Environment::AssignVariable(const Token& name, std::any value) {
   throw RuntimeError(name, "Undefined Variable '" + name.Lexeme + "'.");
 }
 
-std::any Environment::GetVariable(const Token& name) {
+std::any Environment::GetVariable(const parsing::Token& name) {
   if (values_.contains(name.Lexeme)) {
     return values_[name.Lexeme];
   }

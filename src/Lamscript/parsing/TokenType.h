@@ -4,6 +4,8 @@
 #include <string>
 
 namespace lamscript {
+namespace parsing {
+
 
 /// @brief Tokens supported by the lamscript parser.
 enum TokenType {
@@ -28,6 +30,7 @@ enum TokenType {
 
 std::string ConvertTokenTypeToString(TokenType token_type);
 
+}  // namespace parsing
 }  // namespace lamscript
 
 #endif  // SRC_LAMSCRIPT_PARSING_TOKENTYPE_H_

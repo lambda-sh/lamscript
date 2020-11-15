@@ -53,34 +53,39 @@ class ExpressionStatement : public Statement {
 class Function : public Statement {
  public:
   Function(
-      Token name,
-      const std::vector<Token>& params,
+      parsing::Token name,
+      const std::vector<parsing::Token>& params,
       std::vector<std::unique_ptr<Statement>>&& body)
           : name_(name), params_(params), body_(std::move(body)) {}
 
   std::any Accept(StatementVisitor* visitor) override;
 
-  const Token& GetName() const { return name_; }
-  const std::vector<Token>& GetParams() const { return params_; }
+  const parsing::Token& GetName() const { return name_; }
+  const std::vector<parsing::Token>& GetParams() const { return params_; }
   const std::vector<std::unique_ptr<Statement>>& GetBody() const {
       return body_; }
 
  private:
-  Token name_;
-  std::vector<Token> params_;
+  parsing::Token name_;
+  std::vector<parsing::Token> params_;
   std::vector<std::unique_ptr<Statement>> body_;
 };
 
 /// @brief Class definition statements.
 class Class : public Statement {
  public:
-  Class(Token name, Variable super_class, std::vector<Function>&& methods)
-      : name_(name), super_class_(super_class), methods_(std::move(methods)) {}
+  Class(
+      parsing::Token name,
+      Variable super_class,
+      std::vector<Function>&& methods)
+          : name_(name),
+          super_class_(super_class),
+          methods_(std::move(methods)) {}
 
   std::any Accept(StatementVisitor* visitor) override;
 
  private:
-  Token name_;
+  parsing::Token name_;
   Variable super_class_;
   std::vector<Function> methods_;
 };
@@ -122,28 +127,29 @@ class Print : public Statement {
 
 class Return : public Statement {
  public:
-  Return(Token keyword, std::unique_ptr<Expression> value)
+  Return(parsing::Token keyword, std::unique_ptr<Expression> value)
     : keyword_(std::move(keyword)), value_(std::move(value)) {}
 
   std::any Accept(StatementVisitor* visitor) override;
 
  private:
-  Token keyword_;
+  parsing::Token keyword_;
   std::unique_ptr<Expression> value_;
 };
 
 class VariableStatement : public Statement {
  public:
-  VariableStatement(Token name, std::unique_ptr<Expression> initializer)
-      : name_(name), initializer_(std::move(initializer)) {}
+  VariableStatement(
+      parsing::Token name, std::unique_ptr<Expression> initializer)
+          : name_(name), initializer_(std::move(initializer)) {}
 
   std::any Accept(StatementVisitor* visitor) override;
 
-  const Token& GetName() const { return name_; }
+  const parsing::Token& GetName() const { return name_; }
   Expression* GetInitializer() const { return initializer_.get(); }
 
  private:
-  Token name_;
+  parsing::Token name_;
   std::unique_ptr<Expression> initializer_;
 };
 

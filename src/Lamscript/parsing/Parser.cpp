@@ -12,6 +12,8 @@
 #include <Lamscript/parsing/TokenType.h>
 
 namespace lamscript {
+namespace parsing {
+
 
 // ---------------------------------- PUBLIC -----------------------------------
 
@@ -536,4 +538,5 @@ std::unique_ptr<parsable::Expression> Parser::FinishCall(
   return std::move(expression);
 }
 
+}  // namespace parsing
 }  // namespace lamscript
