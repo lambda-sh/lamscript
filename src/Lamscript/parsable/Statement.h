@@ -1,15 +1,19 @@
-#ifndef SRC_LAMSCRIPT_STATEMENT_H_
-#define SRC_LAMSCRIPT_STATEMENT_H_
+#ifndef SRC_LAMSCRIPT_PARSABLE_STATEMENT_H_
+#define SRC_LAMSCRIPT_PARSABLE_STATEMENT_H_
 
 #include <any>
 #include <memory>
 #include <vector>
 
-#include <Lamscript/Expression.h>
+#include <Lamscript/parsable/Expression.h>
 
 namespace lamscript {
 
+// Forward declaration so Visitor.h doesn't need to be included into the
+// file.
 class StatementVisitor;
+
+namespace parsable {
 
 class Statement {
  public:
@@ -158,6 +162,7 @@ class While : public Statement {
   std::unique_ptr<Statement> body_;
 };
 
+}  // namespace parsable
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_STATEMENT_H_
+#endif  // SRC_LAMSCRIPT_PARSABLE_STATEMENT_H_

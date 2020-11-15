@@ -1,14 +1,15 @@
-#ifndef SRC_LAMSCRIPT_FUNCTION_H_
-#define SRC_LAMSCRIPT_FUNCTION_H_
+#ifndef SRC_LAMSCRIPT_PARSABLE_LAMSCRIPTFUNCTION_H_
+#define SRC_LAMSCRIPT_PARSABLE_LAMSCRIPTFUNCTION_H_
 
 #include <any>
 
-#include <Lamscript/Callable.h>
 #include <Lamscript/Environment.h>
-#include <Lamscript/Statement.h>
 #include <Lamscript/Interpreter.h>
+#include <Lamscript/parsable/Callable.h>
+#include <Lamscript/parsable/Statement.h>
 
 namespace lamscript {
+namespace parsable {
 
 class LamscriptFunction : public LamscriptCallable {
  public:
@@ -39,6 +40,7 @@ class LamscriptFunction : public LamscriptCallable {
   Function* declaration_;
 };
 
+}  // namespace parsable
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_FUNCTION_H_
+#endif  // SRC_LAMSCRIPT_PARSABLE_LAMSCRIPTFUNCTION_H_

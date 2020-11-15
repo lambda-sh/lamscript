@@ -1,15 +1,16 @@
-#ifndef SRC_LAMSCRIPT_GLOBALS_H_
-#define SRC_LAMSCRIPT_GLOBALS_H_
+#ifndef SRC_LAMSCRIPT_LIB_GLOBALS_H_
+#define SRC_LAMSCRIPT_LIB_GLOBALS_H_
 
 #include <any>
 #include <chrono>
 #include <vector>
 
-#include <Lamscript/Callable.h>
+#include <Lamscript/parsable/Callable.h>
 
 namespace lamscript {
+namespace lib {
 
-class Clock : public LamscriptCallable {
+class Clock : public parsable::LamscriptCallable {
  public:
   int Arity() const override { return 0; }
   std::any Call(
@@ -20,6 +21,7 @@ class Clock : public LamscriptCallable {
   std::string ToString() const override { return "<native fn>"; }
 };
 
+}  // namespace lib
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_GLOBALS_H_
+#endif  // SRC_LAMSCRIPT_LIB_GLOBALS_H_
