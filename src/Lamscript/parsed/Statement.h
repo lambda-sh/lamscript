@@ -121,6 +121,7 @@ class Print : public Statement {
   std::any Accept(StatementVisitor* visitor) override;
 
   Expression* GetExpression() { return expression_.get(); }
+
  private:
   std::unique_ptr<Expression> expression_;
 };
@@ -131,6 +132,8 @@ class Return : public Statement {
     : keyword_(std::move(keyword)), value_(std::move(value)) {}
 
   std::any Accept(StatementVisitor* visitor) override;
+
+  Expression* GetValue() { return value_.get(); }
 
  private:
   parsing::Token keyword_;

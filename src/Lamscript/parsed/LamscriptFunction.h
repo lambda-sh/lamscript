@@ -6,7 +6,9 @@
 #include <Lamscript/Environment.h>
 #include <Lamscript/Interpreter.h>
 #include <Lamscript/parsed/LamscriptCallable.h>
+#include <Lamscript/parsed/LamscriptReturnValue.h>
 #include <Lamscript/parsed/Statement.h>
+#include <iostream>
 
 namespace lamscript {
 namespace parsed {
@@ -21,15 +23,20 @@ class LamscriptFunction : public LamscriptCallable {
   std::any Call(
       Interpreter* interpreter, std::vector<std::any> arguments) override {
     Environment* function_env = new Environment(
-        interpreter->GetGlobalEnvironment());
+        interpreter->GetCurrentEnvironment());
 
     const std::vector<parsing::Token>& params = declaration_->GetParams();
     for (size_t i = 0; i < params.size(); i++) {
       function_env->SetVariable(params[i], arguments[i]);
     }
 
-    interpreter->ExecuteBlock(declaration_->GetBody(), function_env);
-    return NULL;
+    try {
+      interpreter->ExecuteBlock(declaration_->GetBody(), function_env);
+    } catch (const LamscriptReturnValue& value_container) {
+      return value_container.GetReturnedValue();
+    }
+
+    return nullptr;
   }
 
   std::string ToString() const override {
