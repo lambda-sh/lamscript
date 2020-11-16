@@ -2,6 +2,7 @@
 #define SRC_LAMSCRIPT_ENVIRONMENT_H_
 
 #include <any>
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -16,14 +17,14 @@ class Environment {
   Environment() : parent_(nullptr) {}
 
   /// @brief Create an environment within a parent environment.
-  explicit Environment(Environment* parent) : parent_(parent) {}
+  explicit Environment(std::shared_ptr<Environment> parent) : parent_(parent) {}
 
   /// @brief Defines a variable within the current environment.
   void SetVariable(const parsing::Token& name, std::any value);
   void AssignVariable(const parsing::Token& name, std::any value);
   std::any GetVariable(const parsing::Token& token);
  private:
-  Environment* parent_;
+  std::shared_ptr<Environment> parent_;
   std::unordered_map<std::string, std::any> values_;
 };
 
