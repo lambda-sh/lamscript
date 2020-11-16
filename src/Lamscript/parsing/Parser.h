@@ -99,6 +99,8 @@ class Parser {
   /// @brief Parses function statements.
   std::unique_ptr<parsed::Statement> ParseFunction(const std::string& kind);
 
+  std::unique_ptr<parsed::Statement> ParseReturnStatement();
+
   // ---------------------------- PARSE EXPRESSIONS ----------------------------
 
   /// @brief Parses an equality for as long as there are equal signs and

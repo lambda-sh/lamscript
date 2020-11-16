@@ -178,6 +178,10 @@ std::unique_ptr<parsed::Statement> Parser::ParseStatement() {
     return std::move(ParsePrintStatement());
   }
 
+  if (CheckAndConsumeTokens({RETURN})) {
+    return std::move(ParseReturnStatement());
+  }
+
   if (CheckAndConsumeTokens({WHILE})) {
     return std::move(ParseWhileStatement());
   }
@@ -323,6 +327,21 @@ std::unique_ptr<parsed::Statement> Parser::ParseFunction(
 
   std::unique_ptr<parsed::Statement> statement;
   statement.reset(new parsed::Function(name, parameters, std::move(body)));
+  return std::move(statement);
+}
+
+std::unique_ptr<parsed::Statement> Parser::ParseReturnStatement() {
+  Token keyword = Previous();
+  std::unique_ptr<parsed::Expression> value = nullptr;
+
+  if (!CheckToken(SEMICOLON)) {
+    value = std::move(ParseExpression());
+  }
+
+  Consume(SEMICOLON, "Expect ';' after return value.");
+
+  std::unique_ptr<parsed::Statement> statement;
+  statement.reset(new parsed::Return(keyword, std::move(value)));
   return std::move(statement);
 }
 
