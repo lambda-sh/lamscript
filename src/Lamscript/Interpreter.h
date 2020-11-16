@@ -6,8 +6,8 @@
 #include <typeinfo>
 
 #include <Lamscript/Environment.h>
-#include <Lamscript/RuntimeError.h>
 #include <Lamscript/Visitor.h>
+#include <Lamscript/errors/RuntimeError.h>
 #include <Lamscript/parsed/Expression.h>
 #include <Lamscript/parsed/Statement.h>
 

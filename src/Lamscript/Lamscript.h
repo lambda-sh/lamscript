@@ -6,8 +6,8 @@
 #include <iostream>
 #include <vector>
 
-#include <Lamscript/RuntimeError.h>
 #include <Lamscript/Interpreter.h>
+#include <Lamscript/errors/RuntimeError.h>
 #include <Lamscript/parsing/Token.h>
 
 namespace lamscript {

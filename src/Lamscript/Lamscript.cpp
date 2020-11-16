@@ -3,7 +3,7 @@
 #include <any>
 #include <memory>
 
-#include <Lamscript/RuntimeError.h>
+#include <Lamscript/errors/RuntimeError.h>
 #include <Lamscript/parsing/Parser.h>
 #include <Lamscript/parsing/Scanner.h>
 

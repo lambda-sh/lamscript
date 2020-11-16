@@ -13,7 +13,6 @@
 namespace lamscript {
 namespace parsing {
 
-
 /// @brief Lightweight scanner class.
 class Scanner {
  public:

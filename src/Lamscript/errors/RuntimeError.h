@@ -1,5 +1,5 @@
-#ifndef SRC_LAMSCRIPT_RUNTIMEERROR_H_
-#define SRC_LAMSCRIPT_RUNTIMEERROR_H_
+#ifndef SRC_LAMSCRIPT_ERRORS_RUNTIMEERROR_H_
+#define SRC_LAMSCRIPT_ERRORS_RUNTIMEERROR_H_
 
 #include <stdexcept>
 #include <string>
@@ -20,4 +20,4 @@ class RuntimeError : public std::runtime_error {
 
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_RUNTIMEERROR_H_
+#endif  // SRC_LAMSCRIPT_ERRORS_RUNTIMEERROR_H_
