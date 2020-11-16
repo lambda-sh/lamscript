@@ -3,10 +3,10 @@
 
 #include <initializer_list>
 #include <memory>
-#include <stdexcept>
 #include <typeinfo>
 #include <vector>
 
+#include <Lamscript/errors/ParseError.h>
 #include <Lamscript/parsed/Expression.h>
 #include <Lamscript/parsed/Statement.h>
 #include <Lamscript/parsing/Token.h>
@@ -14,14 +14,6 @@
 
 namespace lamscript {
 namespace parsing {
-
-
-/// @brief Custom Parse error for when the parser encounters an invalid
-/// expression/statement.
-class ParseError : std::runtime_error {
- public:
-  explicit ParseError(const char* what_arg) : std::runtime_error(what_arg){}
-};
 
 /// @brief The Lamscript LL parser for converting Tokens into
 /// Statements and Expressions. This evaluates Tokens presented by the scanner

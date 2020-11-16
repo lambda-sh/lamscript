@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <Lamscript/Lamscript.h>
+#include <Lamscript/errors/ParseError.h>
 #include <Lamscript/parsed/Expression.h>
 #include <Lamscript/parsed/Statement.h>
 #include <Lamscript/parsing/Token.h>
