@@ -239,10 +239,18 @@ std::any Interpreter::VisitWhileStatement(parsed::While* statement) {
 }
 
 std::any Interpreter::VisitFunctionStatement(parsed::Function* statement) {
-  parsed::LamscriptCallable* func = new parsed::LamscriptFunction(
-      statement);
+  parsed::LamscriptCallable* func = new parsed::LamscriptFunction(statement);
   environment_->SetVariable(statement->GetName(), func);
   return NULL;
+}
+
+std::any Interpreter::VisitReturnStatement(parsed::Return* statement) {
+  std::any value = nullptr;
+  if (statement->GetValue() != nullptr) {
+    value = Evaluate(statement->GetValue());
+  }
+
+  throw parsed::LamscriptReturnValue(value);
 }
 
 void Interpreter::Interpret(
@@ -265,6 +273,8 @@ void Interpreter::ExecuteBlock(
     Environment* current_env) {
   Environment* previous = environment_;
 
+  // Forwards return value statements up the chain so that function calls that
+  // recurse get their environment reset once the recursion starts unwinding.
   try {
     environment_ = current_env;
 
@@ -273,8 +283,12 @@ void Interpreter::ExecuteBlock(
     }
   } catch(const RuntimeError& error) {
     Lamscript::RuntimeError(error);
+  } catch (const parsed::LamscriptReturnValue& returned_value) {
+    environment_ = previous;
+    throw returned_value;
   }
 
+  // Needed to ensure that if no error or return value happens, function calls
   environment_ = previous;
 }
 

@@ -38,6 +38,7 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitIfStatement(parsed::If* statement) override;
   std::any VisitWhileStatement(parsed::While* statement) override;
   std::any VisitFunctionStatement(parsed::Function* statement) override;
+  std::any VisitReturnStatement(parsed::Return* statement) override;
 
   /// @todo (C3NZ) Implement the rest of the visitor pattern.
 
@@ -48,7 +49,6 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
 
   // Statements
   std::any VisitClassStatement(parsed::Class* statement) override {};
-  std::any VisitReturnStatement(parsed::Return* statement) override {};
 
   // Primary external API
 
@@ -59,7 +59,8 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
       const std::vector<std::unique_ptr<parsed::Statement>>& statements,
       Environment* current_env);
 
-  Environment* GetGlobalEnvironment() const { return globals_; }
+  Environment* GetGlobalEnvironment() { return globals_; }
+  Environment* GetCurrentEnvironment() { return environment_; }
 
  private:
   Environment* globals_;
