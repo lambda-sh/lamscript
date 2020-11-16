@@ -192,7 +192,8 @@ std::any Interpreter::VisitCallExpression(parsed::Call* expression) {
 // --------------------------------- STATEMENTS --------------------------------
 
 std::any Interpreter::VisitBlockStatement(parsed::Block* statement) {
-  ExecuteBlock(statement->GetStatements(), new Environment(environment_));
+  ExecuteBlock(
+      statement->GetStatements(), std::make_shared<Environment>(environment_));
   return NULL;
 }
 
@@ -239,7 +240,8 @@ std::any Interpreter::VisitWhileStatement(parsed::While* statement) {
 }
 
 std::any Interpreter::VisitFunctionStatement(parsed::Function* statement) {
-  parsed::LamscriptCallable* func = new parsed::LamscriptFunction(statement);
+  parsed::LamscriptCallable* func = new parsed::LamscriptFunction(
+      statement, environment_);
   environment_->SetVariable(statement->GetName(), func);
   return NULL;
 }
@@ -270,8 +272,8 @@ void Interpreter::Execute(parsed::Statement* statement) {
 
 void Interpreter::ExecuteBlock(
     const std::vector<std::unique_ptr<parsed::Statement>>& statements,
-    Environment* current_env) {
-  Environment* previous = environment_;
+    std::shared_ptr<Environment> current_env) {
+  std::shared_ptr<Environment> previous = environment_;
 
   // Forwards return value statements up the chain so that function calls that
   // recurse get their environment reset once the recursion starts unwinding.

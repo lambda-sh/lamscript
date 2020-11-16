@@ -57,14 +57,14 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   void Execute(parsed::Statement* statement);
   void ExecuteBlock(
       const std::vector<std::unique_ptr<parsed::Statement>>& statements,
-      Environment* current_env);
+      std::shared_ptr<Environment> current_env);
 
-  Environment* GetGlobalEnvironment() { return globals_; }
-  Environment* GetCurrentEnvironment() { return environment_; }
+  std::shared_ptr<Environment> GetGlobalEnvironment() { return globals_; }
+  std::shared_ptr<Environment> GetCurrentEnvironment() { return environment_; }
 
  private:
-  Environment* globals_;
-  Environment* environment_;
+  std::shared_ptr<Environment> globals_;
+  std::shared_ptr<Environment> environment_;
 
   /// @brief Validates that a unary operand is indeed a number.
   void CheckNumberOperand(parsing::Token operator_used, std::any operand);
