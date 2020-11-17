@@ -27,6 +27,7 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitVariableExpression(parsed::Variable* expression) override;
   std::any VisitLogicalExpression(parsed::Logical* expression) override;
   std::any VisitCallExpression(parsed::Call* expression) override;
+  std::any VisitLambdaExpression(parsed::LambdaExpression* expression) override;
 
   // Implemented Statements
 

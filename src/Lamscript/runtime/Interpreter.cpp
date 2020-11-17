@@ -191,6 +191,17 @@ std::any Interpreter::VisitCallExpression(parsed::Call* expression) {
   }
 }
 
+std::any Interpreter::VisitLambdaExpression(
+    parsed::LambdaExpression* expression) {
+
+  parsed::Function* func(
+      static_cast<parsed::Function*>(expression->GetFunctionStatement()));
+
+  Execute(func);
+
+  return environment_->GetVariable(func->GetName());
+}
+
 // --------------------------------- STATEMENTS --------------------------------
 
 std::any Interpreter::VisitBlockStatement(parsed::Block* statement) {
