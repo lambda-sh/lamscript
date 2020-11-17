@@ -27,6 +27,21 @@ std::vector<std::unique_ptr<parsed::Statement>> Parser::Parse() {
   return statements;
 }
 
+std::string GenerateRandomString(size_t length) {
+  auto RandomCharacter = []() -> char {
+    const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+        const size_t max_index = (sizeof(charset) - 1);
+        return charset[ rand() % max_index ];
+  };
+
+  std::string random_string(length, 0);
+  std::generate_n(random_string.begin(), length, RandomCharacter);
+  return random_string;
+}
+
 // ---------------------------------- PRIVATE ----------------------------------
 
 Token Parser::Peek() {
@@ -114,7 +129,7 @@ Token Parser::Consume(TokenType type, const std::string& message) {
 std::unique_ptr<parsed::Statement> Parser::ParseDeclaration() {
   try {
     if (CheckAndConsumeTokens({FUN})) {
-      return std::move(ParseFunction("function"));
+        return std::move(ParseFunction("function"));
     }
 
     if (CheckAndConsumeTokens({VAR})) {
@@ -304,7 +319,12 @@ std::unique_ptr<parsed::Statement> Parser::ParseForStatement() {
 
 std::unique_ptr<parsed::Statement> Parser::ParseFunction(
     const std::string& kind) {
-  Token name = Consume(IDENTIFIER, "Expect " + kind + " name.");
+
+  Token name{FUN, "lambda" + GenerateRandomString(8), nullptr,  Peek().Line };
+  if (kind.compare("function") == 0) {
+    name = Consume(IDENTIFIER, "Expect " + kind + " name.");
+  }
+
   Consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
 
   std::vector<Token> parameters;
@@ -423,6 +443,13 @@ std::unique_ptr<parsed::Expression> Parser::ParsePrimary() {
 
     if (CheckAndConsumeTokens({IDENTIFIER})) {
       expression.reset(new parsed::Variable(Previous()));
+      return std::move(expression);
+    }
+
+    if (CheckAndConsumeTokens({FUN})) {
+      std::unique_ptr<parsed::Statement> fn = std::move(
+          ParseFunction("lambda"));
+      expression.reset(new parsed::LambdaExpression(std::move(fn)));
       return std::move(expression);
     }
 
@@ -545,6 +572,7 @@ std::unique_ptr<parsed::Expression> Parser::FinishCall(
       if (arguments.size() >= 255) {
         Error(Peek(), "Can't have more than 255 arguments.");
       }
+
       arguments.emplace_back(std::move(ParseExpression()));
     } while (CheckAndConsumeTokens({COMMA}));
   }
