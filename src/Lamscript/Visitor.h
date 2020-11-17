@@ -21,6 +21,8 @@ class ExpressionVisitor {
   virtual std::any VisitThisExpression(parsed::This* expression) = 0;
   virtual std::any VisitUnaryExpression(parsed::Unary* expression) = 0;
   virtual std::any VisitVariableExpression(parsed::Variable* expression) = 0;
+  virtual std::any VisitLambdaExpression(
+      parsed::LambdaExpression* expression) = 0;
 };
 
 /// @brief The visitor interface for evaluating statements.
