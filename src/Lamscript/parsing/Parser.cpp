@@ -5,12 +5,12 @@
 #include <vector>
 #include <memory>
 
-#include <Lamscript/Lamscript.h>
 #include <Lamscript/errors/ParseError.h>
 #include <Lamscript/parsed/Expression.h>
 #include <Lamscript/parsed/Statement.h>
 #include <Lamscript/parsing/Token.h>
 #include <Lamscript/parsing/TokenType.h>
+#include <Lamscript/runtime/Lamscript.h>
 
 namespace lamscript {
 namespace parsing {
@@ -95,7 +95,7 @@ void Parser::Synchronize() {
 }
 
 ParseError Parser::Error(Token token, const std::string& message) {
-  Lamscript::Error(token, message);
+  runtime::Lamscript::Error(token, message);
   return ParseError(message.c_str());
 }
 

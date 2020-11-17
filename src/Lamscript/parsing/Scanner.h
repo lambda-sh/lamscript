@@ -6,9 +6,9 @@
 #include <string>
 #include <vector>
 
-#include <Lamscript/Lamscript.h>
 #include <Lamscript/parsing/Token.h>
 #include <Lamscript/parsing/TokenType.h>
+#include <Lamscript/runtime/Lamscript.h>
 
 namespace lamscript {
 namespace parsing {
@@ -133,7 +133,7 @@ class Scanner {
     }
 
     if (HasReachedEOF()) {
-      Lamscript::Error(line_, "Unterminated string.");
+      runtime::Lamscript::Error(line_, "Unterminated string.");
       return;
     }
 
@@ -208,7 +208,8 @@ class Scanner {
         } else if (IsAlpha(c)) {
           ParseIdentifier();
         } else {
-          Lamscript::Error(line_, "Encountered an unexpected character.");
+          runtime::Lamscript::Error(
+              line_, "Encountered an unexpected character.");
         }
         break;
     }

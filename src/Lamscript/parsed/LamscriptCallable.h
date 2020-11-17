@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include <Lamscript/Interpreter.h>
+#include <Lamscript/runtime/Interpreter.h>
 
 namespace lamscript {
 namespace parsed {
@@ -14,7 +14,7 @@ class LamscriptCallable {
  public:
   virtual int Arity() const = 0;
   virtual std::any Call(
-      Interpreter* interpreter, std::vector<std::any> arguments) = 0;
+      runtime::Interpreter* interpreter, std::vector<std::any> arguments) = 0;
   virtual std::string ToString() const = 0;
 };
 

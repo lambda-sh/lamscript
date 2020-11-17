@@ -5,11 +5,11 @@
 #include <memory>
 #include <iostream>
 
-#include <Lamscript/Environment.h>
-#include <Lamscript/Interpreter.h>
 #include <Lamscript/parsed/LamscriptCallable.h>
 #include <Lamscript/parsed/LamscriptReturnValue.h>
 #include <Lamscript/parsed/Statement.h>
+#include <Lamscript/runtime/Environment.h>
+#include <Lamscript/runtime/Interpreter.h>
 
 namespace lamscript {
 namespace parsed {
@@ -17,15 +17,16 @@ namespace parsed {
 class LamscriptFunction : public LamscriptCallable {
  public:
   explicit LamscriptFunction(
-      Function* declaration, std::shared_ptr<Environment> closure)
+      Function* declaration, std::shared_ptr<runtime::Environment> closure)
           : declaration_(declaration), closure_(closure) {}
 
   int Arity() const override { return declaration_->GetParams().size(); }
 
   std::any Call(
-      Interpreter* interpreter, std::vector<std::any> arguments) override {
-    std::shared_ptr<Environment> function_env = std::make_shared<Environment>(
-        closure_);
+      runtime::Interpreter* interpreter,
+      std::vector<std::any> arguments) override {
+    std::shared_ptr<runtime::Environment> function_env =
+        std::make_shared<runtime::Environment>(closure_);
 
     const std::vector<parsing::Token>& params = declaration_->GetParams();
     for (size_t i = 0; i < params.size(); i++) {
@@ -47,7 +48,7 @@ class LamscriptFunction : public LamscriptCallable {
 
  private:
   Function* declaration_;
-  std::shared_ptr<Environment> closure_;
+  std::shared_ptr<runtime::Environment> closure_;
 };
 
 }  // namespace parsed
