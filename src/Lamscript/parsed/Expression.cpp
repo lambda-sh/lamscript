@@ -55,5 +55,9 @@ std::any Variable::Accept(ExpressionVisitor* visitor) {
   return visitor->VisitVariableExpression(this);
 }
 
+std::any LambdaExpression::Accept(ExpressionVisitor* visitor) {
+  return visitor->VisitLambdaExpression(this);
+}
+
 }  // namespace parsed
 }  // namespace lamscript

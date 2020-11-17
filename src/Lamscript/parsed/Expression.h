@@ -9,11 +9,10 @@
 
 namespace lamscript {
 
-/// @brief Base expression class used for allowing expressions to work with one
-/// another
 class ExpressionVisitor;
 
 namespace parsed {
+
 
 class Expression {
  public:
@@ -213,6 +212,19 @@ class Variable : public Expression {
   parsing::Token name_;
 };
 
+class Statement;
+
+class LambdaExpression : public Expression {
+ public:
+  explicit LambdaExpression(std::unique_ptr<Statement> lambda_function)
+      : lambda_function_(std::move(lambda_function)) {}
+
+  std::any Accept(ExpressionVisitor* visitor) override;
+
+  Statement* GetFunctionStatement() { return lambda_function_.get(); }
+ private:
+  std::unique_ptr<Statement> lambda_function_;
+};
 
 }  // namespace parsed
 }  // namespace lamscript
