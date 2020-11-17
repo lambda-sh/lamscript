@@ -1,17 +1,18 @@
-#ifndef SRC_LAMSCRIPT_INTERPRETER_H_
-#define SRC_LAMSCRIPT_INTERPRETER_H_
+#ifndef SRC_LAMSCRIPT_RUNTIME_INTERPRETER_H_
+#define SRC_LAMSCRIPT_RUNTIME_INTERPRETER_H_
 
 #include <any>
 #include <memory>
 #include <typeinfo>
 
-#include <Lamscript/Environment.h>
 #include <Lamscript/Visitor.h>
 #include <Lamscript/errors/RuntimeError.h>
 #include <Lamscript/parsed/Expression.h>
 #include <Lamscript/parsed/Statement.h>
+#include <Lamscript/runtime/Environment.h>
 
 namespace lamscript {
+namespace runtime {
 
 class Interpreter : ExpressionVisitor, StatementVisitor {
  public:
@@ -81,6 +82,7 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::string Stringify(std::any value);
 };
 
+}  // namespace runtime
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_INTERPRETER_H_
+#endif  // SRC_LAMSCRIPT_RUNTIME_INTERPRETER_H_

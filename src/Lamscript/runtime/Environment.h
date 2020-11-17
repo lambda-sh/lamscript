@@ -1,5 +1,5 @@
-#ifndef SRC_LAMSCRIPT_ENVIRONMENT_H_
-#define SRC_LAMSCRIPT_ENVIRONMENT_H_
+#ifndef SRC_LAMSCRIPT_RUNTIME_ENVIRONMENT_H_
+#define SRC_LAMSCRIPT_RUNTIME_ENVIRONMENT_H_
 
 #include <any>
 #include <memory>
@@ -9,7 +9,9 @@
 #include <Lamscript/parsing/Token.h>
 
 namespace lamscript {
+namespace runtime {
 
+/// @brief Allows for the storage of variables in memory.
 class Environment {
  public:
   /// @brief Create a new environment with no parent (Usually the global
@@ -28,6 +30,7 @@ class Environment {
   std::unordered_map<std::string, std::any> values_;
 };
 
+}  // namespace runtime
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_ENVIRONMENT_H_
+#endif  // SRC_LAMSCRIPT_RUNTIME_ENVIRONMENT_H_

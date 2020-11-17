@@ -1,4 +1,4 @@
-#include <Lamscript/Lamscript.h>
+#include <Lamscript/runtime/Lamscript.h>
 
 #include <any>
 #include <memory>
@@ -8,6 +8,7 @@
 #include <Lamscript/parsing/Scanner.h>
 
 namespace lamscript {
+namespace runtime {
 
 Interpreter Lamscript::interpreter_ = Interpreter();
 
@@ -112,4 +113,6 @@ void Lamscript::Report(
       << message
       << std::endl;
 }
+
+}  // namespace runtime
 }  // namespace lamscript

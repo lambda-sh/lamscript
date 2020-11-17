@@ -1,17 +1,19 @@
-#include <Lamscript/Interpreter.h>
+#include <Lamscript/runtime/Interpreter.h>
 
 #include <any>
 #include <math.h>
 #include <string>
 #include <typeinfo>
 
-#include <Lamscript/Lamscript.h>
 #include <Lamscript/lib/Globals.h>
 #include <Lamscript/parsed/LamscriptCallable.h>
 #include <Lamscript/parsed/LamscriptFunction.h>
 #include <Lamscript/parsed/Statement.h>
+#include <Lamscript/runtime/Lamscript.h>
 
 namespace lamscript {
+namespace runtime {
+
 
 // ---------------------------------- INTERNAL ---------------------------------
 
@@ -392,4 +394,5 @@ std::string Interpreter::Stringify(std::any object) {
   return AnyAs<std::string>(object);
 }
 
+}  // namespace runtime
 }  // namespace lamscript

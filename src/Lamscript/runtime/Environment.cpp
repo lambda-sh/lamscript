@@ -1,9 +1,10 @@
-#include <Lamscript/Environment.h>
+#include <Lamscript/runtime/Environment.h>
 
 #include <Lamscript/errors/RuntimeError.h>
 #include <Lamscript/parsing/Token.h>
 
 namespace lamscript {
+namespace runtime {
 
 void Environment::SetVariable(const parsing::Token& name, std::any value) {
   values_[name.Lexeme] = value;
@@ -34,4 +35,5 @@ std::any Environment::GetVariable(const parsing::Token& name) {
   throw RuntimeError(name, "Undefined variable: '" + name.Lexeme + "'.");
 }
 
+}  // namespace runtime
 }  // namespace lamscript

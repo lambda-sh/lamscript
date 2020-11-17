@@ -1,16 +1,17 @@
-#ifndef SRC_LAMSCRIPT_LAMSCRIPT_H_
-#define SRC_LAMSCRIPT_LAMSCRIPT_H_
+#ifndef SRC_LAMSCRIPT_RUNTIME_LAMSCRIPT_H_
+#define SRC_LAMSCRIPT_RUNTIME_LAMSCRIPT_H_
 
 #include <fstream>
 #include <ios>
 #include <iostream>
 #include <vector>
 
-#include <Lamscript/Interpreter.h>
+#include <Lamscript/runtime/Interpreter.h>
 #include <Lamscript/errors/RuntimeError.h>
 #include <Lamscript/parsing/Token.h>
 
 namespace lamscript {
+namespace runtime {
 
 class Lamscript {
  public:
@@ -27,7 +28,7 @@ class Lamscript {
   static bool had_error_, had_runtime_error_;
 };
 
-
+}  // namespace runtime
 }  // namespace lamscript
 
-#endif  // SRC_LAMSCRIPT_LAMSCRIPT_H_
+#endif  // SRC_LAMSCRIPT_RUNTIME_LAMSCRIPT_H_
