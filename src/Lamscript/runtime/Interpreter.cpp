@@ -14,7 +14,6 @@
 namespace lamscript {
 namespace runtime {
 
-
 // ---------------------------------- INTERNAL ---------------------------------
 
 namespace {
