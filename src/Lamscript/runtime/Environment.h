@@ -23,11 +23,25 @@ class Environment {
 
   /// @brief Defines a variable within the current environment.
   void SetVariable(const parsing::Token& name, std::any value);
+
+  /// @brief Assigns a variable within the current environment.
   void AssignVariable(const parsing::Token& name, std::any value);
+
+  /// @brief Assigns a variable at a further up scope.
+  void AssignVariableAtScope(
+      size_t distance, const parsing::Token& name, std::any value);
+
+  /// @brief Gets a variable within the current environment.
   std::any GetVariable(const parsing::Token& token);
+
+  /// brief Gets a variable at scope.
+  std::any GetVariableAtScope(size_t distance, const parsing::Token& name);
+
  private:
   std::shared_ptr<Environment> parent_;
   std::unordered_map<std::string, std::any> values_;
+
+  Environment* ScopeAt(size_t distance);
 };
 
 }  // namespace runtime

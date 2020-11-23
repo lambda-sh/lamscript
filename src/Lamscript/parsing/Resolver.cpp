@@ -7,7 +7,9 @@
 #include <unordered_map>
 #include <vector>
 
+#include <Lamscript/parsed/Expression.h>
 #include <Lamscript/parsed/Statement.h>
+#include <Lamscript/runtime/Lamscript.h>
 
 namespace lamscript {
 namespace parsing {
@@ -16,10 +18,73 @@ namespace parsing {
 
 void Resolver::Resolve(
     const std::vector<std::unique_ptr<parsed::Statement>>& statements) {
-  for (auto&& statement : statements) {
+  for (auto& statement : statements) {
     Resolve(statement.get());
   }
 }
+
+// ------------------------------- EXPRESSIONS ---------------------------------
+
+std::any Resolver::VisitVariableExpression(parsed::Variable* variable) {
+  // Validate that there is at least one scope for the variable to exist in.
+  if (scope_stack_.empty()) {
+    runtime::Lamscript::Error(
+        variable->GetName(), "There are no scopes currently available.");
+    return nullptr;
+  }
+
+  std::unordered_map<std::string, bool> &scope = scope_stack_.back();
+  const std::string& variable_name = variable->GetName().Lexeme;
+
+  if (scope[variable_name] == false) {
+    runtime::Lamscript::Error(
+        variable->GetName(),
+        "Can't read local variable in it's own initializer.");
+  }
+
+  ResolveLocalVariable(variable, variable->GetName());
+  return nullptr;
+}
+
+std::any Resolver::VisitAssignExpression(parsed::Assign* assignment) {
+  Resolve(assignment->GetValue());
+  ResolveLocalVariable(assignment, assignment->GetName());
+  return nullptr;
+}
+
+std::any Resolver::VisitBinaryExpression(parsed::Binary* binary) {
+  Resolve(binary->GetLeftSide());
+  Resolve(binary->GetRightSide());
+  return nullptr;
+}
+
+
+std::any Resolver::VisitCallExpression(parsed::Call* call) {
+  Resolve(call->GetCallee());
+
+  for (auto& argument : call->GetArguments()) {
+    Resolve(argument.get());
+  }
+
+  return nullptr;
+}
+
+std::any Resolver::VisitGroupingExpression(parsed::Grouping* grouping) {
+  Resolve(grouping->GetExpression());
+  return nullptr;
+}
+
+std::any Resolver::VisitLiteralExpression(parsed::Literal* literal) {
+  return nullptr;
+}
+
+std::any Resolver::VisitLogicalExpression(parsed::Logical* logical) {
+  Resolve(logical->GetLeftOperand());
+  Resolve(logical->GetRightOperand());
+  return nullptr;
+}
+
+// -------------------------------- STATEMENTS ---------------------------------
 
 std::any Resolver::VisitBlockStatement(parsed::Block* block) {
   BeginScope();
@@ -40,15 +105,59 @@ std::any Resolver::VisitVariableStatement(parsed::VariableStatement* variable) {
   return nullptr;
 }
 
+std::any Resolver::VisitFunctionStatement(parsed::Function* func) {
+  Declare(func->GetName());
+  Define(func->GetName());
+
+  ResolveFunction(func);
+  return nullptr;
+}
+
+std::any Resolver::VisitExpressionStatement(
+    parsed::ExpressionStatement* expression) {
+  Resolve(expression->GetExpression());
+  return nullptr;
+}
+
+/// This will resolve all parts of the if statement, regardless of what gets
+/// executed or not
+std::any Resolver::VisitIfStatement(parsed::If* if_statement) {
+  Resolve(if_statement->GetCondition());
+  Resolve(if_statement->GetThenBranch());
+
+  if (if_statement->GetElseBranch() != nullptr) {
+    Resolve(if_statement->GetElseBranch());
+  }
+
+  return nullptr;
+}
+
+std::any Resolver::VisitPrintStatement(parsed::Print* print) {
+  Resolve(print->GetExpression());
+  return nullptr;
+}
+
+std::any Resolver::VisitReturnStatement(parsed::Return* return_statement) {
+  if (return_statement->GetValue() != nullptr) {
+    Resolve(return_statement->GetValue());
+  }
+
+  return nullptr;
+}
+
+std::any Resolver::VisitWhileStatement(parsed::While* while_statement) {
+  Resolve(while_statement->GetCondition());
+  Resolve(while_statement->GetBody());
+  return nullptr;
+}
+
 // --------------------------------- PRIVATE -----------------------------------
 
 void Resolver::BeginScope() {
-  scopes_.push(std::unordered_map<std::string, bool>());
+  scope_stack_.push_back(std::unordered_map<std::string, bool>());
 }
 
-void Resolver::EndScope() {
-  scopes_.pop();
-}
+void Resolver::EndScope() { scope_stack_.pop_back(); }
 
 void Resolver::Resolve(parsed::Statement* statement) {
   statement->Accept(this);
@@ -59,21 +168,41 @@ void Resolver::Resolve(parsed::Expression* expression) {
 }
 
 void Resolver::Declare(Token name) {
-  if (scopes_.empty()) {
+  if (scope_stack_.empty()) {
     return;
   }
 
-  std::unordered_map<std::string, bool>& scope = scopes_.top();
+  std::unordered_map<std::string, bool> &scope = scope_stack_.back();
   scope[name.Lexeme] = false;
 }
 
 void Resolver::Define(Token name) {
-  if (scopes_.empty()) {
+  if (scope_stack_.empty()) {
     return;
   }
 
-  std::unordered_map<std::string, bool>& scope = scopes_.top();
+  std::unordered_map<std::string, bool> &scope = scope_stack_.back();
   scope[name.Lexeme] = true;
+}
+
+void Resolver::ResolveLocalVariable(
+    parsed::Expression* expression, const Token& variable_name) {
+  for (size_t pos = scope_stack_.size() - 1; pos >= 0; pos--) {
+    if (scope_stack_[pos].contains(variable_name.Lexeme)) {
+      interpreter_->Resolve(expression, scope_stack_.size() - 1 - pos);
+    }
+  }
+}
+
+void Resolver::ResolveFunction(parsed::Function* func) {
+  BeginScope();
+  for (const Token& param : func->GetParams()) {
+    Declare(param);
+    Define(param);
+  }
+
+  Resolve(func->GetBody());
+  EndScope();
 }
 
 }  // namespace parsing

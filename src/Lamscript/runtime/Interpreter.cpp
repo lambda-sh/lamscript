@@ -55,7 +55,7 @@ std::any Interpreter::VisitGroupingExpression(parsed::Grouping* expression) {
 }
 
 std::any Interpreter::VisitVariableExpression(parsed::Variable* variable) {
-  return environment_->GetVariable(variable->GetName());
+  return LookupVariable(variable->GetName(), variable);
 }
 
 std::any Interpreter::VisitUnaryExpression(parsed::Unary* expression) {
@@ -402,6 +402,16 @@ std::string Interpreter::Stringify(std::any object) {
   }
 
   return AnyAs<std::string>(object);
+}
+
+std::any Interpreter::LookupVariable(
+    const parsing::Token& name, parsed::Expression* expression) {
+  try {
+    size_t distance = locals_.at(expression);
+    return environment_->GetVariableAt(distance, name.Lexeme);
+  } catch (const std::out_of_range& error) {
+    return globals_->GetVariable(name);
+  }
 }
 
 }  // namespace runtime

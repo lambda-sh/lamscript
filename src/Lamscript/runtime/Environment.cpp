@@ -35,5 +35,20 @@ std::any Environment::GetVariable(const parsing::Token& name) {
   throw RuntimeError(name, "Undefined variable: '" + name.Lexeme + "'.");
 }
 
+std::any Environment::GetVariableAtScope(
+    size_t distance, const parsing::Token& name) {
+  return ScopeAt(distance)->GetVariable(name);
+}
+
+// ---------------------------------- PRIVATE ----------------------------------
+
+Environment* Environment::ScopeAt(size_t distance) {
+  Environment* current = this;
+  for (size_t current_pos = 0; current_pos < distance; distance++) {
+    current = current->parent_.get();
+  }
+  return current;
+}
+
 }  // namespace runtime
 }  // namespace lamscript

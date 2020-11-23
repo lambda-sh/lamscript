@@ -3,6 +3,7 @@
 
 #include <any>
 #include <memory>
+#include <unordered_map>
 #include <typeinfo>
 
 #include <Lamscript/Visitor.h>
@@ -61,26 +62,37 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
       const std::vector<std::unique_ptr<parsed::Statement>>& statements,
       std::shared_ptr<Environment> current_env);
 
+  void Resolve(parsed::Expression*, size_t index);
+
   std::shared_ptr<Environment> GetGlobalEnvironment() { return globals_; }
   std::shared_ptr<Environment> GetCurrentEnvironment() { return environment_; }
 
  private:
   std::shared_ptr<Environment> globals_;
   std::shared_ptr<Environment> environment_;
+  std::unordered_map<parsed::Expression*, size_t> locals_;
 
   /// @brief Validates that a unary operand is indeed a number.
   void CheckNumberOperand(parsing::Token operator_used, std::any operand);
+
   /// @brief Validates that binary operands are indeed both numbers.
   void CheckNumberOperands(
       parsing::Token operator_used, std::any left_side, std::any right_side);
+
+  /// @brief Evaluates if an object is truthy or not.
   bool IsTruthy(std::any object);
+
   /// @brief Evaluate a given expression.
   std::any Evaluate(parsed::Expression* expression);
+
   /// @brief Check to see if two values are equal.
   bool IsEqual(std::any left_side, std::any right_side);
 
   /// @brief Stringify any given interpreted object.
   std::string Stringify(std::any value);
+
+  std::any LookupVariable(
+      const parsing::Token& name, parsed::Expression* expression);
 };
 
 }  // namespace runtime
