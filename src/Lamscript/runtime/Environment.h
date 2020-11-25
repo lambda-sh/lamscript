@@ -20,9 +20,7 @@ class Environment {
   Environment() : parent_(nullptr) {}
 
   /// @brief Create an environment within a parent environment.
-  explicit Environment(std::shared_ptr<Environment> parent) : parent_(parent) {
-    std::cout << "making a new env" << std::endl;
-  }
+  explicit Environment(std::shared_ptr<Environment> parent) : parent_(parent) {}
 
   /// @brief Defines a variable within the current environment.
   void SetVariable(const parsing::Token& name, std::any value);
