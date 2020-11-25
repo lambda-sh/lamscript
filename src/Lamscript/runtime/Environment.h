@@ -44,7 +44,7 @@ class Environment {
   std::shared_ptr<Environment> parent_;
   std::unordered_map<std::string, std::any> values_;
 
-  Environment* ScopeAt(size_t distance);
+  Environment* ScopeAt(const size_t& distance);
 };
 
 }  // namespace runtime

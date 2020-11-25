@@ -49,7 +49,7 @@ std::any Environment::GetVariableAtScope(
 
 // ---------------------------------- PRIVATE ----------------------------------
 
-Environment* Environment::ScopeAt(size_t distance) {
+Environment* Environment::ScopeAt(const size_t& distance) {
   Environment* current = this;
   for (size_t current_pos = 0; current_pos < distance; current_pos++) {
     current = current->parent_.get();
