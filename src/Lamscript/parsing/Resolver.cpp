@@ -2,7 +2,6 @@
 
 #include <any>
 #include <memory>
-#include <stack>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -18,7 +17,7 @@ namespace parsing {
 
 void Resolver::Resolve(
     const std::vector<std::unique_ptr<parsed::Statement>>& statements) {
-  for (auto& statement : statements) {
+  for (auto&& statement : statements) {
     Resolve(statement.get());
   }
 }
@@ -26,17 +25,16 @@ void Resolver::Resolve(
 // ------------------------------- EXPRESSIONS ---------------------------------
 
 std::any Resolver::VisitVariableExpression(parsed::Variable* variable) {
-  // Validate that there is at least one scope for the variable to exist in.
   if (scope_stack_.empty()) {
-    runtime::Lamscript::Error(
-        variable->GetName(), "There are no scopes currently available.");
+    ResolveLocalVariable(variable, variable->GetName());
     return nullptr;
   }
 
-  std::unordered_map<std::string, bool> &scope = scope_stack_.back();
+  std::unordered_map<std::string, bool>& scope = scope_stack_.back();
   const std::string& variable_name = variable->GetName().Lexeme;
+  auto lookup = scope.find(variable_name);
 
-  if (scope[variable_name] == false) {
+  if (lookup != scope.end() && lookup->second == false) {
     runtime::Lamscript::Error(
         variable->GetName(),
         "Can't read local variable in it's own initializer.");
@@ -62,7 +60,7 @@ std::any Resolver::VisitBinaryExpression(parsed::Binary* binary) {
 std::any Resolver::VisitCallExpression(parsed::Call* call) {
   Resolve(call->GetCallee());
 
-  for (auto& argument : call->GetArguments()) {
+  for (auto&& argument : call->GetArguments()) {
     Resolve(argument.get());
   }
 
@@ -81,6 +79,11 @@ std::any Resolver::VisitLiteralExpression(parsed::Literal* literal) {
 std::any Resolver::VisitLogicalExpression(parsed::Logical* logical) {
   Resolve(logical->GetLeftOperand());
   Resolve(logical->GetRightOperand());
+  return nullptr;
+}
+
+std::any Resolver::VisitUnaryExpression(parsed::Unary* unary) {
+  Resolve(unary->GetRightExpression());
   return nullptr;
 }
 
@@ -157,7 +160,9 @@ void Resolver::BeginScope() {
   scope_stack_.push_back(std::unordered_map<std::string, bool>());
 }
 
-void Resolver::EndScope() { scope_stack_.pop_back(); }
+void Resolver::EndScope() {
+  scope_stack_.pop_back();
+}
 
 void Resolver::Resolve(parsed::Statement* statement) {
   statement->Accept(this);
@@ -190,6 +195,7 @@ void Resolver::ResolveLocalVariable(
   for (size_t pos = scope_stack_.size() - 1; pos >= 0; pos--) {
     if (scope_stack_[pos].contains(variable_name.Lexeme)) {
       interpreter_->Resolve(expression, scope_stack_.size() - 1 - pos);
+      return;
     }
   }
 }

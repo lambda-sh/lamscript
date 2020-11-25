@@ -44,6 +44,10 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   /// @brief Visits both the left and the right operands.
   std::any VisitLogicalExpression(parsed::Logical* logical) override;
 
+  /// @brief Visit the right side of the unary expression.
+  std::any VisitUnaryExpression(parsed::Unary* unary) override;
+
+
   /// @brief Resolves all variables declared within block statements.
   std::any VisitBlockStatement(parsed::Block* block) override;
 
@@ -55,7 +59,6 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   /// @brief Resolves the function eagerly, allowing it to recursively call
   /// itself.
   std::any VisitFunctionStatement(parsed::Function* func) override;
-
 
   /// @brief Resolves the expression associated with the expression statement.
   std::any VisitExpressionStatement(parsed::ExpressionStatement* expression)
@@ -80,6 +83,17 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   /// to ensure that variables are being binded and resolved properly.
   void Resolve(
       const std::vector<std::unique_ptr<parsed::Statement>> &statements);
+
+
+  /// @todo Implement the rest of these expression/statement visitation methods.
+  std::any VisitGetExpression(parsed::Get* expression) override {}
+  std::any VisitSetExpression(parsed::Set* expression) override {}
+  std::any VisitSuperExpression(parsed::Super* expression) override {}
+  std::any VisitThisExpression(parsed::This* expression) override {}
+  std::any VisitLambdaExpression(
+      parsed::LambdaExpression* expression) override {}
+
+  std::any VisitClassStatement(parsed::Class* statement) override {}
 
  private:
   std::shared_ptr<runtime::Interpreter> interpreter_;
