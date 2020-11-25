@@ -1,5 +1,7 @@
 #include <Lamscript/runtime/Environment.h>
 
+#include <iostream>
+
 #include <Lamscript/errors/RuntimeError.h>
 #include <Lamscript/parsing/Token.h>
 
@@ -23,6 +25,11 @@ void Environment::AssignVariable(const parsing::Token& name, std::any value) {
   throw RuntimeError(name, "Undefined Variable '" + name.Lexeme + "'.");
 }
 
+void Environment::AssignVariableAtScope(
+    size_t distance, const parsing::Token &name, std::any value) {
+  ScopeAt(distance)->AssignVariable(name, value);
+}
+
 std::any Environment::GetVariable(const parsing::Token& name) {
   if (values_.contains(name.Lexeme)) {
     return values_[name.Lexeme];
@@ -44,7 +51,7 @@ std::any Environment::GetVariableAtScope(
 
 Environment* Environment::ScopeAt(size_t distance) {
   Environment* current = this;
-  for (size_t current_pos = 0; current_pos < distance; distance++) {
+  for (size_t current_pos = 0; current_pos < distance; current_pos++) {
     current = current->parent_.get();
   }
   return current;

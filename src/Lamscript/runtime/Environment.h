@@ -2,6 +2,7 @@
 #define SRC_LAMSCRIPT_RUNTIME_ENVIRONMENT_H_
 
 #include <any>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -19,7 +20,9 @@ class Environment {
   Environment() : parent_(nullptr) {}
 
   /// @brief Create an environment within a parent environment.
-  explicit Environment(std::shared_ptr<Environment> parent) : parent_(parent) {}
+  explicit Environment(std::shared_ptr<Environment> parent) : parent_(parent) {
+    std::cout << "making a new env" << std::endl;
+  }
 
   /// @brief Defines a variable within the current environment.
   void SetVariable(const parsing::Token& name, std::any value);
