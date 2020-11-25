@@ -62,7 +62,7 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
       const std::vector<std::unique_ptr<parsed::Statement>>& statements,
       std::shared_ptr<Environment> current_env);
 
-  void Resolve(parsed::Expression*, size_t index);
+  void Resolve(parsed::Expression* expression, size_t distance);
 
   std::shared_ptr<Environment> GetGlobalEnvironment() { return globals_; }
   std::shared_ptr<Environment> GetCurrentEnvironment() { return environment_; }

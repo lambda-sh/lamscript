@@ -5,12 +5,14 @@
 
 #include <Lamscript/errors/RuntimeError.h>
 #include <Lamscript/parsing/Parser.h>
+#include <Lamscript/parsing/Resolver.h>
 #include <Lamscript/parsing/Scanner.h>
 
 namespace lamscript {
 namespace runtime {
 
-Interpreter Lamscript::interpreter_ = Interpreter();
+std::shared_ptr<Interpreter> Lamscript::interpreter_ = std::make_shared<
+    Interpreter>();
 
 bool Lamscript::had_error_ = false;
 
@@ -29,7 +31,10 @@ void Lamscript::Run(const std::string& source) {
     return;
   }
 
-  interpreter_.Interpret(statements);
+  parsing::Resolver resolver = parsing::Resolver(interpreter_);
+  resolver.Resolve(statements);
+
+  interpreter_->Interpret(statements);
 }
 
 /// @brief Run a given file.

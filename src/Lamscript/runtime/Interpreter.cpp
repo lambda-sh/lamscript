@@ -42,7 +42,14 @@ Interpreter::Interpreter()
 
 std::any Interpreter::VisitAssignExpression(parsed::Assign* expression) {
   std::any value = Evaluate(expression->GetValue());
-  environment_->AssignVariable(expression->GetName(), value);
+
+  try {
+    size_t& distance = locals_.at(expression);
+    environment_->AssignVariableAtScope(distance, expression->GetName(), value);
+  } catch (const std::out_of_range& error) {
+    globals_->AssignVariable(expression->GetName(), value);
+  }
+
   return value;
 }
 
@@ -306,6 +313,10 @@ void Interpreter::ExecuteBlock(
   environment_ = previous;
 }
 
+void Interpreter::Resolve(parsed::Expression* expression, size_t distance) {
+  locals_[expression] = distance;
+}
+
 // ---------------------------------- PRIVATE ----------------------------------
 
 void Interpreter::CheckNumberOperand(
@@ -407,8 +418,8 @@ std::string Interpreter::Stringify(std::any object) {
 std::any Interpreter::LookupVariable(
     const parsing::Token& name, parsed::Expression* expression) {
   try {
-    size_t distance = locals_.at(expression);
-    return environment_->GetVariableAt(distance, name.Lexeme);
+    size_t& distance = locals_.at(expression);
+    return environment_->GetVariableAtScope(distance, name);
   } catch (const std::out_of_range& error) {
     return globals_->GetVariable(name);
   }

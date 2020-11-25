@@ -24,7 +24,7 @@ class Lamscript {
   static void Report(
       int line, const std::string& where, const std::string& message);
  private:
-  static Interpreter interpreter_;
+  static std::shared_ptr<Interpreter> interpreter_;
   static bool had_error_, had_runtime_error_;
 };
 
