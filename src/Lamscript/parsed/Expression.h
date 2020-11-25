@@ -13,7 +13,6 @@ class ExpressionVisitor;
 
 namespace parsed {
 
-
 class Expression {
  public:
   virtual std::any Accept(ExpressionVisitor* visitor) = 0;
