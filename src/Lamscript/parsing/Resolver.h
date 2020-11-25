@@ -47,7 +47,6 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   /// @brief Visit the right side of the unary expression.
   std::any VisitUnaryExpression(parsed::Unary* unary) override;
 
-
   /// @brief Resolves all variables declared within block statements.
   std::any VisitBlockStatement(parsed::Block* block) override;
 
