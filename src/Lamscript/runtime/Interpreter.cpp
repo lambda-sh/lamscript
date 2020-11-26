@@ -7,6 +7,7 @@
 
 #include <Lamscript/lib/Globals.h>
 #include <Lamscript/parsed/LamscriptCallable.h>
+#include <Lamscript/parsed/LamscriptClass.h>
 #include <Lamscript/parsed/LamscriptFunction.h>
 #include <Lamscript/parsed/Statement.h>
 #include <Lamscript/runtime/Lamscript.h>
@@ -255,14 +256,14 @@ std::any Interpreter::VisitWhileStatement(parsed::While* statement) {
     Execute(statement->GetBody());
   }
 
-  return NULL;
+  return nullptr;
 }
 
 std::any Interpreter::VisitFunctionStatement(parsed::Function* statement) {
   parsed::LamscriptCallable* func = new parsed::LamscriptFunction(
       statement, environment_);
   environment_->SetVariable(statement->GetName(), func);
-  return NULL;
+  return nullptr;
 }
 
 std::any Interpreter::VisitReturnStatement(parsed::Return* statement) {
@@ -272,6 +273,14 @@ std::any Interpreter::VisitReturnStatement(parsed::Return* statement) {
   }
 
   throw parsed::LamscriptReturnValue(value);
+}
+
+
+std::any Interpreter::VisitClassStatement(parsed::Class* class_def) {
+  environment_->SetVariable(
+      class_def->GetName(),
+      new parsed::LamscriptClass(class_def->GetName().Lexeme));
+  return nullptr;
 }
 
 void Interpreter::Interpret(
@@ -410,6 +419,10 @@ std::string Interpreter::Stringify(std::any object) {
 
   if (object.type() == typeid(parsed::LamscriptFunction*)) {
     return AnyAs<parsed::LamscriptFunction*>(object)->ToString();
+  }
+
+  if (object.type() == typeid(parsed::LamscriptClass*)) {
+    return AnyAs<parsed::LamscriptClass*>(object)->ToString();
   }
 
   return AnyAs<std::string>(object);

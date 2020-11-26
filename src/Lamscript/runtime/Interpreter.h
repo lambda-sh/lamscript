@@ -42,6 +42,7 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitWhileStatement(parsed::While* statement) override;
   std::any VisitFunctionStatement(parsed::Function* statement) override;
   std::any VisitReturnStatement(parsed::Return* statement) override;
+  std::any VisitClassStatement(parsed::Class* statement) override;
 
   /// @todo (C3NZ) Implement the rest of the visitor pattern.
 
@@ -51,7 +52,6 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitThisExpression(parsed::This* expression) override {};
 
   // Statements
-  std::any VisitClassStatement(parsed::Class* statement) override {};
 
   // Primary external API
 
