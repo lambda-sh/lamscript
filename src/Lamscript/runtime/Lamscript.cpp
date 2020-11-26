@@ -34,6 +34,11 @@ void Lamscript::Run(const std::string& source) {
   parsing::Resolver resolver = parsing::Resolver(interpreter_);
   resolver.Resolve(statements);
 
+  if (had_error_) {
+    had_error_ = false;
+    return;
+  }
+
   interpreter_->Interpret(statements);
 }
 
