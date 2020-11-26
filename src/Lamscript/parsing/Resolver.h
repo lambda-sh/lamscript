@@ -17,11 +17,18 @@
 namespace lamscript {
 namespace parsing {
 
+enum FunctionType {
+  kNone,
+  kFunction,
+};
+
 /// @brief Resolves variables and expressions prior to interpreting them.
 class Resolver : public ExpressionVisitor, StatementVisitor {
  public:
   explicit Resolver(std::shared_ptr<runtime::Interpreter> interpreter)
-      : interpreter_(interpreter), scope_stack_() {}
+      : interpreter_(interpreter),
+      scope_stack_(),
+      current_function_(FunctionType::kNone) {}
 
   std::any VisitVariableExpression(parsed::Variable* variable) override;
 
@@ -95,6 +102,7 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
  private:
   std::shared_ptr<runtime::Interpreter> interpreter_;
   std::vector<std::unordered_map<std::string, bool>> scope_stack_;
+  FunctionType current_function_;
 
   /// @brief Creates a new scope to store variables and their usage in.
   void BeginScope();
@@ -121,7 +129,7 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
 
   /// @brief Creates the function scope and binds the function parameters and
   /// body to the proper variables.
-  void ResolveFunction(parsed::Function* func);
+  void ResolveFunction(parsed::Function* func, FunctionType type);
 };
 
 }  // namespace parsing

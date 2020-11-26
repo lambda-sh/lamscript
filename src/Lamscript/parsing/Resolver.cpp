@@ -25,18 +25,16 @@ void Resolver::Resolve(
 // ------------------------------- EXPRESSIONS ---------------------------------
 
 std::any Resolver::VisitVariableExpression(parsed::Variable* variable) {
-  if (scope_stack_.empty()) {
-    return nullptr;
-  }
+  if (!scope_stack_.empty()) {
+    std::unordered_map<std::string, bool>& scope = scope_stack_.back();
+    const std::string& variable_name = variable->GetName().Lexeme;
+    auto lookup = scope.find(variable_name);
 
-  std::unordered_map<std::string, bool>& scope = scope_stack_.back();
-  const std::string& variable_name = variable->GetName().Lexeme;
-  auto lookup = scope.find(variable_name);
-
-  if (lookup != scope.end() && lookup->second == false) {
-    runtime::Lamscript::Error(
-        variable->GetName(),
-        "Can't read local variable in it's own initializer.");
+    if (lookup != scope.end() && lookup->second == false) {
+      runtime::Lamscript::Error(
+          variable->GetName(),
+          "Can't read local variable in it's own initializer.");
+    }
   }
 
   ResolveLocalVariable(variable, variable->GetName());
@@ -111,7 +109,7 @@ std::any Resolver::VisitFunctionStatement(parsed::Function* func) {
   Declare(func->GetName());
   Define(func->GetName());
 
-  ResolveFunction(func);
+  ResolveFunction(func, FunctionType::kFunction);
   return nullptr;
 }
 
@@ -140,6 +138,11 @@ std::any Resolver::VisitPrintStatement(parsed::Print* print) {
 }
 
 std::any Resolver::VisitReturnStatement(parsed::Return* return_statement) {
+  if (current_function_ == FunctionType::kNone) {
+    runtime::Lamscript::Error(
+        return_statement->GetKeyword(), "Can't return from top-level code.");
+  }
+
   if (return_statement->GetValue() != nullptr) {
     Resolve(return_statement->GetValue());
   }
@@ -177,6 +180,12 @@ void Resolver::Declare(Token name) {
   }
 
   std::unordered_map<std::string, bool> &scope = scope_stack_.back();
+
+  if (scope.contains(name.Lexeme)) {
+    runtime::Lamscript::Error(
+        name, "There is already a variable that exists within this scope.");
+  }
+
   scope[name.Lexeme] = false;
 }
 
@@ -191,7 +200,7 @@ void Resolver::Define(Token name) {
 
 void Resolver::ResolveLocalVariable(
     parsed::Expression* expression, const Token& variable_name) {
-  for (size_t pos = scope_stack_.size() - 1; pos >= 0; pos--) {
+  for (int pos = scope_stack_.size() - 1; pos >= 0; pos--) {
     if (scope_stack_[pos].contains(variable_name.Lexeme)) {
       interpreter_->Resolve(expression, scope_stack_.size() - 1 - pos);
       return;
@@ -199,15 +208,19 @@ void Resolver::ResolveLocalVariable(
   }
 }
 
-void Resolver::ResolveFunction(parsed::Function* func) {
+void Resolver::ResolveFunction(parsed::Function* func, FunctionType type) {
+  FunctionType enclosing_function = current_function_;
+  current_function_ = type;
+
   BeginScope();
   for (const Token& param : func->GetParams()) {
     Declare(param);
     Define(param);
   }
-
   Resolve(func->GetBody());
   EndScope();
+
+  current_function_ = enclosing_function;
 }
 
 }  // namespace parsing
