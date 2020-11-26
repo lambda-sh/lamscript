@@ -26,7 +26,6 @@ void Resolver::Resolve(
 
 std::any Resolver::VisitVariableExpression(parsed::Variable* variable) {
   if (scope_stack_.empty()) {
-    ResolveLocalVariable(variable, variable->GetName());
     return nullptr;
   }
 

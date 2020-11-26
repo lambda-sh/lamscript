@@ -77,12 +77,10 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   /// @brief Resolves both the condition and the body.
   std::any VisitWhileStatement(parsed::While* while_statement) override;
 
-
   /// @brief Forwards references to each statement into the visitor interface
   /// to ensure that variables are being binded and resolved properly.
   void Resolve(
       const std::vector<std::unique_ptr<parsed::Statement>> &statements);
-
 
   /// @todo Implement the rest of these expression/statement visitation methods.
   std::any VisitGetExpression(parsed::Get* expression) override {}
