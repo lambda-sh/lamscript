@@ -134,6 +134,7 @@ class Return : public Statement {
   std::any Accept(StatementVisitor* visitor) override;
 
   Expression* GetValue() { return value_.get(); }
+  const parsing::Token& GetKeyword() const { return keyword_; }
 
  private:
   parsing::Token keyword_;
