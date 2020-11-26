@@ -76,18 +76,19 @@ class Class : public Statement {
  public:
   Class(
       parsing::Token name,
-      Variable super_class,
-      std::vector<Function>&& methods)
+      std::unique_ptr<Variable> super_class,
+      std::vector<std::unique_ptr<Function>>&& methods)
           : name_(name),
-          super_class_(super_class),
+          super_class_(std::move(super_class)),
           methods_(std::move(methods)) {}
 
   std::any Accept(StatementVisitor* visitor) override;
+  const parsing::Token& GetName() const { return name_; }
 
  private:
   parsing::Token name_;
-  Variable super_class_;
-  std::vector<Function> methods_;
+  std::unique_ptr<Variable> super_class_;
+  std::vector<std::unique_ptr<Function>> methods_;
 };
 
 class If : public Statement {
