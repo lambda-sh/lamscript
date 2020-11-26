@@ -101,6 +101,8 @@ class Parser {
 
   std::unique_ptr<parsed::Statement> ParseReturnStatement();
 
+  std::unique_ptr<parsed::Statement> ParseClassStatement();
+
   // ---------------------------- PARSE EXPRESSIONS ----------------------------
 
   /// @brief Parses an equality for as long as there are equal signs and

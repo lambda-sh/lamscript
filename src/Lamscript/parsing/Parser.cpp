@@ -128,6 +128,10 @@ Token Parser::Consume(TokenType type, const std::string& message) {
 /// statement.
 std::unique_ptr<parsed::Statement> Parser::ParseDeclaration() {
   try {
+    if (CheckAndConsumeTokens({CLASS})) {
+      return std::move(ParseClassStatement());
+    }
+
     if (CheckAndConsumeTokens({FUN})) {
         return std::move(ParseFunction("function"));
     }
@@ -321,7 +325,7 @@ std::unique_ptr<parsed::Statement> Parser::ParseFunction(
     const std::string& kind) {
 
   Token name{FUN, "lambda" + GenerateRandomString(8), nullptr,  Peek().Line };
-  if (kind.compare("function") == 0) {
+  if (kind.compare("function") == 0 || kind.compare("method") == 0) {
     name = Consume(IDENTIFIER, "Expect " + kind + " name.");
   }
 
@@ -362,6 +366,25 @@ std::unique_ptr<parsed::Statement> Parser::ParseReturnStatement() {
 
   std::unique_ptr<parsed::Statement> statement;
   statement.reset(new parsed::Return(keyword, std::move(value)));
+  return std::move(statement);
+}
+
+std::unique_ptr<parsed::Statement> Parser::ParseClassStatement() {
+  Token name = Consume(IDENTIFIER, "Expect a class name.");
+  Consume(LEFT_BRACE, "Expect '{' before class body.");
+
+  std::vector<std::unique_ptr<parsed::Function>> methods;
+  while (!CheckToken(RIGHT_BRACE) && !HasReachedEOF()) {
+    std::unique_ptr<parsed::Function> class_method;
+    class_method.reset(
+        static_cast<parsed::Function*>(ParseFunction("method").get()));
+    methods.emplace_back(std::move(class_method));
+  }
+
+  Consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+  std::unique_ptr<parsed::Statement> statement;
+  statement.reset(new parsed::Class(name, nullptr, std::move(methods)));
   return std::move(statement);
 }
 

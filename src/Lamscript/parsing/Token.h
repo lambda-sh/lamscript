@@ -9,7 +9,6 @@
 namespace lamscript {
 namespace parsing {
 
-
 struct Token {
   TokenType Type;
   std::string Lexeme;
