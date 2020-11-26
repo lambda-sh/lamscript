@@ -22,6 +22,13 @@ enum FunctionType {
   kFunction,
 };
 
+/// @brief Small container for keeping track of variables being used
+struct VariableMetadata{
+  bool Defined;
+  bool Used;
+  int Line;
+};
+
 /// @brief Resolves variables and expressions prior to interpreting them.
 class Resolver : public ExpressionVisitor, StatementVisitor {
  public:
@@ -101,7 +108,7 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
 
  private:
   std::shared_ptr<runtime::Interpreter> interpreter_;
-  std::vector<std::unordered_map<std::string, bool>> scope_stack_;
+  std::vector<std::unordered_map<std::string, VariableMetadata>> scope_stack_;
   FunctionType current_function_;
 
   /// @brief Creates a new scope to store variables and their usage in.

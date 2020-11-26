@@ -26,14 +26,18 @@ void Resolver::Resolve(
 
 std::any Resolver::VisitVariableExpression(parsed::Variable* variable) {
   if (!scope_stack_.empty()) {
-    std::unordered_map<std::string, bool>& scope = scope_stack_.back();
+    std::unordered_map<std::string, VariableMetadata>& scope =
+        scope_stack_.back();
     const std::string& variable_name = variable->GetName().Lexeme;
     auto lookup = scope.find(variable_name);
 
-    if (lookup != scope.end() && lookup->second == false) {
-      runtime::Lamscript::Error(
-          variable->GetName(),
-          "Can't read local variable in it's own initializer.");
+    if (lookup != scope.end()) {
+      if (lookup->second.Defined == false) {
+          runtime::Lamscript::Error(
+              variable->GetName(),
+              "Can't read local variable in it's own initializer.");
+      }
+      scope[variable_name].Used = true;
     }
   }
 
@@ -159,10 +163,19 @@ std::any Resolver::VisitWhileStatement(parsed::While* while_statement) {
 // --------------------------------- PRIVATE -----------------------------------
 
 void Resolver::BeginScope() {
-  scope_stack_.push_back(std::unordered_map<std::string, bool>());
+  scope_stack_.push_back(std::unordered_map<std::string, VariableMetadata>());
 }
 
+/// Ensures that variables have to be used inside of their local scopes.
 void Resolver::EndScope() {
+  for (auto it : scope_stack_.back()) {
+    if (it.second.Used == false) {
+      runtime::Lamscript::Error(
+          parsing::Token{IDENTIFIER, it.first, nullptr, it.second.Line},
+          "Defined a local variable but that isn't used.");
+    }
+  }
+
   scope_stack_.pop_back();
 }
 
@@ -179,14 +192,15 @@ void Resolver::Declare(Token name) {
     return;
   }
 
-  std::unordered_map<std::string, bool> &scope = scope_stack_.back();
+  std::unordered_map<std::string, VariableMetadata>& scope =
+      scope_stack_.back();
 
   if (scope.contains(name.Lexeme)) {
     runtime::Lamscript::Error(
         name, "There is already a variable that exists within this scope.");
   }
 
-  scope[name.Lexeme] = false;
+  scope[name.Lexeme] = VariableMetadata{false, false, name.Line};
 }
 
 void Resolver::Define(Token name) {
@@ -194,8 +208,9 @@ void Resolver::Define(Token name) {
     return;
   }
 
-  std::unordered_map<std::string, bool> &scope = scope_stack_.back();
-  scope[name.Lexeme] = true;
+  std::unordered_map<std::string, VariableMetadata>& scope =
+      scope_stack_.back();
+  scope[name.Lexeme].Defined = true;
 }
 
 void Resolver::ResolveLocalVariable(
