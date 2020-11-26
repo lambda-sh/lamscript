@@ -91,6 +91,8 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   /// @brief Resolves both the condition and the body.
   std::any VisitWhileStatement(parsed::While* while_statement) override;
 
+  std::any VisitClassStatement(parsed::Class* statement) override;
+
   /// @brief Forwards references to each statement into the visitor interface
   /// to ensure that variables are being binded and resolved properly.
   void Resolve(
@@ -104,7 +106,6 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   std::any VisitLambdaExpression(
       parsed::LambdaExpression* expression) override {}
 
-  std::any VisitClassStatement(parsed::Class* statement) override {}
 
  private:
   std::shared_ptr<runtime::Interpreter> interpreter_;

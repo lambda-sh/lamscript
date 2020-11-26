@@ -160,6 +160,13 @@ std::any Resolver::VisitWhileStatement(parsed::While* while_statement) {
   return nullptr;
 }
 
+
+std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
+  Declare(class_def->GetName());
+  Define(class_def->GetName());
+  return nullptr;
+}
+
 // --------------------------------- PRIVATE -----------------------------------
 
 void Resolver::BeginScope() {
