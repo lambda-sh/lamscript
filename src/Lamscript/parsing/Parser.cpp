@@ -419,9 +419,14 @@ std::unique_ptr<parsed::Expression> Parser::ParseAssignment() {
           expression.get())) {
       expression.reset(new parsed::Assign(var->GetName(), std::move(value)));
       return std::move(expression);
+    } else if (
+        parsed::Get* get = dynamic_cast<parsed::Get*>(expression.get())) {
+      expression.reset(
+          new parsed::Set(
+              get->GetObject(), get->GetName(), std::move(value)));
     }
 
-    Error(equals, "Ivalid assignment target");
+    Error(equals, "Invalid assignment target");
   }
 
   return std::move(expression);
@@ -578,6 +583,9 @@ std::unique_ptr<parsed::Expression> Parser::ParseCall() {
   while (true) {
     if (CheckAndConsumeTokens({LEFT_PAREN})) {
       expression = FinishCall(std::move(expression));
+    } else if (CheckAndConsumeTokens({DOT})) {
+      Token name = Consume(IDENTIFIER, "Expect property name after '.'.");
+      expression.reset(new parsed::Get(std::move(expression), name));
     } else {
       break;
     }
