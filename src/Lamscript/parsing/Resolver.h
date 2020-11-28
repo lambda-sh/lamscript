@@ -61,6 +61,12 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   /// @brief Visit the right side of the unary expression.
   std::any VisitUnaryExpression(parsed::Unary* unary) override;
 
+  /// @brief Resolves Getting data from an instance.
+  std::any VisitGetExpression(parsed::Get* getter) override;
+
+  /// @brief Resolves both the object and value being set to the class field.
+  std::any VisitSetExpression(parsed::Set* setter) override;
+
   /// @brief Resolves all variables declared within block statements.
   std::any VisitBlockStatement(parsed::Block* block) override;
 
@@ -99,8 +105,6 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
       const std::vector<std::unique_ptr<parsed::Statement>> &statements);
 
   /// @todo Implement the rest of these expression/statement visitation methods.
-  std::any VisitGetExpression(parsed::Get* expression) override {}
-  std::any VisitSetExpression(parsed::Set* expression) override {}
   std::any VisitSuperExpression(parsed::Super* expression) override {}
   std::any VisitThisExpression(parsed::This* expression) override {}
   std::any VisitLambdaExpression(

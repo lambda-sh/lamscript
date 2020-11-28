@@ -88,6 +88,18 @@ std::any Resolver::VisitUnaryExpression(parsed::Unary* unary) {
   return nullptr;
 }
 
+
+std::any Resolver::VisitGetExpression(parsed::Get* getter) {
+  Resolve(getter->GetObject().get());
+  return nullptr;
+}
+
+std::any Resolver::VisitSetExpression(parsed::Set* setter) {
+  Resolve(setter->GetValue());
+  Resolve(setter->GetObject().get());
+  return nullptr;
+}
+
 // -------------------------------- STATEMENTS ---------------------------------
 
 std::any Resolver::VisitBlockStatement(parsed::Block* block) {
