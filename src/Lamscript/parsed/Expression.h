@@ -85,14 +85,17 @@ class Call : public Expression {
 class Get : public Expression {
  public:
   Get(
-      std::unique_ptr<Expression> object,
+      std::shared_ptr<Expression> object,
       parsing::Token name)
           : object_(std::move(object)), name_(name) {}
 
   std::any Accept(ExpressionVisitor* visitor) override;
 
+  std::shared_ptr<Expression> GetObject() const { return object_; }
+  const parsing::Token& GetName() const { return name_; }
+
  private:
-  std::unique_ptr<Expression> object_;
+  std::shared_ptr<Expression> object_;
   parsing::Token name_;
 };
 
@@ -147,15 +150,19 @@ class Logical : public Expression {
 class Set : public Expression {
  public:
   Set(
-      std::unique_ptr<Expression> object,
+      std::shared_ptr<Expression> object,
       parsing::Token name,
       std::unique_ptr<Expression> value)
-          : object_(std::move(object)), name_(name), value_(std::move(value)) {}
+          : object_(object), name_(name), value_(std::move(value)) {}
 
   std::any Accept(ExpressionVisitor* visitor) override;
 
+  std::shared_ptr<Expression> GetObject() { return object_; }
+  Expression* GetValue() { return value_.get(); }
+  const parsing::Token& GetName() const { return name_; }
+
  private:
-  std::unique_ptr<Expression> object_;
+  std::shared_ptr<Expression> object_;
   parsing::Token name_;
   std::unique_ptr<Expression> value_;
 };
