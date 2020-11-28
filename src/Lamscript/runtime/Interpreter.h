@@ -29,6 +29,8 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitLogicalExpression(parsed::Logical* expression) override;
   std::any VisitCallExpression(parsed::Call* expression) override;
   std::any VisitLambdaExpression(parsed::LambdaExpression* expression) override;
+  std::any VisitGetExpression(parsed::Get* getter) override;
+  std::any VisitSetExpression(parsed::Set* setter) override;
 
   // Implemented Statements
 
@@ -46,8 +48,6 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
 
   /// @todo (C3NZ) Implement the rest of the visitor pattern.
 
-  std::any VisitGetExpression(parsed::Get* expression) override {};
-  std::any VisitSetExpression(parsed::Set* expression) override {};
   std::any VisitSuperExpression(parsed::Super* expression) override {};
   std::any VisitThisExpression(parsed::This* expression) override {};
 

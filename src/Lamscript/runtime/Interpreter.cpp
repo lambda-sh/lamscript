@@ -11,7 +11,6 @@
 #include <Lamscript/parsed/LamscriptFunction.h>
 #include <Lamscript/parsed/Statement.h>
 #include <Lamscript/runtime/Lamscript.h>
-
 namespace lamscript {
 namespace runtime {
 
@@ -207,6 +206,33 @@ std::any Interpreter::VisitLambdaExpression(
   Execute(func);
 
   return environment_->GetVariable(func->GetName());
+}
+
+
+std::any Interpreter::VisitGetExpression(parsed::Get* getter) {
+  std::any object = Evaluate(getter->GetObject().get());
+
+  if (object.type() != typeid(std::shared_ptr<parsed::LamscriptInstance>)) {
+    throw RuntimeError(
+        getter->GetName(), "Only instances have properties.");
+  }
+
+  return std::any_cast<std::shared_ptr<parsed::LamscriptInstance>>(
+      object)->GetField(getter->GetName());
+}
+
+std::any Interpreter::VisitSetExpression(parsed::Set* setter) {
+  std::any object = Evaluate(setter->GetObject().get());
+
+  if (object.type() != typeid(std::shared_ptr<parsed::LamscriptInstance>)) {
+    throw RuntimeError(setter->GetName(), "Only instances have fields.");
+  }
+
+  std::any value = Evaluate(setter->GetValue());
+  std::any_cast<std::shared_ptr<parsed::LamscriptInstance>>(
+      object)->SetField(setter->GetName(), value);
+
+  return value;
 }
 
 // --------------------------------- STATEMENTS --------------------------------
