@@ -84,6 +84,7 @@ class Class : public Statement {
 
   std::any Accept(StatementVisitor* visitor) override;
   const parsing::Token& GetName() const { return name_; }
+  std::vector<std::unique_ptr<Function>>& GetMethods() { return methods_; }
 
  private:
   parsing::Token name_;
