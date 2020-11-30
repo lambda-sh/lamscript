@@ -303,9 +303,19 @@ std::any Interpreter::VisitReturnStatement(parsed::Return* statement) {
 
 
 std::any Interpreter::VisitClassStatement(parsed::Class* class_def) {
-  environment_->SetVariable(
-      class_def->GetName(),
-      new parsed::LamscriptClass(class_def->GetName().Lexeme));
+  std::unordered_map<
+      std::string, parsed::LamscriptFunction*> methods;
+
+
+  for (auto& method : class_def->GetMethods()) {
+    methods[method->GetName().Lexeme] =
+        new parsed::LamscriptFunction(method.get(), environment_);
+  }
+
+  parsed::LamscriptCallable* lam_class = new parsed::LamscriptClass(
+      class_def->GetName().Lexeme, methods);
+
+  environment_->SetVariable(class_def->GetName(), lam_class);
   return nullptr;
 }
 
