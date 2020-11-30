@@ -16,9 +16,10 @@ namespace parsed {
 
 class LamscriptFunction : public LamscriptCallable {
  public:
-  explicit LamscriptFunction(
-      Function* declaration, std::shared_ptr<runtime::Environment> closure)
-          : declaration_(declaration), closure_(closure) {}
+  LamscriptFunction(
+      Function* declaration,
+      std::shared_ptr<runtime::Environment> closure)
+          : declaration_(std::move(declaration)), closure_(closure) {}
 
   int Arity() const override { return declaration_->GetParams().size(); }
 
@@ -47,7 +48,7 @@ class LamscriptFunction : public LamscriptCallable {
   }
 
  private:
-  Function* declaration_;
+  std::unique_ptr<Function> declaration_;
   std::shared_ptr<runtime::Environment> closure_;
 };
 

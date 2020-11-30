@@ -4,15 +4,19 @@
 #include <string>
 
 #include <Lamscript/parsed/LamscriptCallable.h>
+#include <Lamscript/parsed/LamscriptFunction.h>
 
 namespace lamscript {
 namespace parsed {
 
 class LamscriptInstance;
 
-class LamscriptClass : LamscriptCallable {
+class LamscriptClass : public LamscriptCallable {
  public:
-  explicit LamscriptClass(const std::string& name) : name_(name) {}
+  LamscriptClass(
+      const std::string& name,
+      std::unordered_map<std::string, parsed::LamscriptFunction*> methods)
+              : name_(name), methods_(methods) {}
 
   int Arity() const override { return 0; }
 
@@ -24,9 +28,21 @@ class LamscriptClass : LamscriptCallable {
     return instance;
   }
 
+  /// @brief Looks up a method inside of the current class definition. If it
+  /// doesn't exist, returns a nullptr.
+  parsed::LamscriptFunction* LookupMethod(std::string method_name) {
+    if (methods_.contains(method_name)) {
+      return methods_.at(method_name);
+    }
+
+    return nullptr;
+  }
+
   std::string ToString() const override { return name_; }
+
  private:
   std::string name_;
+  std::unordered_map<std::string, parsed::LamscriptFunction*> methods_;
 };
 
 
@@ -36,12 +52,17 @@ class LamscriptInstance {
   explicit LamscriptInstance(
       LamscriptClass* class_def) : class_def_(class_def) {}
 
-  std::any& GetField(const parsing::Token& name) {
+  std::any GetField(const parsing::Token& name) {
     if (fields.contains(name.Lexeme)) {
       return fields.at(name.Lexeme);
     }
 
-    throw new RuntimeError(name, "Undefined property '" + name.Lexeme + "'.");
+    LamscriptCallable* method = class_def_->LookupMethod(name.Lexeme);
+    if (method != nullptr) {
+      return method;
+    }
+
+    throw RuntimeError(name, "Undefined property '" + name.Lexeme + "'.");
   }
 
   void SetField(const parsing::Token& name, std::any value) {
@@ -49,6 +70,7 @@ class LamscriptInstance {
   }
 
   std::string ToString() const { return class_def_->ToString() + " Instance"; }
+
  private:
   LamscriptClass* class_def_;
   std::unordered_map<std::string, std::any> fields;
