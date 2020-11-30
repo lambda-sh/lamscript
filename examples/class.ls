@@ -5,3 +5,7 @@ class HelloWorld {
 }
 
 print HelloWorld;
+
+var hello = HelloWorld();
+
+print hello.Hello();
