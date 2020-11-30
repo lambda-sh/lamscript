@@ -30,13 +30,13 @@ const std::type_info& String = typeid(std::string);
 }  // namespace
 
 // ---------------------------------- PUBLIC -----------------------------------
+
 Interpreter::Interpreter()
     : globals_(new Environment()), environment_(globals_) {
   globals_->SetVariable(
       parsing::Token{parsing::FUN, "clock", nullptr, 0},
       reinterpret_cast<parsed::LamscriptCallable*>(new lib::Clock()));
 }
-
 
 // --------------------------------- EXPRESSIONS -------------------------------
 
@@ -240,19 +240,19 @@ std::any Interpreter::VisitSetExpression(parsed::Set* setter) {
 std::any Interpreter::VisitBlockStatement(parsed::Block* statement) {
   ExecuteBlock(
       statement->GetStatements(), std::make_shared<Environment>(environment_));
-  return NULL;
+  return nullptr;
 }
 
 std::any Interpreter::VisitPrintStatement(parsed::Print* statement) {
   std::any value = Evaluate(statement->GetExpression());
   std::cout << Stringify(value) << std::endl;
-  return NULL;
+  return nullptr;
 }
 
 std::any Interpreter::VisitExpressionStatement(
     parsed::ExpressionStatement* statement) {
   Evaluate(statement->GetExpression());
-  return NULL;
+  return nullptr;
 }
 
 std::any Interpreter::VisitVariableStatement(
@@ -264,7 +264,7 @@ std::any Interpreter::VisitVariableStatement(
   }
 
   environment_->SetVariable(statement->GetName(), value);
-  return NULL;
+  return nullptr;
 }
 
 std::any Interpreter::VisitIfStatement(parsed::If* statement) {
@@ -274,7 +274,7 @@ std::any Interpreter::VisitIfStatement(parsed::If* statement) {
     Execute(statement->GetElseBranch());
   }
 
-  return NULL;
+  return nullptr;
 }
 
 std::any Interpreter::VisitWhileStatement(parsed::While* statement) {
