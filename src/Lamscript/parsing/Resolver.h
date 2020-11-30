@@ -20,6 +20,7 @@ namespace parsing {
 enum FunctionType {
   kNone,
   kFunction,
+  kMethod
 };
 
 /// @brief Small container for keeping track of variables being used
