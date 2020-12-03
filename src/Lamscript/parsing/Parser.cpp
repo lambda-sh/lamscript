@@ -373,18 +373,18 @@ std::unique_ptr<parsed::Statement> Parser::ParseClassStatement() {
   Token name = Consume(IDENTIFIER, "Expect a class name.");
   Consume(LEFT_BRACE, "Expect '{' before class body.");
 
-  std::vector<std::unique_ptr<parsed::Function>> methods;
+  std::vector<std::shared_ptr<parsed::Function>> methods;
   while (!CheckToken(RIGHT_BRACE) && !HasReachedEOF()) {
-    std::unique_ptr<parsed::Function> class_method;
+    std::shared_ptr<parsed::Function> class_method;
     class_method.reset(
-        static_cast<parsed::Function*>(ParseFunction("method").get()));
-    methods.emplace_back(std::move(class_method));
+        static_cast<parsed::Function*>(ParseFunction("method").release()));
+    methods.emplace_back(class_method);
   }
 
   Consume(RIGHT_BRACE, "Expect '}' after class body.");
 
   std::unique_ptr<parsed::Statement> statement;
-  statement.reset(new parsed::Class(name, nullptr, std::move(methods)));
+  statement.reset(new parsed::Class(name, nullptr, methods));
   return std::move(statement);
 }
 
@@ -424,9 +424,9 @@ std::unique_ptr<parsed::Expression> Parser::ParseAssignment() {
       expression.reset(
           new parsed::Set(
               get->GetObject(), get->GetName(), std::move(value)));
+    } else {
+      Error(equals, "Invalid assignment target");
     }
-
-    Error(equals, "Invalid assignment target");
   }
 
   return std::move(expression);
@@ -440,55 +440,60 @@ std::unique_ptr<parsed::Expression> Parser::ParseExpression() {
 std::unique_ptr<parsed::Expression> Parser::ParsePrimary() {
   std::unique_ptr<parsed::Expression> expression;
 
-    if (CheckAndConsumeTokens({FALSE})) {
-      expression.reset(new parsed::Literal(false));
-      return std::move(expression);
-    }
+  if (CheckAndConsumeTokens({FALSE})) {
+    expression.reset(new parsed::Literal(false));
+    return std::move(expression);
+  }
 
-    if (CheckAndConsumeTokens({TRUE})) {
-      expression.reset(new parsed::Literal(true));
-      return std::move(expression);
-    }
+  if (CheckAndConsumeTokens({TRUE})) {
+    expression.reset(new parsed::Literal(true));
+    return std::move(expression);
+  }
 
-    if (CheckAndConsumeTokens({NIL})) {
-      expression.reset(new parsed::Literal());
-      return std::move(expression);
-    }
+  if (CheckAndConsumeTokens({NIL})) {
+    expression.reset(new parsed::Literal());
+    return std::move(expression);
+  }
 
-    if (CheckAndConsumeTokens({NUMBER, STRING})) {
-      Token token = Previous();
+  if (CheckAndConsumeTokens({NUMBER, STRING})) {
+    Token token = Previous();
 
-      if (token.Literal.type() == typeid(double)) {
-        expression.reset(new parsed::Literal(
-              std::any_cast<double>(token.Literal)));
-        return std::move(expression);
-      }
-
+    if (token.Literal.type() == typeid(double)) {
       expression.reset(new parsed::Literal(
-            std::any_cast<std::string&>(token.Literal)));
+            std::any_cast<double>(token.Literal)));
       return std::move(expression);
     }
 
-    if (CheckAndConsumeTokens({IDENTIFIER})) {
-      expression.reset(new parsed::Variable(Previous()));
-      return std::move(expression);
-    }
+    expression.reset(new parsed::Literal(
+          std::any_cast<std::string&>(token.Literal)));
+    return std::move(expression);
+  }
 
-    if (CheckAndConsumeTokens({FUN})) {
-      std::unique_ptr<parsed::Statement> fn = std::move(
-          ParseFunction("lambda"));
-      expression.reset(new parsed::LambdaExpression(std::move(fn)));
-      return std::move(expression);
-    }
+  if (CheckAndConsumeTokens({THIS})) {
+    expression.reset(new parsed::This(Previous()));
+    return std::move(expression);
+  }
 
-    if (CheckAndConsumeTokens({LEFT_PAREN})) {
-      std::unique_ptr<parsed::Expression> expression = ParseExpression();
-      Consume(RIGHT_PAREN, "Expect ')' after expression");
-      expression.reset(new parsed::Grouping(std::move(expression)));
-      return std::move(expression);
-    }
+  if (CheckAndConsumeTokens({IDENTIFIER})) {
+    expression.reset(new parsed::Variable(Previous()));
+    return std::move(expression);
+  }
 
-    throw Error(Peek(), "Expect expression.");
+  if (CheckAndConsumeTokens({FUN})) {
+    std::unique_ptr<parsed::Statement> fn = std::move(
+        ParseFunction("lambda"));
+    expression.reset(new parsed::LambdaExpression(std::move(fn)));
+    return std::move(expression);
+  }
+
+  if (CheckAndConsumeTokens({LEFT_PAREN})) {
+    std::unique_ptr<parsed::Expression> expression = ParseExpression();
+    Consume(RIGHT_PAREN, "Expect ')' after expression");
+    expression.reset(new parsed::Grouping(std::move(expression)));
+    return std::move(expression);
+  }
+
+  throw Error(Peek(), "Expect expression.");
 }
 
 /// Precedence will have ! parsed first and then - afterwards.
