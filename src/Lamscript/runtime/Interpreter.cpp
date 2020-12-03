@@ -35,7 +35,7 @@ Interpreter::Interpreter()
     : globals_(new Environment()), environment_(globals_) {
   globals_->SetVariable(
       parsing::Token{parsing::FUN, "clock", nullptr, 0},
-      reinterpret_cast<parsed::LamscriptCallable*>(new lib::Clock()));
+      std::shared_ptr<parsed::LamscriptCallable>(new lib::Clock()));
 }
 
 // --------------------------------- EXPRESSIONS -------------------------------
@@ -179,8 +179,8 @@ std::any Interpreter::VisitCallExpression(parsed::Call* expression) {
   }
 
   try {
-    parsed::LamscriptCallable* callable = AnyAs<
-        parsed::LamscriptCallable*>(callee);
+    std::shared_ptr<parsed::LamscriptCallable> callable = std::any_cast<
+        std::shared_ptr<parsed::LamscriptCallable>>(callee);
 
     if (callable->Arity() != arguments.size()) {
       throw RuntimeError(
@@ -208,7 +208,6 @@ std::any Interpreter::VisitLambdaExpression(
   return environment_->GetVariable(func->GetName());
 }
 
-
 std::any Interpreter::VisitGetExpression(parsed::Get* getter) {
   std::any object = Evaluate(getter->GetObject().get());
 
@@ -217,7 +216,7 @@ std::any Interpreter::VisitGetExpression(parsed::Get* getter) {
         getter->GetName(), "Only instances have properties.");
   }
 
-  return std::any_cast<std::shared_ptr<parsed::LamscriptInstance>>(
+  return AnyAs<std::shared_ptr<parsed::LamscriptInstance>>(
       object)->GetField(getter->GetName());
 }
 
@@ -233,6 +232,10 @@ std::any Interpreter::VisitSetExpression(parsed::Set* setter) {
       object)->SetField(setter->GetName(), value);
 
   return value;
+}
+
+std::any Interpreter::VisitThisExpression(parsed::This* this_expr) {
+  return LookupVariable(this_expr->GetKeyword(), this_expr);
 }
 
 // --------------------------------- STATEMENTS --------------------------------
@@ -286,8 +289,9 @@ std::any Interpreter::VisitWhileStatement(parsed::While* statement) {
 }
 
 std::any Interpreter::VisitFunctionStatement(parsed::Function* statement) {
-  parsed::LamscriptCallable* func = new parsed::LamscriptFunction(
-      statement, environment_);
+  std::shared_ptr<parsed::LamscriptCallable> func(
+      new parsed::LamscriptFunction(
+          std::shared_ptr<parsed::Function>(statement), environment_));
   environment_->SetVariable(statement->GetName(), func);
   return nullptr;
 }
@@ -304,16 +308,16 @@ std::any Interpreter::VisitReturnStatement(parsed::Return* statement) {
 
 std::any Interpreter::VisitClassStatement(parsed::Class* class_def) {
   std::unordered_map<
-      std::string, parsed::LamscriptFunction*> methods;
-
+      std::string, parsed::LamscriptFunction> methods;
 
   for (auto& method : class_def->GetMethods()) {
-    methods[method->GetName().Lexeme] =
-        new parsed::LamscriptFunction(method.get(), environment_);
+    parsed::LamscriptFunction func(method, environment_);
+    methods.insert(std::make_pair(method->GetName().Lexeme, func));
   }
 
-  parsed::LamscriptCallable* lam_class = new parsed::LamscriptClass(
-      class_def->GetName().Lexeme, methods);
+  std::shared_ptr<parsed::LamscriptCallable> lam_class(
+      new parsed::LamscriptClass(
+          class_def->GetName().Lexeme, std::move(methods)));
 
   environment_->SetVariable(class_def->GetName(), lam_class);
   return nullptr;
@@ -449,12 +453,9 @@ std::string Interpreter::Stringify(std::any object) {
     return AnyAs<bool&>(object) ? "true" : "false";
   }
 
-  if (object.type() == typeid(parsed::LamscriptCallable*)) {
-    return AnyAs<parsed::LamscriptCallable*>(object)->ToString();
-  }
-
-  if (object.type() == typeid(parsed::LamscriptFunction*)) {
-    return AnyAs<parsed::LamscriptFunction*>(object)->ToString();
+  if (object.type() == typeid(std::shared_ptr<parsed::LamscriptCallable>)) {
+    return AnyAs<std::shared_ptr<parsed::LamscriptCallable>>(
+        object)->ToString();
   }
 
   if (object.type() == typeid(parsed::LamscriptClass*)) {
