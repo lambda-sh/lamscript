@@ -14,12 +14,29 @@
 namespace lamscript {
 namespace parsed {
 
+class LamscriptInstance;
+
 class LamscriptFunction : public LamscriptCallable {
  public:
   LamscriptFunction(
-      Function* declaration,
+      std::shared_ptr<Function> declaration,
       std::shared_ptr<runtime::Environment> closure)
-          : declaration_(std::move(declaration)), closure_(closure) {}
+          : declaration_(declaration), closure_(closure) {}
+
+  /// @brief Enables functions to bind to whatever instance they desire,
+  /// allowing `this` expressions to be resolved to their correct scope.
+  std::shared_ptr<LamscriptCallable> Bind(
+      std::shared_ptr<LamscriptInstance> instance) {
+    std::shared_ptr<runtime::Environment> function_env =
+        std::make_shared<runtime::Environment>(closure_);
+
+    function_env->SetVariable(
+        parsing::Token{parsing::THIS, "this", nullptr, 0}, instance);
+
+    std::shared_ptr<LamscriptCallable> callable;
+    callable.reset(new LamscriptFunction(declaration_, function_env));
+    return callable;
+  }
 
   int Arity() const override { return declaration_->GetParams().size(); }
 
@@ -48,7 +65,7 @@ class LamscriptFunction : public LamscriptCallable {
   }
 
  private:
-  std::unique_ptr<Function> declaration_;
+  std::shared_ptr<Function> declaration_;
   std::shared_ptr<runtime::Environment> closure_;
 };
 
