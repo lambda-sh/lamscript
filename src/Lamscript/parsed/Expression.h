@@ -184,6 +184,7 @@ class This : public Expression {
   explicit This(parsing::Token keyword) : keyword_(keyword) {}
 
   std::any Accept(ExpressionVisitor* visitor) override;
+  const parsing::Token& GetKeyword() const { return keyword_; }
 
  private:
   parsing::Token keyword_;
