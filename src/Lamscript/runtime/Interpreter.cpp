@@ -11,6 +11,7 @@
 #include <Lamscript/parsed/LamscriptFunction.h>
 #include <Lamscript/parsed/Statement.h>
 #include <Lamscript/runtime/Lamscript.h>
+
 namespace lamscript {
 namespace runtime {
 
@@ -23,9 +24,14 @@ ReturnType AnyAs(std::any any_object) {
   return std::any_cast<ReturnType>(any_object);
 }
 
-const std::type_info& Boolean = typeid(bool);
-const std::type_info& Number = typeid(double);
-const std::type_info& String = typeid(std::string);
+typedef std::shared_ptr<parsed::LamscriptInstance> SharedLamscriptInstance;
+typedef std::shared_ptr<parsed::LamscriptCallable> SharedLamscriptCallable;
+
+const std::type_info& LS_TYPE_BOOLEAN = typeid(bool);
+const std::type_info& LS_TYPE_NUMBER = typeid(double);
+const std::type_info& LS_TYPE_STRING = typeid(std::string);
+const std::type_info& LS_TYPE_INSTANCE = typeid(SharedLamscriptInstance);
+const std::type_info& LS_TYPE_CALLABLE = typeid(SharedLamscriptCallable);
 
 }  // namespace
 
@@ -35,7 +41,7 @@ Interpreter::Interpreter()
     : globals_(new Environment()), environment_(globals_) {
   globals_->SetVariable(
       parsing::Token{parsing::FUN, "clock", nullptr, 0},
-      std::shared_ptr<parsed::LamscriptCallable>(new lib::Clock()));
+      SharedLamscriptCallable(new lib::Clock()));
 }
 
 // --------------------------------- EXPRESSIONS -------------------------------
@@ -83,9 +89,13 @@ std::any Interpreter::VisitBinaryExpression(parsed::Binary* expression) {
   std::any left_side = Evaluate(expression->GetLeftSide());
   std::any right_side = Evaluate(expression->GetRightSide());
 
-  if (left_side.type() == Number || right_side.type() == Number) {
+  if (left_side.type() == LS_TYPE_NUMBER
+      || right_side.type() == LS_TYPE_NUMBER) {
     CheckNumberOperands(expression->GetOperator(), left_side, right_side);
   }
+
+  const std::type_info& left_type = left_side.type();
+  const std::type_info& right_type = right_side.type();
 
   switch (expression->GetOperator().Type) {
     case parsing::MINUS:
@@ -94,11 +104,11 @@ std::any Interpreter::VisitBinaryExpression(parsed::Binary* expression) {
     }
     case parsing::PLUS:
     {
-      if (left_side.type() == Number && right_side.type() == Number) {
+      if (left_type == LS_TYPE_NUMBER && right_type == LS_TYPE_NUMBER) {
         return AnyAs<double>(left_side) + AnyAs<double>(right_side);
       }
 
-      if (left_side.type() == String && right_side.type() == String) {
+      if (left_type == LS_TYPE_STRING && right_type == LS_TYPE_STRING) {
         return AnyAs<std::string>(left_side) + AnyAs<std::string>(right_side);
       }
 
@@ -211,25 +221,24 @@ std::any Interpreter::VisitLambdaExpression(
 std::any Interpreter::VisitGetExpression(parsed::Get* getter) {
   std::any object = Evaluate(getter->GetObject().get());
 
-  if (object.type() != typeid(std::shared_ptr<parsed::LamscriptInstance>)) {
+  if (object.type() != LS_TYPE_INSTANCE) {
     throw RuntimeError(
         getter->GetName(), "Only instances have properties.");
   }
 
-  return AnyAs<std::shared_ptr<parsed::LamscriptInstance>>(
+  return AnyAs<SharedLamscriptInstance>(
       object)->GetField(getter->GetName());
 }
 
 std::any Interpreter::VisitSetExpression(parsed::Set* setter) {
   std::any object = Evaluate(setter->GetObject().get());
 
-  if (object.type() != typeid(std::shared_ptr<parsed::LamscriptInstance>)) {
+  if (object.type() != LS_TYPE_INSTANCE) {
     throw RuntimeError(setter->GetName(), "Only instances have fields.");
   }
 
   std::any value = Evaluate(setter->GetValue());
-  std::any_cast<std::shared_ptr<parsed::LamscriptInstance>>(
-      object)->SetField(setter->GetName(), value);
+  AnyAs<SharedLamscriptInstance>(object)->SetField(setter->GetName(), value);
 
   return value;
 }
@@ -370,14 +379,15 @@ void Interpreter::Resolve(parsed::Expression* expression, size_t distance) {
 
 void Interpreter::CheckNumberOperand(
     parsing::Token operator_used, std::any operand) {
-  if (operand.type() != Number) {
+  if (operand.type() != LS_TYPE_NUMBER) {
     throw RuntimeError(operator_used, "Operand must be a number.");
   }
 }
 
 void Interpreter::CheckNumberOperands(
     parsing::Token operator_used, std::any left_side, std::any right_side) {
-  if (left_side.type() != Number || right_side.type() != Number) {
+  if (left_side.type() != LS_TYPE_NUMBER
+      || right_side.type() != LS_TYPE_NUMBER) {
     throw RuntimeError(operator_used, "Operands must both be numbers.");
   }
 }
@@ -386,15 +396,18 @@ bool Interpreter::IsTruthy(std::any object) {
   if (!object.has_value()) {
     return false;
   }
-  if (object.type() == Boolean) {
+
+  const std::type_info& type = object.type();
+
+  if (type == LS_TYPE_BOOLEAN) {
     return AnyAs<bool&>(object);
   }
 
-  if (object.type() == Number) {
+  if (type == LS_TYPE_NUMBER) {
     return AnyAs<double&>(object) != 0;
   }
 
-  if (object.type() == String) {
+  if (type == LS_TYPE_STRING) {
     return !AnyAs<std::string&>(object).empty();
   }
 
@@ -421,19 +434,23 @@ bool Interpreter::IsEqual(std::any left_side, std::any right_side) {
     return false;
   }
 
-  if (left_side.type() != right_side.type()) {
+  const std::type_info& left_type = left_side.type();
+  const std::type_info& right_type = right_side.type();
+
+
+  if (left_type != right_type) {
     return false;
   }
 
-  if (left_side.type() == Boolean) {
+  if (left_type == LS_TYPE_BOOLEAN) {
     return AnyAs<bool>(left_side) == AnyAs<bool>(right_side);
   }
 
-  if (left_side.type() == Number) {
+  if (left_type == LS_TYPE_NUMBER) {
     return AnyAs<double&>(left_side) == AnyAs<double&>(right_side);
   }
 
-  if (left_side.type() == String) {
+  if (left_type == LS_TYPE_STRING) {
     return AnyAs<std::string&>(left_side) == AnyAs<std::string&>(right_side);
   }
 
@@ -445,21 +462,18 @@ std::string Interpreter::Stringify(std::any object) {
     return "nil";
   }
 
-  if (object.type() == Number) {
-    return std::to_string(AnyAs<double&>(object));
-  }
+  const std::type_info& type = object.type();
 
-  if (object.type() == Boolean) {
+  if (type == LS_TYPE_BOOLEAN) {
     return AnyAs<bool&>(object) ? "true" : "false";
   }
 
-  if (object.type() == typeid(std::shared_ptr<parsed::LamscriptCallable>)) {
-    return AnyAs<std::shared_ptr<parsed::LamscriptCallable>>(
-        object)->ToString();
+  if (type == LS_TYPE_NUMBER) {
+    return std::to_string(AnyAs<double&>(object));
   }
 
-  if (object.type() == typeid(parsed::LamscriptClass*)) {
-    return AnyAs<parsed::LamscriptClass*>(object)->ToString();
+  if (type == LS_TYPE_CALLABLE) {
+    return AnyAs<SharedLamscriptCallable>(object)->ToString();
   }
 
   return AnyAs<std::string>(object);
