@@ -17,10 +17,15 @@
 namespace lamscript {
 namespace parsing {
 
-enum FunctionType {
+enum class FunctionType {
   kNone,
   kFunction,
   kMethod
+};
+
+enum class ClassType {
+  kNone,
+  kClass
 };
 
 /// @brief Small container for keeping track of variables being used
