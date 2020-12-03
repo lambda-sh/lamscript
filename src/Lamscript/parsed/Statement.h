@@ -77,19 +77,20 @@ class Class : public Statement {
   Class(
       parsing::Token name,
       std::unique_ptr<Variable> super_class,
-      std::vector<std::unique_ptr<Function>>&& methods)
+      const std::vector<std::shared_ptr<Function>>& methods)
           : name_(name),
           super_class_(std::move(super_class)),
-          methods_(std::move(methods)) {}
+          methods_(methods) {}
 
   std::any Accept(StatementVisitor* visitor) override;
   const parsing::Token& GetName() const { return name_; }
-  std::vector<std::unique_ptr<Function>>& GetMethods() { return methods_; }
+  const std::vector<std::shared_ptr<Function>>& GetMethods() {
+    return methods_; }
 
  private:
   parsing::Token name_;
   std::unique_ptr<Variable> super_class_;
-  std::vector<std::unique_ptr<Function>> methods_;
+  std::vector<std::shared_ptr<Function>> methods_;
 };
 
 class If : public Statement {
