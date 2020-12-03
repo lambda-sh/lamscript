@@ -100,6 +100,11 @@ std::any Resolver::VisitSetExpression(parsed::Set* setter) {
   return nullptr;
 }
 
+std::any Resolver::VisitThisExpression(parsed::This* this_expr) {
+  ResolveLocalVariable(this_expr, this_expr->GetKeyword());
+  return nullptr;
+}
+
 // -------------------------------- STATEMENTS ---------------------------------
 
 std::any Resolver::VisitBlockStatement(parsed::Block* block) {
@@ -177,9 +182,18 @@ std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
   Declare(class_def->GetName());
   Define(class_def->GetName());
 
+  BeginScope();
+  std::unordered_map<std::string, VariableMetadata>& scope =
+      scope_stack_.back();
+
+  scope["this"] = VariableMetadata{true, true, class_def->GetName().Line};
+
   for (auto& method : class_def->GetMethods()) {
+    std::cout << "Resolving method:" << method->GetName().Lexeme << std::endl;
     ResolveFunction(method.get(), FunctionType::kMethod);
   }
+
+  EndScope();
 
   return nullptr;
 }
@@ -252,10 +266,12 @@ void Resolver::ResolveFunction(parsed::Function* func, FunctionType type) {
   current_function_ = type;
 
   BeginScope();
+
   for (const Token& param : func->GetParams()) {
     Declare(param);
     Define(param);
   }
+
   Resolve(func->GetBody());
   EndScope();
 
