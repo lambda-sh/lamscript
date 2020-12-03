@@ -41,7 +41,8 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   explicit Resolver(std::shared_ptr<runtime::Interpreter> interpreter)
       : interpreter_(interpreter),
       scope_stack_(),
-      current_function_(FunctionType::kNone) {}
+      current_function_(FunctionType::kNone),
+      current_class_(ClassType::kNone) {}
 
   std::any VisitVariableExpression(parsed::Variable* variable) override;
 
@@ -122,6 +123,7 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   std::shared_ptr<runtime::Interpreter> interpreter_;
   std::vector<std::unordered_map<std::string, VariableMetadata>> scope_stack_;
   FunctionType current_function_;
+  ClassType current_class_;
 
   /// @brief Creates a new scope to store variables and their usage in.
   void BeginScope();

@@ -31,10 +31,6 @@ class LamscriptClass : public LamscriptCallable {
   /// @brief Looks up a method inside of the current class definition. If it
   /// doesn't exist, returns a nullptr.
   LamscriptFunction& LookupMethod(const std::string& method_name) {
-    std::cout << "looking up method by name: " << method_name << std::endl;
-    for (auto& method : methods_) {
-      std::cout << method.first << std::endl;
-    }
     return methods_.at(method_name);
   }
 

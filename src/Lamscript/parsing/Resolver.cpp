@@ -101,6 +101,11 @@ std::any Resolver::VisitSetExpression(parsed::Set* setter) {
 }
 
 std::any Resolver::VisitThisExpression(parsed::This* this_expr) {
+  if (current_class_ == ClassType::kNone) {
+    runtime::Lamscript::Error(
+        this_expr->GetKeyword(), "Cannot use this outside of a class.");
+  }
+
   ResolveLocalVariable(this_expr, this_expr->GetKeyword());
   return nullptr;
 }
@@ -179,6 +184,9 @@ std::any Resolver::VisitWhileStatement(parsed::While* while_statement) {
 
 
 std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
+  ClassType enclosing_class = current_class_;
+  current_class_ = ClassType::kClass;
+
   Declare(class_def->GetName());
   Define(class_def->GetName());
 
@@ -189,12 +197,11 @@ std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
   scope["this"] = VariableMetadata{true, true, class_def->GetName().Line};
 
   for (auto& method : class_def->GetMethods()) {
-    std::cout << "Resolving method:" << method->GetName().Lexeme << std::endl;
     ResolveFunction(method.get(), FunctionType::kMethod);
   }
 
   EndScope();
-
+  current_class_ = enclosing_class;
   return nullptr;
 }
 
