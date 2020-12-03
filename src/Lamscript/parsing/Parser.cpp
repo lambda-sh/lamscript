@@ -16,9 +16,27 @@ namespace lamscript {
 namespace parsing {
 
 namespace {
-  typedef std::unique_ptr<parsed::Expression> UniqueExpression;
-  typedef std::unique_ptr<parsed::Statement> UniqueStatement;
-  typedef std::shared_ptr<parsed::Function> SharedFunction;
+
+typedef std::unique_ptr<parsed::Expression> UniqueExpression;
+typedef std::unique_ptr<parsed::Statement> UniqueStatement;
+typedef std::shared_ptr<parsed::Function> SharedFunction;
+
+/// Used for anonymous function generation. Will most likely be moved or
+/// removed.
+std::string GenerateRandomString(size_t length) {
+  auto RandomCharacter = []() -> char {
+    const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+        const size_t max_index = (sizeof(charset) - 1);
+        return charset[ rand() % max_index ];
+  };
+
+  std::string random_string(length, 0);
+  std::generate_n(random_string.begin(), length, RandomCharacter);
+  return random_string;
+}
 
 }  // namespace
 
@@ -34,20 +52,6 @@ std::vector<UniqueStatement> Parser::Parse() {
   return statements;
 }
 
-std::string GenerateRandomString(size_t length) {
-  auto RandomCharacter = []() -> char {
-    const char charset[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
-        const size_t max_index = (sizeof(charset) - 1);
-        return charset[ rand() % max_index ];
-  };
-
-  std::string random_string(length, 0);
-  std::generate_n(random_string.begin(), length, RandomCharacter);
-  return random_string;
-}
 
 // ---------------------------------- PRIVATE ----------------------------------
 
