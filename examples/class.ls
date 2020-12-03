@@ -1,11 +1,13 @@
 class HelloWorld {
   Hello() {
-    return "Hello, world!";
+    return this.message;
   }
 }
 
 print HelloWorld;
 
 var hello = HelloWorld();
+
+hello.message = "Hello, world";
 
 print hello.Hello();
