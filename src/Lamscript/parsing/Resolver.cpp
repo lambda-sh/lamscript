@@ -13,6 +13,12 @@
 namespace lamscript {
 namespace parsing {
 
+namespace {
+
+typedef std::unordered_map<std::string, VariableMetadata> Scope;
+
+}  // namespace
+
 // ---------------------------------- PUBLIC -----------------------------------
 
 void Resolver::Resolve(
@@ -26,8 +32,7 @@ void Resolver::Resolve(
 
 std::any Resolver::VisitVariableExpression(parsed::Variable* variable) {
   if (!scope_stack_.empty()) {
-    std::unordered_map<std::string, VariableMetadata>& scope =
-        scope_stack_.back();
+    Scope& scope = scope_stack_.back();
     const std::string& variable_name = variable->GetName().Lexeme;
     auto lookup = scope.find(variable_name);
 
@@ -191,9 +196,7 @@ std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
   Define(class_def->GetName());
 
   BeginScope();
-  std::unordered_map<std::string, VariableMetadata>& scope =
-      scope_stack_.back();
-
+  Scope& scope = scope_stack_.back();
   scope["this"] = VariableMetadata{true, true, class_def->GetName().Line};
 
   for (auto& method : class_def->GetMethods()) {
@@ -208,7 +211,7 @@ std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
 // --------------------------------- PRIVATE -----------------------------------
 
 void Resolver::BeginScope() {
-  scope_stack_.push_back(std::unordered_map<std::string, VariableMetadata>());
+  scope_stack_.push_back(Scope());
 }
 
 /// Ensures that variables have to be used inside of their local scopes.
@@ -237,8 +240,7 @@ void Resolver::Declare(Token name) {
     return;
   }
 
-  std::unordered_map<std::string, VariableMetadata>& scope =
-      scope_stack_.back();
+  Scope& scope = scope_stack_.back();
 
   if (scope.contains(name.Lexeme)) {
     runtime::Lamscript::Error(
@@ -253,8 +255,7 @@ void Resolver::Define(Token name) {
     return;
   }
 
-  std::unordered_map<std::string, VariableMetadata>& scope =
-      scope_stack_.back();
+  Scope& scope = scope_stack_.back();
   scope[name.Lexeme].Defined = true;
 }
 
