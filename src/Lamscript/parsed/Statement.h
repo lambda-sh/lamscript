@@ -55,8 +55,12 @@ class Function : public Statement {
   Function(
       parsing::Token name,
       const std::vector<parsing::Token>& params,
-      std::vector<std::unique_ptr<Statement>>&& body)
-          : name_(name), params_(params), body_(std::move(body)) {}
+      std::vector<std::unique_ptr<Statement>>&& body,
+      bool is_static)
+          : name_(name),
+          params_(params),
+          body_(std::move(body)),
+          is_static_(is_static) {}
 
   std::any Accept(StatementVisitor* visitor) override;
 
@@ -65,10 +69,13 @@ class Function : public Statement {
   const std::vector<std::unique_ptr<Statement>>& GetBody() const {
       return body_; }
 
+  const bool IsStatic() const { return is_static_; }
+
  private:
   parsing::Token name_;
   std::vector<parsing::Token> params_;
   std::vector<std::unique_ptr<Statement>> body_;
+  bool is_static_;
 };
 
 /// @brief Class definition statements.
