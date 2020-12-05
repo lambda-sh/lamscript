@@ -26,12 +26,14 @@ ReturnType AnyAs(std::any any_object) {
 
 typedef std::shared_ptr<parsed::LamscriptInstance> SharedLamscriptInstance;
 typedef std::shared_ptr<parsed::LamscriptCallable> SharedLamscriptCallable;
+typedef std::shared_ptr<parsed::LamscriptClass> SharedLamscriptClass;
 
 const std::type_info& LS_TYPE_BOOLEAN = typeid(bool);
 const std::type_info& LS_TYPE_NUMBER = typeid(double);
 const std::type_info& LS_TYPE_STRING = typeid(std::string);
 const std::type_info& LS_TYPE_INSTANCE = typeid(SharedLamscriptInstance);
 const std::type_info& LS_TYPE_CALLABLE = typeid(SharedLamscriptCallable);
+const std::type_info& LS_TYPE_CLASS = typeid(SharedLamscriptClass);
 
 }  // namespace
 
@@ -189,8 +191,7 @@ std::any Interpreter::VisitCallExpression(parsed::Call* expression) {
   }
 
   try {
-    std::shared_ptr<parsed::LamscriptCallable> callable = std::any_cast<
-        std::shared_ptr<parsed::LamscriptCallable>>(callee);
+    SharedLamscriptCallable callable = AnyAs<SharedLamscriptCallable>(callee);
 
     if (callable->Arity() != arguments.size()) {
       throw RuntimeError(
@@ -220,6 +221,26 @@ std::any Interpreter::VisitLambdaExpression(
 
 std::any Interpreter::VisitGetExpression(parsed::Get* getter) {
   std::any object = Evaluate(getter->GetObject().get());
+
+  if (object.type() == LS_TYPE_CALLABLE) {
+    auto class_def = static_cast<parsed::LamscriptClass*>(
+        AnyAs<SharedLamscriptCallable>(object).get());
+
+    try {
+      auto func = class_def->LookupMethod(getter->GetName().Lexeme);
+
+      if (!func.IsStatic()) {
+        throw RuntimeError(
+            getter->GetName(),
+            "Only instances can access non-static class methods.");
+      }
+
+      return func.Bind(nullptr);
+    } catch (std::out_of_range& err) {
+      throw RuntimeError(
+          getter->GetName(), "No static function found on class.");
+    }
+  }
 
   if (object.type() != LS_TYPE_INSTANCE) {
     throw RuntimeError(
@@ -300,7 +321,7 @@ std::any Interpreter::VisitWhileStatement(parsed::While* statement) {
 std::any Interpreter::VisitFunctionStatement(parsed::Function* statement) {
   std::shared_ptr<parsed::LamscriptCallable> func(
       new parsed::LamscriptFunction(
-          std::shared_ptr<parsed::Function>(statement), environment_));
+          std::shared_ptr<parsed::Function>(statement), environment_, false));
   environment_->SetVariable(statement->GetName(), func);
   return nullptr;
 }
@@ -320,7 +341,10 @@ std::any Interpreter::VisitClassStatement(parsed::Class* class_def) {
       std::string, parsed::LamscriptFunction> methods;
 
   for (auto& method : class_def->GetMethods()) {
-    parsed::LamscriptFunction func(method, environment_);
+    parsed::LamscriptFunction func(
+        method,
+        environment_,
+        method->GetName().Lexeme.compare("constructor") == 0);
     methods.insert(std::make_pair(method->GetName().Lexeme, func));
   }
 
