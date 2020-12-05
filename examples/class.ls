@@ -1,6 +1,11 @@
 class HelloWorld {
-  Hello() {
-    return this.message;
+  static Hello() {
+    return "Hello, world!";
+  }
+
+  Hey() {
+    print this;
+    print "hey";
   }
 }
 
@@ -10,4 +15,21 @@ var hello = HelloWorld();
 
 hello.message = "Hello, world";
 
-print hello.Hello();
+print HelloWorld.Hello();
+
+//
+class Student {
+    constructor(name, age, concentration) {
+        this.name = name;
+        this.age = age;
+        this.concentration = concentration;
+    }
+
+    GetDetails() {
+        print  "Student name: " + this.name + " age: " + this.age
+            + " concentration:" + this.concentration;
+    }
+}
+var ben = Student("Ben", "20", "BEW");
+
+ben.GetDetails();
