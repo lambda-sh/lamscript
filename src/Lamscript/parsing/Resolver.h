@@ -20,7 +20,9 @@ namespace parsing {
 enum class FunctionType {
   kNone,
   kFunction,
-  kMethod
+  kMethod,
+  kInitializer,
+  kStatic
 };
 
 enum class ClassType {

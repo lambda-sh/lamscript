@@ -22,7 +22,7 @@ enum TokenType {
 
   // Keywords
   AND, CLASS, ELSE, FALSE, FUN, LAMBDA, FOR, IF, NIL, OR, PRINT, RETURN, SUPER,
-  THIS, TRUE, VAR, WHILE,
+  THIS, TRUE, VAR, WHILE, STATIC,
 
   // etc
   END_OF_FILE

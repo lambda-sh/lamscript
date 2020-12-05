@@ -111,6 +111,12 @@ std::any Resolver::VisitThisExpression(parsed::This* this_expr) {
         this_expr->GetKeyword(), "Cannot use this outside of a class.");
   }
 
+  if (current_function_ == FunctionType::kStatic) {
+    runtime::Lamscript::Error(
+        this_expr->GetKeyword(),
+        "Cannot use this inside of a static function ");
+  }
+
   ResolveLocalVariable(this_expr, this_expr->GetKeyword());
   return nullptr;
 }
@@ -175,6 +181,11 @@ std::any Resolver::VisitReturnStatement(parsed::Return* return_statement) {
   }
 
   if (return_statement->GetValue() != nullptr) {
+    if (current_function_ == FunctionType::kInitializer) {
+      runtime::Lamscript::Error(
+          return_statement->GetKeyword(),
+          "Cannot return a value form an initializer.");
+    }
     Resolve(return_statement->GetValue());
   }
 
@@ -200,7 +211,23 @@ std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
   scope["this"] = VariableMetadata{true, true, class_def->GetName().Line};
 
   for (auto& method : class_def->GetMethods()) {
-    ResolveFunction(method.get(), FunctionType::kMethod);
+    FunctionType method_type = FunctionType::kMethod;
+
+    if (method->IsStatic()) {
+      method_type = FunctionType::kStatic;
+    }
+
+    if (method->GetName().Lexeme.compare("constructor") == 0) {
+      if (method->IsStatic()) {
+        runtime::Lamscript::Error(
+            parsing::Token{STATIC, "static", nullptr, method->GetName().Line},
+            "static cannot come before the initializer.");
+      } else {
+        method_type = FunctionType::kInitializer;
+      }
+    }
+
+    ResolveFunction(method.get(), method_type);
   }
 
   EndScope();

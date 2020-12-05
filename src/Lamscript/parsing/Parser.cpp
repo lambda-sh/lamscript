@@ -336,8 +336,17 @@ UniqueStatement Parser::ParseForStatement() {
 
 UniqueStatement Parser::ParseFunction(const std::string& kind) {
   Token name{FUN, "lambda" + GenerateRandomString(8), nullptr,  Peek().Line };
-  if (kind.compare("function") == 0 || kind.compare("method") == 0) {
+  bool is_static = false;
+
+  if (kind.compare("function") == 0) {
     name = Consume(IDENTIFIER, "Expect " + kind + " name.");
+  }
+
+  if (kind.compare("method") == 0) {
+    if (CheckAndConsumeTokens({STATIC})) {
+      is_static = true;
+    }
+      name = Consume(IDENTIFIER, "Expect " + kind + " name.");
   }
 
   Consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
@@ -361,7 +370,8 @@ UniqueStatement Parser::ParseFunction(const std::string& kind) {
       ParseBlockStatements();
 
   UniqueStatement func_statement;
-  func_statement.reset(new parsed::Function(name, parameters, std::move(body)));
+  func_statement.reset(
+      new parsed::Function(name, parameters, std::move(body), is_static));
   return std::move(func_statement);
 }
 
