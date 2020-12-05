@@ -18,19 +18,32 @@ class LamscriptClass : public LamscriptCallable {
       std::unordered_map<std::string, LamscriptFunction>&& methods)
               : name_(name), methods_(methods) {}
 
-  int Arity() const override { return 0; }
+  int Arity() const override {
+    try {
+      const LamscriptFunction& initializer = LookupMethod("constructor");
+      return initializer.Arity();
+    } catch (const std::out_of_range& err) {
+      return 0;
+    }
+  }
 
   std::any Call(
       runtime::Interpreter* interpreter,
       std::vector<std::any> arguments) override {
     std::shared_ptr<LamscriptInstance> instance = std::make_shared<
         LamscriptInstance>(this);
+
+    try {
+      const LamscriptFunction& initializer = LookupMethod("constructor");
+      initializer.Bind(instance)->Call(interpreter, arguments);
+    } catch (const std::out_of_range& err) {}
+
     return instance;
   }
 
   /// @brief Looks up a method inside of the current class definition. If it
   /// doesn't exist, returns a nullptr.
-  LamscriptFunction& LookupMethod(const std::string& method_name) {
+  const LamscriptFunction& LookupMethod(const std::string& method_name) const {
     return methods_.at(method_name);
   }
 
@@ -57,7 +70,7 @@ class LamscriptInstance :
     // Binds the function to the current instance, allowing the use of `this`
     // to correctly be resolved.
     try {
-      LamscriptFunction& method = class_def_->LookupMethod(name.Lexeme);
+      const LamscriptFunction& method = class_def_->LookupMethod(name.Lexeme);
       return method.Bind(shared_from_this());
     } catch (const std::out_of_range& err) {
       throw RuntimeError(name, "Undefined property '" + name.Lexeme + "'.");

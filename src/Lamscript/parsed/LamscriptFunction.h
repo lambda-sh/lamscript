@@ -20,13 +20,16 @@ class LamscriptFunction : public LamscriptCallable {
  public:
   LamscriptFunction(
       std::shared_ptr<Function> declaration,
-      std::shared_ptr<runtime::Environment> closure)
-          : declaration_(declaration), closure_(closure) {}
+      std::shared_ptr<runtime::Environment> closure,
+      bool is_initializer)
+          : declaration_(declaration),
+          closure_(closure),
+          is_initializer_(is_initializer) {}
 
   /// @brief Enables functions to bind to whatever instance they desire,
   /// allowing `this` expressions to be resolved to their correct scope.
   std::shared_ptr<LamscriptCallable> Bind(
-      std::shared_ptr<LamscriptInstance> instance) {
+      std::shared_ptr<LamscriptInstance> instance) const {
     std::shared_ptr<runtime::Environment> function_env =
         std::make_shared<runtime::Environment>(closure_);
 
@@ -34,7 +37,8 @@ class LamscriptFunction : public LamscriptCallable {
         parsing::Token{parsing::THIS, "this", nullptr, 0}, instance);
 
     std::shared_ptr<LamscriptCallable> callable;
-    callable.reset(new LamscriptFunction(declaration_, function_env));
+    callable.reset(
+        new LamscriptFunction(declaration_, function_env, is_initializer_));
     return callable;
   }
 
@@ -54,6 +58,10 @@ class LamscriptFunction : public LamscriptCallable {
     try {
       interpreter->ExecuteBlock(declaration_->GetBody(), function_env);
     } catch (const LamscriptReturnValue& value_container) {
+      if (is_initializer_) {
+        return closure_->GetVariableAtScope(
+            0, parsing::Token{parsing::THIS, "this", nullptr, 0});
+      }
       return value_container.GetReturnedValue();
     }
 
@@ -64,7 +72,10 @@ class LamscriptFunction : public LamscriptCallable {
     return "<fn " + declaration_->GetName().Lexeme + ">";
   }
 
+  const bool IsStatic() const { return declaration_->IsStatic(); }
+
  private:
+  bool is_initializer_;
   std::shared_ptr<Function> declaration_;
   std::shared_ptr<runtime::Environment> closure_;
 };
