@@ -15,6 +15,13 @@ class StatementVisitor;
 
 namespace parsed {
 
+/// @brief Function metadata for creating functions.
+struct FunctionMetadata{
+  bool IsStatic;
+  bool IsMethod;
+  bool IsGetter;
+};
+
 class Statement {
  public:
   virtual std::any Accept(StatementVisitor* visitor) = 0;
@@ -56,11 +63,11 @@ class Function : public Statement {
       parsing::Token name,
       const std::vector<parsing::Token>& params,
       std::vector<std::unique_ptr<Statement>>&& body,
-      bool is_static)
+      FunctionMetadata metadata)
           : name_(name),
           params_(params),
           body_(std::move(body)),
-          is_static_(is_static) {}
+          metadata_(metadata) {}
 
   std::any Accept(StatementVisitor* visitor) override;
 
@@ -69,13 +76,15 @@ class Function : public Statement {
   const std::vector<std::unique_ptr<Statement>>& GetBody() const {
       return body_; }
 
-  const bool IsStatic() const { return is_static_; }
+  const bool IsStatic() const { return metadata_.IsStatic; }
+  const bool IsMethod() const { return metadata_.IsMethod; }
+  const bool IsGetter() const { return metadata_.IsGetter; }
 
  private:
   parsing::Token name_;
   std::vector<parsing::Token> params_;
   std::vector<std::unique_ptr<Statement>> body_;
-  bool is_static_;
+  FunctionMetadata metadata_;
 };
 
 /// @brief Class definition statements.
