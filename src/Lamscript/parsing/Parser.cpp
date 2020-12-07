@@ -337,41 +337,52 @@ UniqueStatement Parser::ParseForStatement() {
 UniqueStatement Parser::ParseFunction(const std::string& kind) {
   Token name{FUN, "lambda" + GenerateRandomString(8), nullptr,  Peek().Line };
   bool is_static = false;
+  bool is_func = kind.compare("function") == 0;
+  bool is_method = kind.compare("method") == 0;
 
-  if (kind.compare("function") == 0) {
+  if (is_func) {
     name = Consume(IDENTIFIER, "Expect " + kind + " name.");
   }
 
-  if (kind.compare("method") == 0) {
+  if (is_method) {
     if (CheckAndConsumeTokens({STATIC})) {
       is_static = true;
     }
       name = Consume(IDENTIFIER, "Expect " + kind + " name.");
   }
 
-  Consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
-
+  bool is_getter = is_method && CheckToken(LEFT_BRACE);
   std::vector<Token> parameters;
 
-  // Parse function arguments.
-  if (!CheckToken(RIGHT_PAREN)) {
-    do {
-      if (parameters.size() > 255) {
-        Error(Peek(), "Can't have more than 255 parameters.");
-      }
+  if ((is_func || is_method) && !is_getter) {
+    Consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
 
-      parameters.push_back(Consume(IDENTIFIER, "Expect parameter name."));
-    } while (CheckAndConsumeTokens({COMMA}));
+    // Parse function arguments.
+    if (!CheckToken(RIGHT_PAREN)) {
+      do {
+        if (parameters.size() > 255) {
+          Error(Peek(), "Can't have more than 255 parameters.");
+        }
+
+        parameters.push_back(Consume(IDENTIFIER, "Expect parameter name."));
+      } while (CheckAndConsumeTokens({COMMA}));
+    }
+    Consume(RIGHT_PAREN, "Expect ')' after parameters.");
   }
-  Consume(RIGHT_PAREN, "Expect ')' after parameters.");
 
-  Consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+  Consume(LEFT_BRACE, "Expect '{' before" + kind + "body.");
+
   std::vector<std::unique_ptr<parsed::Statement>> body =
       ParseBlockStatements();
 
   UniqueStatement func_statement;
   func_statement.reset(
-      new parsed::Function(name, parameters, std::move(body), is_static));
+      new parsed::Function(
+          name,
+          parameters,
+          std::move(body),
+          parsed::FunctionMetadata{is_static, is_method, is_getter}));
+
   return std::move(func_statement);
 }
 
