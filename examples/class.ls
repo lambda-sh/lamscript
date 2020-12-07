@@ -30,6 +30,6 @@ class Student {
             + " concentration:" + this.concentration;
     }
 }
-var ben = Student("Ben", "20", "BEW");
 
+var ben = Student("Ben", "20", "BEW");
 ben.GetDetails();
