@@ -73,6 +73,7 @@ class LamscriptFunction : public LamscriptCallable {
   }
 
   const bool IsStatic() const { return declaration_->IsStatic(); }
+  const bool IsGetter() const { return declaration_->IsGetter(); }
 
  private:
   bool is_initializer_;
