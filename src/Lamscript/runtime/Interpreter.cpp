@@ -235,6 +235,10 @@ std::any Interpreter::VisitGetExpression(parsed::Get* getter) {
             "Only instances can access non-static class methods.");
       }
 
+      if (func.IsGetter()) {
+        return func.Call(this, {{}});
+      }
+
       return func.Bind(nullptr);
     } catch (std::out_of_range& err) {
       throw RuntimeError(
@@ -247,8 +251,19 @@ std::any Interpreter::VisitGetExpression(parsed::Get* getter) {
         getter->GetName(), "Only instances have properties.");
   }
 
-  return AnyAs<SharedLamscriptInstance>(
+  std::any instance_field = AnyAs<SharedLamscriptInstance>(
       object)->GetField(getter->GetName());
+
+  if (instance_field.type() == LS_TYPE_CALLABLE) {
+    auto func = static_cast<parsed::LamscriptFunction*>(
+        AnyAs<SharedLamscriptCallable>(instance_field).get());
+
+    if (func->IsGetter()) {
+      return func->Call(this, {{}});
+    }
+  }
+
+  return instance_field;
 }
 
 std::any Interpreter::VisitSetExpression(parsed::Set* setter) {

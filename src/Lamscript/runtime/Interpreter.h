@@ -52,7 +52,6 @@ class Interpreter : ExpressionVisitor, StatementVisitor {
   std::any VisitSuperExpression(parsed::Super* expression) override {};
 
   // Statements
-
   // Primary external API
 
   void Interpret(
