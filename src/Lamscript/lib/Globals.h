@@ -20,6 +20,7 @@ class Clock : public parsed::LamscriptCallable {
     return static_cast<double>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count());
   }
+
   std::string ToString() const override { return "<native fn>"; }
 };
 

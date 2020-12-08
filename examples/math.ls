@@ -13,7 +13,7 @@ class Math {
   }
 
   test {
-    return this.example;
+    return 0;
   }
 }
 
@@ -31,3 +31,5 @@ print Math.PI;
 
 // Calling static var from instance.
 print math.DoSomething();
+
+print clock();
