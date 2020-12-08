@@ -102,6 +102,7 @@ class Class : public Statement {
   const parsing::Token& GetName() const { return name_; }
   const std::vector<std::shared_ptr<Function>>& GetMethods() {
     return methods_; }
+  Expression* GetSuperClass() { return super_class_.get(); }
 
  private:
   parsing::Token name_;
