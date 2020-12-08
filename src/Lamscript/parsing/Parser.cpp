@@ -659,7 +659,7 @@ UniqueExpression Parser::FinishCall(UniqueExpression callee) {
   UniqueExpression call;
   call.reset(
       new parsed::Call(std::move(callee), parent, std::move(arguments)));
-  return std::move(call);
+  return call;
 }
 
 }  // namespace parsing

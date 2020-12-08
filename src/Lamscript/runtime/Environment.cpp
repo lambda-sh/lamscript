@@ -8,14 +8,21 @@
 namespace lamscript {
 namespace runtime {
 
+namespace {
+
+typedef std::unordered_map<std::string, std::any>::iterator EnvSearchResult;
+
+}  // namespace
+
 void Environment::SetVariable(const parsing::Token& name, std::any value) {
   values_[name.Lexeme] = value;
 }
 
 void Environment::AssignVariable(const parsing::Token& name, std::any value) {
-  if (values_.contains(name.Lexeme)) {
-    values_[name.Lexeme] = value;
-    return;
+  EnvSearchResult lookup = values_.find(name.Lexeme);
+
+  if (lookup != values_.end()) {
+    lookup->second = value;
   }
 
   if (parent_ != nullptr) {
@@ -31,8 +38,10 @@ void Environment::AssignVariableAtScope(
 }
 
 std::any Environment::GetVariable(const parsing::Token& name) {
-  if (values_.contains(name.Lexeme)) {
-    return values_[name.Lexeme];
+  EnvSearchResult lookup = values_.find(name.Lexeme);
+
+  if (lookup != values_.end()) {
+    return lookup->second;
   }
 
   if (parent_ != nullptr) {

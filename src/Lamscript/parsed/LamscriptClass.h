@@ -15,8 +15,9 @@ class LamscriptClass : public LamscriptCallable {
  public:
   LamscriptClass(
       const std::string& name,
+      std::shared_ptr<LamscriptClass> super_class,
       std::unordered_map<std::string, LamscriptFunction>&& methods)
-              : name_(name), methods_(methods) {}
+              : name_(name), super_class_(super_class), methods_(methods) {}
 
   int Arity() const override {
     try {
@@ -44,13 +45,24 @@ class LamscriptClass : public LamscriptCallable {
   /// @brief Looks up a method inside of the current class definition. If it
   /// doesn't exist, returns a nullptr.
   const LamscriptFunction& LookupMethod(const std::string& method_name) const {
-    return methods_.at(method_name);
+    auto lookup = methods_.find(method_name);
+
+    if (lookup != methods_.end()) {
+      return lookup->second;
+    }
+
+    if (super_class_ != nullptr) {
+      return super_class_->LookupMethod(method_name);
+    }
+
+    throw std::out_of_range("Lookup out of range.");
   }
 
   std::string ToString() const override { return name_; }
 
  private:
   std::string name_;
+  std::shared_ptr<LamscriptClass> super_class_;
   std::unordered_map<std::string, parsed::LamscriptFunction> methods_;
 };
 
