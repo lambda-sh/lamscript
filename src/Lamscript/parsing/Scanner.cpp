@@ -24,7 +24,8 @@ std::unordered_map<std::string, TokenType> Scanner::keywords_ =
             {"true", TRUE},
             {"var", VAR},
             {"while", WHILE},
-            {"static", STATIC}});
+            {"static", STATIC},
+            {"extends", EXTENDS}});
 
 // ---------------------------------- PUBLIC -----------------------------------
 

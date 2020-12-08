@@ -206,6 +206,19 @@ std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
   Declare(class_def->GetName());
   Define(class_def->GetName());
 
+  // Validate super class first.
+  if (class_def->GetSuperClass() != nullptr) {
+    std::string super_class_name  = static_cast<parsed::Variable*>(
+        class_def->GetSuperClass())->GetName().Lexeme;
+
+    if (super_class_name.compare(class_def->GetName().Lexeme) == 0) {
+      runtime::Lamscript::Error(
+          class_def->GetName(), "A class can't inherit from itself.");
+    }
+
+    Resolve(class_def->GetSuperClass());
+  }
+
   BeginScope();
   Scope& scope = scope_stack_.back();
   scope["this"] = VariableMetadata{true, true, class_def->GetName().Line};

@@ -38,7 +38,7 @@ std::string ConvertTokenTypeToString(TokenType token_type) {
     case ELSE:          return "else";
     case FALSE:         return "False";
     case TRUE:          return "true";
-    case FUN:           return "fun";
+    case FUN:           return "func";
     case FOR:           return "for";
     case IF:            return "if";
     case NIL:           return "nil";

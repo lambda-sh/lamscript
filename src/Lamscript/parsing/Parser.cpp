@@ -403,6 +403,15 @@ UniqueStatement Parser::ParseReturnStatement() {
 
 UniqueStatement Parser::ParseClassStatement() {
   Token name = Consume(IDENTIFIER, "Expect a class name.");
+
+  std::unique_ptr<parsed::Variable> base_class = nullptr;
+  if (CheckAndConsumeTokens({EXTENDS})) {
+    Token base_class_name = Consume(
+        IDENTIFIER, "Expect base class to extend from.");
+
+    base_class.reset(new parsed::Variable(base_class_name));
+  }
+
   Consume(LEFT_BRACE, "Expect '{' before class body.");
 
   std::vector<SharedFunction> methods;
@@ -417,7 +426,7 @@ UniqueStatement Parser::ParseClassStatement() {
   Consume(RIGHT_BRACE, "Expect '}' after class body.");
 
   UniqueStatement class_def;
-  class_def.reset(new parsed::Class(name, nullptr, methods));
+  class_def.reset(new parsed::Class(name, std::move(base_class), methods));
   return std::move(class_def);
 }
 
