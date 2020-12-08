@@ -355,6 +355,25 @@ std::any Interpreter::VisitClassStatement(parsed::Class* class_def) {
   std::unordered_map<
       std::string, parsed::LamscriptFunction> methods;
 
+  std::any super_class;
+  SharedLamscriptClass super_class_def = nullptr;
+
+  if (class_def->GetSuperClass() != nullptr) {
+    super_class = Evaluate(class_def->GetSuperClass());
+
+    if (super_class.type() == LS_TYPE_CALLABLE) {
+      SharedLamscriptCallable callable = AnyAs<
+          SharedLamscriptCallable>(super_class);
+
+          if (auto x = dynamic_cast<parsed::LamscriptClass*>(callable.get())) {
+            super_class_def.reset(x);
+          }
+    } else {
+      throw RuntimeError(
+          class_def->GetName(), "Superclass must be a class.");
+    }
+  }
+
   for (auto& method : class_def->GetMethods()) {
     parsed::LamscriptFunction func(
         method,
@@ -365,7 +384,9 @@ std::any Interpreter::VisitClassStatement(parsed::Class* class_def) {
 
   std::shared_ptr<parsed::LamscriptCallable> lam_class(
       new parsed::LamscriptClass(
-          class_def->GetName().Lexeme, std::move(methods)));
+          class_def->GetName().Lexeme,
+          super_class_def,
+          std::move(methods)));
 
   environment_->SetVariable(class_def->GetName(), lam_class);
   return nullptr;
