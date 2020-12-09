@@ -82,9 +82,9 @@ std::any Interpreter::VisitUnaryExpression(parsed::Unary* expression) {
     case parsing::MINUS:
       CheckNumberOperand(expression->GetUnaryOperator(), right_side);
       return -(AnyAs<double>(right_side));
+    default:
+      return nullptr;
   }
-
-  return nullptr;
 }
 
 std::any Interpreter::VisitBinaryExpression(parsed::Binary* expression) {
@@ -160,9 +160,11 @@ std::any Interpreter::VisitBinaryExpression(parsed::Binary* expression) {
     {
       return IsEqual(left_side, right_side);
     }
+    default:
+    {
+      return nullptr;
+    }
   }
-
-  return nullptr;
 }
 
 std::any Interpreter::VisitLogicalExpression(parsed::Logical* expression) {
@@ -283,6 +285,31 @@ std::any Interpreter::VisitThisExpression(parsed::This* this_expr) {
   return LookupVariable(this_expr->GetKeyword(), this_expr);
 }
 
+std::any Interpreter::VisitSuperExpression(parsed::Super* super) {
+  size_t distance = locals_.at(super);
+  std::any super_class = environment_->GetVariableAtScope(
+      distance, parsing::Token{parsing::SUPER, "super", nullptr, 0});
+
+  SharedLamscriptClass super_class_def = AnyAs<SharedLamscriptClass>(
+      super_class);
+
+  std::any instance = environment_->GetVariableAtScope(
+      distance - 1, parsing::Token{parsing::THIS, "this", nullptr, 0});
+
+  SharedLamscriptInstance instance_ref = AnyAs<SharedLamscriptInstance>(
+      instance);
+
+  try {
+    parsed::LamscriptFunction method = super_class_def->LookupMethod(
+        super->GetMethod().Lexeme);
+    return method.Bind(instance_ref);
+  } catch (const std::out_of_range& err) {
+    throw RuntimeError(
+        super->GetMethod(),
+        "Undefined property '" + super->GetMethod().Lexeme + "'.");
+  }
+}
+
 // --------------------------------- STATEMENTS --------------------------------
 
 std::any Interpreter::VisitBlockStatement(parsed::Block* statement) {
@@ -365,13 +392,20 @@ std::any Interpreter::VisitClassStatement(parsed::Class* class_def) {
       SharedLamscriptCallable callable = AnyAs<
           SharedLamscriptCallable>(super_class);
 
-          if (auto x = dynamic_cast<parsed::LamscriptClass*>(callable.get())) {
-            super_class_def.reset(x);
-          }
+      if (auto x = dynamic_cast<parsed::LamscriptClass*>(callable.get())) {
+        super_class_def.reset(x);
+      }
     } else {
       throw RuntimeError(
           class_def->GetName(), "Superclass must be a class.");
     }
+  }
+
+  environment_->SetVariable(class_def->GetName(), nullptr);
+  if (super_class_def != nullptr) {
+    environment_ = std::make_shared<Environment>(environment_);
+    environment_->SetVariable(
+        parsing::Token{parsing::SUPER, "super", nullptr, 0}, super_class_def);
   }
 
   for (auto& method : class_def->GetMethods()) {
@@ -382,11 +416,15 @@ std::any Interpreter::VisitClassStatement(parsed::Class* class_def) {
     methods.insert(std::make_pair(method->GetName().Lexeme, func));
   }
 
-  std::shared_ptr<parsed::LamscriptCallable> lam_class(
+  SharedLamscriptCallable lam_class(
       new parsed::LamscriptClass(
           class_def->GetName().Lexeme,
           super_class_def,
           std::move(methods)));
+
+  if (super_class_def != nullptr) {
+    environment_ = environment_->GetParentEnvironment();
+  }
 
   environment_->SetVariable(class_def->GetName(), lam_class);
   return nullptr;
