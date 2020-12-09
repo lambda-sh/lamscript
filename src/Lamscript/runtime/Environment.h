@@ -38,6 +38,8 @@ class Environment {
   /// brief Gets a variable at scope.
   std::any GetVariableAtScope(size_t distance, const parsing::Token& name);
 
+  std::shared_ptr<Environment> GetParentEnvironment() { return parent_; }
+
  private:
   std::shared_ptr<Environment> parent_;
   std::unordered_map<std::string, std::any> values_;
