@@ -23,10 +23,12 @@ void Environment::AssignVariable(const parsing::Token& name, std::any value) {
 
   if (lookup != values_.end()) {
     lookup->second = value;
+    return;
   }
 
   if (parent_ != nullptr) {
-    return parent_->AssignVariable(name, value);
+    parent_->AssignVariable(name, value);
+    return;
   }
 
   throw RuntimeError(name, "Undefined Variable '" + name.Lexeme + "'.");
