@@ -4,7 +4,7 @@ An interpreted language aimed for productivity and simplicity.
 ## Description
 Lamscript is a language I've been working on for the last couple of months with
 the goal of creating a programming language to further my learnings and
-integrate into another project, [lambda](https://github.com/lambda-sh/lambda)
+integrate into another project, [Lambda](https://github.com/lambda-sh/lambda).
 
 This language is primarily aimed to be simple, consistent, and lightweight.
 It may not be the best language in terms of performance, as it's developed
@@ -13,8 +13,9 @@ recursion to handle parsing, resolving, and interpretation.
 
 This language is still currently experimental with many more features to come.
 
-## Current features
-* Classes & Inheritance.
+## Current features with working examples.
+* [Classes](examples/class.ls).
+* Inheritance.
 * Functions.
 * Variables.
 * Conditionals.
@@ -34,7 +35,9 @@ This language is still currently experimental with many more features to come.
 * const (`const x = 10;`)
 * async (`async func MakeHttpRequest() {...}`)
 * Compiling the language as a library for use in other software, providing the
-* ability for easily binding your c++ code to the lamscript runtime.
+ability for easily binding your c++ code to the lamscript runtime.
+* Testing and an automated testing suite for other developers to use for working
+on or with lamscript.
 
 And many more features that I've forgot to list or haven't thought of yet!
 
