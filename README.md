@@ -18,7 +18,8 @@ This language is still currently experimental with many more features to come.
 * [Inheritance](examples/extends.ls).
 * [Functions](examples/func.ls).
 * [Variables](examples/variable.ls).
-* Conditionals.
+* [Conditionals](examples/conditionals.ls).
+* Logical operators.
 * Loops.
 * Closures.
 * [Recursion](examples/recursion.ls).
