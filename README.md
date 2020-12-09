@@ -19,7 +19,7 @@ This language is still currently experimental with many more features to come.
 * [Functions](examples/func.ls).
 * [Variables](examples/variable.ls).
 * [Conditionals](examples/conditionals.ls).
-* Logical operators.
+* [Logical operators](examples/logical.ls).
 * Loops.
 * Closures.
 * [Recursion](examples/recursion.ls).
