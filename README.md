@@ -15,7 +15,7 @@ This language is still currently experimental with many more features to come.
 
 ## Current features with working examples.
 * [Classes](examples/class.ls).
-* Inheritance.
+* [Inheritance](examples/extends.ls).
 * Functions.
 * Variables.
 * Conditionals.
