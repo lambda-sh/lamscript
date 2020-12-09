@@ -21,6 +21,7 @@ This language is still currently experimental with many more features to come.
 * Conditionals.
 * Loops.
 * Closures.
+* [Recursion](examples/recursion.ls).
 * Blocks.
 * Printing.
 * Lambda expressions/Anonymous functions.
