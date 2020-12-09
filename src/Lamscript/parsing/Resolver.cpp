@@ -330,6 +330,7 @@ void Resolver::ResolveLocalVariable(
   for (int pos = scope_stack_.size() - 1; pos >= 0; pos--) {
     if (scope_stack_[pos].contains(variable_name.Lexeme)) {
       interpreter_->Resolve(expression, scope_stack_.size() - 1 - pos);
+      scope_stack_[pos][variable_name.Lexeme].Used = true;
       return;
     }
   }

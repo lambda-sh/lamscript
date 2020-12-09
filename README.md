@@ -20,8 +20,8 @@ This language is still currently experimental with many more features to come.
 * [Variables](examples/variable.ls).
 * [Conditionals](examples/conditionals.ls).
 * [Logical operators](examples/logical.ls).
-* Loops.
-* Closures.
+* [Loops](examples/loops.ls).
+* [Closures](examples/closure.ls).
 * [Recursion](examples/recursion.ls).
 * Blocks.
 * Printing.
