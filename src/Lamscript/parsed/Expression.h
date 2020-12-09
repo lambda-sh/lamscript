@@ -174,6 +174,9 @@ class Super : public Expression {
 
   std::any Accept(ExpressionVisitor* visitor) override;
 
+  const parsing::Token& GetKeyword() const { return keyword_; }
+  const parsing::Token& GetMethod() const { return method_; }
+
  private:
   parsing::Token keyword_;
   parsing::Token method_;
