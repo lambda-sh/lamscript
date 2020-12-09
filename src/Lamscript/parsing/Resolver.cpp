@@ -105,13 +105,29 @@ std::any Resolver::VisitSetExpression(parsed::Set* setter) {
   return nullptr;
 }
 
+std::any Resolver::VisitSuperExpression(parsed::Super* super) {
+  if (current_class_ == ClassType::None) {
+    runtime::Lamscript::Error(
+        super->GetKeyword(), "Can't use 'super' outside of a class.");
+  }
+
+  if (current_class_ != ClassType::SuperClass) {
+    runtime::Lamscript::Error(
+        super->GetKeyword(),
+        "Can't use 'super' in a class with no super class.");
+  }
+
+  ResolveLocalVariable(super, super->GetKeyword());
+  return nullptr;
+}
+
 std::any Resolver::VisitThisExpression(parsed::This* this_expr) {
-  if (current_class_ == ClassType::kNone) {
+  if (current_class_ == ClassType::None) {
     runtime::Lamscript::Error(
         this_expr->GetKeyword(), "Cannot use this outside of a class.");
   }
 
-  if (current_function_ == FunctionType::kStatic) {
+  if (current_function_ == FunctionType::Static) {
     runtime::Lamscript::Error(
         this_expr->GetKeyword(),
         "Cannot use this inside of a static function ");
@@ -146,7 +162,7 @@ std::any Resolver::VisitFunctionStatement(parsed::Function* func) {
   Declare(func->GetName());
   Define(func->GetName());
 
-  ResolveFunction(func, FunctionType::kFunction);
+  ResolveFunction(func, FunctionType::Function);
   return nullptr;
 }
 
@@ -175,13 +191,13 @@ std::any Resolver::VisitPrintStatement(parsed::Print* print) {
 }
 
 std::any Resolver::VisitReturnStatement(parsed::Return* return_statement) {
-  if (current_function_ == FunctionType::kNone) {
+  if (current_function_ == FunctionType::None) {
     runtime::Lamscript::Error(
         return_statement->GetKeyword(), "Can't return from top-level code.");
   }
 
   if (return_statement->GetValue() != nullptr) {
-    if (current_function_ == FunctionType::kInitializer) {
+    if (current_function_ == FunctionType::Initializer) {
       runtime::Lamscript::Error(
           return_statement->GetKeyword(),
           "Cannot return a value form an initializer.");
@@ -201,7 +217,7 @@ std::any Resolver::VisitWhileStatement(parsed::While* while_statement) {
 
 std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
   ClassType enclosing_class = current_class_;
-  current_class_ = ClassType::kClass;
+  current_class_ = ClassType::Class;
 
   Declare(class_def->GetName());
   Define(class_def->GetName());
@@ -216,7 +232,12 @@ std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
           class_def->GetName(), "A class can't inherit from itself.");
     }
 
+    current_class_ = ClassType::SuperClass;
     Resolve(class_def->GetSuperClass());
+
+    BeginScope();
+    Scope& scope = scope_stack_.back();
+    scope["super"] = VariableMetadata{true, true, class_def->GetName().Line};
   }
 
   BeginScope();
@@ -224,10 +245,10 @@ std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
   scope["this"] = VariableMetadata{true, true, class_def->GetName().Line};
 
   for (auto& method : class_def->GetMethods()) {
-    FunctionType method_type = FunctionType::kMethod;
+    FunctionType method_type = FunctionType::Method;
 
     if (method->IsStatic()) {
-      method_type = FunctionType::kStatic;
+      method_type = FunctionType::Static;
     }
 
     if (method->GetName().Lexeme.compare("constructor") == 0) {
@@ -236,7 +257,7 @@ std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
             parsing::Token{STATIC, "static", nullptr, method->GetName().Line},
             "static cannot come before the initializer.");
       } else {
-        method_type = FunctionType::kInitializer;
+        method_type = FunctionType::Initializer;
       }
     }
 
@@ -244,6 +265,11 @@ std::any Resolver::VisitClassStatement(parsed::Class* class_def) {
   }
 
   EndScope();
+
+  if (class_def->GetSuperClass() != nullptr) {
+    EndScope();
+  }
+
   current_class_ = enclosing_class;
   return nullptr;
 }

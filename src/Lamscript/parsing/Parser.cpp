@@ -511,6 +511,14 @@ UniqueExpression Parser::ParsePrimary() {
     return std::move(expression);
   }
 
+  if (CheckAndConsumeTokens({SUPER})) {
+    Token super_keyword = Previous();
+    Consume(DOT, "Expect '.' after 'super'.");
+    Token field = Consume(IDENTIFIER, "Expect identifier after '.'");
+    expression.reset(new parsed::Super(super_keyword, field));
+    return expression;
+  }
+
   if (CheckAndConsumeTokens({THIS})) {
     expression.reset(new parsed::This(Previous()));
     return std::move(expression);

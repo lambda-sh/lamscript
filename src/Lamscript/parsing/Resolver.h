@@ -18,16 +18,17 @@ namespace lamscript {
 namespace parsing {
 
 enum class FunctionType {
-  kNone,
-  kFunction,
-  kMethod,
-  kInitializer,
-  kStatic
+  None,
+  Function,
+  Method,
+  Initializer,
+  Static
 };
 
 enum class ClassType {
-  kNone,
-  kClass
+  None,
+  Class,
+  SuperClass
 };
 
 /// @brief Small container for keeping track of variables being used
@@ -43,8 +44,8 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   explicit Resolver(std::shared_ptr<runtime::Interpreter> interpreter)
       : interpreter_(interpreter),
       scope_stack_(),
-      current_function_(FunctionType::kNone),
-      current_class_(ClassType::kNone) {}
+      current_function_(FunctionType::None),
+      current_class_(ClassType::None) {}
 
   std::any VisitVariableExpression(parsed::Variable* variable) override;
 
@@ -117,7 +118,7 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
       const std::vector<std::unique_ptr<parsed::Statement>> &statements);
 
   /// @todo Implement the rest of these expression/statement visitation methods.
-  std::any VisitSuperExpression(parsed::Super* expression) override {}
+  std::any VisitSuperExpression(parsed::Super* expression) override;
   std::any VisitLambdaExpression(
       parsed::LambdaExpression* expression) override {}
 
