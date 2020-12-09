@@ -14,6 +14,6 @@ func Closure() {
 // Gets a function from the closure back.
 var counter = Closure();
 
-// Calling counter() increments the counter.
+// Calling counter() increments the counter contained within the closure.
 print counter();
 print counter();

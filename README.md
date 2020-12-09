@@ -23,7 +23,7 @@ This language is still currently experimental with many more features to come.
 * [Loops](examples/loops.ls).
 * [Closures](examples/closure.ls).
 * [Recursion](examples/recursion.ls).
-* Blocks.
+* [Blocks](examples/blocks.ls).
 * Printing.
 * Lambda expressions/Anonymous functions.
 * Static & Instance getters.
