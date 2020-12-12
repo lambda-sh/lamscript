@@ -140,18 +140,18 @@ Token Parser::Consume(TokenType type, const std::string& message) {
 UniqueStatement Parser::ParseDeclaration() {
   try {
     if (CheckAndConsumeTokens({CLASS})) {
-      return std::move(ParseClassStatement());
+      return ParseClassStatement();
     }
 
     if (CheckAndConsumeTokens({FUN})) {
-        return std::move(ParseFunction("function"));
+        return ParseFunction("function");
     }
 
     if (CheckAndConsumeTokens({VAR})) {
-        return std::move(ParseVariableDeclaration());
+        return ParseVariableDeclaration();
     }
 
-    return std::move(ParseStatement());
+    return ParseStatement();
   } catch (const ParseError& error) {
     Synchronize();
     return nullptr;
@@ -172,7 +172,7 @@ UniqueStatement Parser::ParseVariableDeclaration() {
   UniqueStatement statement;
   statement.reset(
       new parsed::VariableStatement(name, std::move(initializer)));
-  return std::move(statement);
+  return statement;
 }
 
 std::vector<
@@ -197,32 +197,32 @@ std::vector<
 /// * Expression statements.
 UniqueStatement Parser::ParseStatement() {
   if (CheckAndConsumeTokens({FOR})) {
-    return std::move(ParseForStatement());
+    return ParseForStatement();
   }
 
   if (CheckAndConsumeTokens({IF})) {
-    return std::move(ParseIfStatement());
+    return ParseIfStatement();
   }
 
   if (CheckAndConsumeTokens({PRINT})) {
-    return std::move(ParsePrintStatement());
+    return ParsePrintStatement();
   }
 
   if (CheckAndConsumeTokens({RETURN})) {
-    return std::move(ParseReturnStatement());
+    return ParseReturnStatement();
   }
 
   if (CheckAndConsumeTokens({WHILE})) {
-    return std::move(ParseWhileStatement());
+    return ParseWhileStatement();
   }
 
   if (CheckAndConsumeTokens({LEFT_BRACE})) {
     UniqueStatement block;
     block.reset(new parsed::Block(std::move(ParseBlockStatements())));
-    return std::move(block);
+    return block;
   }
 
-  return std::move(ParseExpressionStatement());
+  return ParseExpressionStatement();
 }
 
 UniqueStatement Parser::ParsePrintStatement() {
@@ -231,7 +231,7 @@ UniqueStatement Parser::ParsePrintStatement() {
 
   UniqueStatement print;
   print.reset(new parsed::Print(std::move(value)));
-  return std::move(print);
+  return print;
 }
 
 UniqueStatement Parser::ParseExpressionStatement() {
@@ -241,7 +241,7 @@ UniqueStatement Parser::ParseExpressionStatement() {
 
   UniqueStatement expr_statement;
   expr_statement.reset(new parsed::ExpressionStatement(std::move(value)));
-  return std::move(expr_statement);
+  return expr_statement;
 }
 
 UniqueStatement Parser::ParseIfStatement() {
@@ -260,7 +260,7 @@ UniqueStatement Parser::ParseIfStatement() {
   if_statement.reset(
       new parsed::If(
         std::move(condition), std::move(then_branch), std::move(else_branch)));
-  return std::move(if_statement);
+  return if_statement;
 }
 
 UniqueStatement Parser::ParseWhileStatement() {
@@ -274,7 +274,7 @@ UniqueStatement Parser::ParseWhileStatement() {
   while_statement.reset(
       new parsed::While(std::move(condition), std::move(body)));
 
-  return std::move(while_statement);
+  return while_statement;
 }
 
 UniqueStatement Parser::ParseForStatement() {
@@ -331,7 +331,7 @@ UniqueStatement Parser::ParseForStatement() {
     body.reset(new parsed::Block(std::move(statements)));
   }
 
-  return std::move(body);
+  return body;
 }
 
 UniqueStatement Parser::ParseFunction(const std::string& kind) {
@@ -348,7 +348,7 @@ UniqueStatement Parser::ParseFunction(const std::string& kind) {
     if (CheckAndConsumeTokens({STATIC})) {
       is_static = true;
     }
-      name = Consume(IDENTIFIER, "Expect " + kind + " name.");
+    name = Consume(IDENTIFIER, "Expect " + kind + " name.");
   }
 
   bool is_getter = is_method && CheckToken(LEFT_BRACE);
@@ -383,7 +383,7 @@ UniqueStatement Parser::ParseFunction(const std::string& kind) {
           std::move(body),
           parsed::FunctionMetadata{is_static, is_method, is_getter}));
 
-  return std::move(func_statement);
+  return func_statement;
 }
 
 UniqueStatement Parser::ParseReturnStatement() {
@@ -391,7 +391,7 @@ UniqueStatement Parser::ParseReturnStatement() {
   UniqueExpression value = nullptr;
 
   if (!CheckToken(SEMICOLON)) {
-    value = std::move(ParseExpression());
+    value = ParseExpression();
   }
 
   Consume(SEMICOLON, "Expect ';' after return value.");
@@ -427,7 +427,7 @@ UniqueStatement Parser::ParseClassStatement() {
 
   UniqueStatement class_def;
   class_def.reset(new parsed::Class(name, std::move(base_class), methods));
-  return std::move(class_def);
+  return class_def;
 }
 
 // -------------------------------- EXPRESSIONS --------------------------------
@@ -447,7 +447,7 @@ UniqueExpression Parser::ParseEquality() {
             std::move(expression), expr_operator, std::move(right_side)));
   }
 
-  return std::move(expression);
+  return expression;
 }
 
 UniqueExpression Parser::ParseAssignment() {
@@ -460,7 +460,7 @@ UniqueExpression Parser::ParseAssignment() {
     if (parsed::Variable* var = dynamic_cast<parsed::Variable*>(
           expression.get())) {
       expression.reset(new parsed::Assign(var->GetName(), std::move(value)));
-      return std::move(expression);
+      return expression;
     } else if (
         parsed::Get* get = dynamic_cast<parsed::Get*>(expression.get())) {
       expression.reset(
@@ -471,11 +471,11 @@ UniqueExpression Parser::ParseAssignment() {
     }
   }
 
-  return std::move(expression);
+  return expression;
 }
 
 UniqueExpression Parser::ParseExpression() {
-  return std::move(ParseAssignment());
+  return ParseAssignment();
 }
 
 /// @brief Parses primary expressions into literals.
@@ -484,17 +484,17 @@ UniqueExpression Parser::ParsePrimary() {
 
   if (CheckAndConsumeTokens({FALSE})) {
     expression.reset(new parsed::Literal(false));
-    return std::move(expression);
+    return expression;
   }
 
   if (CheckAndConsumeTokens({TRUE})) {
     expression.reset(new parsed::Literal(true));
-    return std::move(expression);
+    return expression;
   }
 
   if (CheckAndConsumeTokens({NIL})) {
     expression.reset(new parsed::Literal());
-    return std::move(expression);
+    return expression;
   }
 
   if (CheckAndConsumeTokens({NUMBER, STRING})) {
@@ -503,12 +503,12 @@ UniqueExpression Parser::ParsePrimary() {
     if (token.Literal.type() == typeid(double)) {
       expression.reset(new parsed::Literal(
             std::any_cast<double>(token.Literal)));
-      return std::move(expression);
+      return expression;
     }
 
     expression.reset(new parsed::Literal(
           std::any_cast<std::string&>(token.Literal)));
-    return std::move(expression);
+    return expression;
   }
 
   if (CheckAndConsumeTokens({SUPER})) {
@@ -521,26 +521,25 @@ UniqueExpression Parser::ParsePrimary() {
 
   if (CheckAndConsumeTokens({THIS})) {
     expression.reset(new parsed::This(Previous()));
-    return std::move(expression);
+    return expression;
   }
 
   if (CheckAndConsumeTokens({IDENTIFIER})) {
     expression.reset(new parsed::Variable(Previous()));
-    return std::move(expression);
+    return expression;
   }
 
   if (CheckAndConsumeTokens({FUN})) {
-    UniqueStatement lambda_func = std::move(
-        ParseFunction("lambda"));
+    UniqueStatement lambda_func = ParseFunction("lambda");
     expression.reset(new parsed::LambdaExpression(std::move(lambda_func)));
-    return std::move(expression);
+    return expression;
   }
 
   if (CheckAndConsumeTokens({LEFT_PAREN})) {
     UniqueExpression grouping = ParseExpression();
     Consume(RIGHT_PAREN, "Expect ')' after expression");
     grouping.reset(new parsed::Grouping(std::move(grouping)));
-    return std::move(grouping);
+    return grouping;
   }
 
   throw Error(Peek(), "Expect expression.");
@@ -553,10 +552,10 @@ UniqueExpression Parser::ParseUnary() {
     UniqueExpression right_side = ParseUnary();
     right_side.reset(
         new parsed::Unary(unary_operator, std::move(right_side)));
-    return std::move(right_side);
+    return right_side;
   }
 
-  return std::move(ParseCall());
+  return ParseCall();
 }
 
 /// Checks for subtraction first and then addition after.
@@ -571,7 +570,7 @@ UniqueExpression Parser::ParseTerm() {
             std::move(expression), expr_operator, std::move(right_side)));
   }
 
-  return std::move(expression);
+  return expression;
 }
 
 UniqueExpression Parser::ParseFactor() {
@@ -585,7 +584,7 @@ UniqueExpression Parser::ParseFactor() {
             std::move(expression), expr_operator, std::move(right_side)));
   }
 
-  return std::move(expression);
+  return expression;
 }
 
 /// This matches >, >=, <, <= and creates a Binary expression from the
@@ -601,7 +600,7 @@ UniqueExpression Parser::ParseComparison() {
             std::move(expression), expr_operator, std::move(right_side)));
   }
 
-  return std::move(expression);
+  return expression;
 }
 
 UniqueExpression Parser::ParseOr() {
@@ -615,7 +614,7 @@ UniqueExpression Parser::ParseOr() {
             std::move(expression), or_operator, std::move(right_operand)));
   }
 
-  return std::move(expression);
+  return expression;
 }
 
 UniqueExpression Parser::ParseAnd() {
@@ -629,7 +628,7 @@ UniqueExpression Parser::ParseAnd() {
             std::move(expression), and_operator, std::move(right_operand)));
   }
 
-  return std::move(expression);
+  return expression;
 }
 
 UniqueExpression Parser::ParseCall() {
@@ -646,7 +645,7 @@ UniqueExpression Parser::ParseCall() {
     }
   }
 
-  return std::move(expression);
+  return expression;
 }
 
 UniqueExpression Parser::FinishCall(UniqueExpression callee) {
@@ -658,7 +657,7 @@ UniqueExpression Parser::FinishCall(UniqueExpression callee) {
         Error(Peek(), "Can't have more than 255 arguments.");
       }
 
-      arguments.emplace_back(std::move(ParseExpression()));
+      arguments.emplace_back(ParseExpression());
     } while (CheckAndConsumeTokens({COMMA}));
   }
 

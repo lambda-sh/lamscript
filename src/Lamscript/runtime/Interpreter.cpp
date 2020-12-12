@@ -574,6 +574,14 @@ std::string Interpreter::Stringify(std::any object) {
     return AnyAs<SharedLamscriptCallable>(object)->ToString();
   }
 
+  if (type == LS_TYPE_CLASS) {
+    return AnyAs<SharedLamscriptClass>(object)->ToString();
+  }
+
+  if (type == LS_TYPE_INSTANCE) {
+    return AnyAs<SharedLamscriptInstance>(object)->ToString();
+  }
+
   return AnyAs<std::string>(object);
 }
 
