@@ -121,6 +121,11 @@ std::any Resolver::VisitSuperExpression(parsed::Super* super) {
   return nullptr;
 }
 
+std::any Resolver::VisitLambdaExpression(parsed::LambdaExpression* lambda) {
+  Resolve(lambda->GetFunctionStatement());
+  return nullptr;
+}
+
 std::any Resolver::VisitThisExpression(parsed::This* this_expr) {
   if (current_class_ == ClassType::None) {
     runtime::Lamscript::Error(

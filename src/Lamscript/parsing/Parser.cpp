@@ -46,7 +46,7 @@ std::vector<UniqueStatement> Parser::Parse() {
   std::vector<UniqueStatement> statements;
 
   while (!HasReachedEOF()) {
-    statements.emplace_back(std::move(ParseDeclaration()));
+    statements.emplace_back(ParseDeclaration());
   }
 
   return statements;
@@ -339,6 +339,7 @@ UniqueStatement Parser::ParseFunction(const std::string& kind) {
   bool is_static = false;
   bool is_func = kind.compare("function") == 0;
   bool is_method = kind.compare("method") == 0;
+  bool is_lambda = kind.compare("lambda") == 0;
 
   if (is_func) {
     name = Consume(IDENTIFIER, "Expect " + kind + " name.");
@@ -354,7 +355,7 @@ UniqueStatement Parser::ParseFunction(const std::string& kind) {
   bool is_getter = is_method && CheckToken(LEFT_BRACE);
   std::vector<Token> parameters;
 
-  if ((is_func || is_method) && !is_getter) {
+  if ((is_func || is_method || is_lambda) && !is_getter) {
     Consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
 
     // Parse function arguments.

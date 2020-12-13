@@ -119,8 +119,7 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
 
   /// @todo Implement the rest of these expression/statement visitation methods.
   std::any VisitSuperExpression(parsed::Super* expression) override;
-  std::any VisitLambdaExpression(
-      parsed::LambdaExpression* expression) override {}
+  std::any VisitLambdaExpression(parsed::LambdaExpression* expression) override;
 
  private:
   std::shared_ptr<runtime::Interpreter> interpreter_;
