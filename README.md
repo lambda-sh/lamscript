@@ -25,8 +25,8 @@ This language is still currently experimental with many more features to come.
 * [Recursion](examples/recursion.ls).
 * [Blocks](examples/blocks.ls).
 * [Printing](examples/print.ls).
-* Lambda expressions/Anonymous functions.
-* Static & Instance getters.
+* [Lambda expressions](examples/anonymous.ls).
+* [Static & Instance getters](examples/getters.ls).
 * Static class methods.
 * Automatic memory management via c++ smart pointers.
 * Interactive mode.
