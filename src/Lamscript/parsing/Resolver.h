@@ -117,8 +117,10 @@ class Resolver : public ExpressionVisitor, StatementVisitor {
   void Resolve(
       const std::vector<std::unique_ptr<parsed::Statement>> &statements);
 
-  /// @todo Implement the rest of these expression/statement visitation methods.
+  /// @brief Resolves super to the parent class.
   std::any VisitSuperExpression(parsed::Super* expression) override;
+
+  /// brief Resolves the functions stored by lambda functions.
   std::any VisitLambdaExpression(parsed::LambdaExpression* expression) override;
 
  private:

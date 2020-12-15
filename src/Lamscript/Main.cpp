@@ -1,3 +1,5 @@
+#ifdef LAMSCRIPT_BUILD_AS_EXECUTABLE
+
 #include <iostream>
 
 #include <Lamscript/runtime/Lamscript.h>
@@ -14,3 +16,5 @@ int main(int argc, char** argv) {
     exit(0);
   }
 }
+
+#endif
