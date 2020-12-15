@@ -107,19 +107,20 @@ bash shell and access to a c++ compiler from it.
 * [Crafting interpreters](http://craftinginterpreters.com/inheritance.html) was
 used for learning the theory behind how languages work. Unfortunately, their
 guide is written in java while I chose to use c++ for the implementation.
-Because of this, a lot of the core implementation has drastically changed, but
-the overall skeleton remains roughly the same.
-* [Recursive descent parser](https://en.wikipedia.org/wiki/Recursive_descent_parser)
+A lot of my core implementation has drastically changed from the tutorials, but
+the overall theory remains highly relevant to this project.
+* [Recursive descent parsing](https://en.wikipedia.org/wiki/Recursive_descent_parser)
 was used for developing a programming language parser that recursively parses a
 series of tokens into their corresponding statements and expressions.
-* [Curated language resource list](https://www.houseofbots.com/news-detail/4166-4-60-amazing-resources-&-tools-to-learn-programming-language-coding)
-was used for finding other resources that pertained to the entirety of building
-a language. There are many great references to go through here if you'd like to
-look at all of the individual components a programming language is built from.
+* [Curated language resource list](https://tomassetti.me/resources-create-programming-languages/)
+is a list of programming language resources that was used for finding valuable
+and modern resources centered around developing a language. There are many great
+references to go through here if you'd like to look at all of the individual
+components a programming language is built from.
 * [Formal langauge theory - caltech](https://www.its.caltech.edu/~matilde/FormalLanguageTheory.pdf)
-was used for understanding the intricacies of language and how you can
-mathematically describe things like utilizing a finite set of syntax to produce
-an infinite number of different strings.
+is a pdf that was used for understanding the intricacies of language and how you
+can mathematically describe things like utilizing a finite set of syntax to
+produce an infinite number of different strings.
 * [cpp reference](https://en.cppreference.com/w/) was used for all things c++
 related.
 
