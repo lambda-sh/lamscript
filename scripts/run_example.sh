@@ -16,12 +16,12 @@ LAMBDA_COMPILE_ARGS $@
 
 # ----------------------------- RUN THE EXAMPLE ------------------------------
 
-if [ ! -d "$ROOT_DIR/builds/$LAMBDA_build" ]; then
+if [ ! -d "$ROOT_DIR/build/$LAMBDA_build" ]; then
     LAMBDA_FATAL "The interpreter for $LAMBDA_build hasn't been built yet."\
         "Please run './scripts/compile_and_run.sh --build $LAMBDA_build"
 fi
 
-pushd $ROOT_DIR/builds/$LAMBDA_build/bin > /dev/null
+pushd $ROOT_DIR/build/$LAMBDA_build/bin > /dev/null
 
 LAMBDA_INFO "Running a $LAMBDA_build build on example $LAMBDA_example."
 
@@ -33,5 +33,5 @@ fi
 
 LAMBDA_INFO "Finished executing $LAMBDA_example"
 
-popd > /dev/null  # $ROOT_DIR/builds/$LAMBDA_build/bin
+popd > /dev/null  # $ROOT_DIR/build/$LAMBDA_build/bin
 popd > /dev/null  # $ROOT_DIR
