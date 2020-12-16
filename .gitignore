@@ -3,6 +3,9 @@
 # The output folder for all builds.
 builds
 
+# The folder to build lamscript in.
+build
+
 # Created by https://www.toptal.com/developers/gitignore/api/linux,cpp,c,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,cpp,c,macos
 
