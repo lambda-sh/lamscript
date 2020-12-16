@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.0.0)
 
 if (${DISTRIBUTION_BUILD})
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/builds/Dist/lib)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/builds/Dist/lib)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/builds/Dist/bin)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Dist/lib)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Dist/lib)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Dist/bin)
 elseif (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
-        ${CMAKE_BINARY_DIR}/builds/${CMAKE_BUILD_TYPE}/lib)
+        ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
-        ${CMAKE_BINARY_DIR}/builds/${CMAKE_BUILD_TYPE}/lib)
+        ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
-        ${CMAKE_BINARY_DIR}/builds/${CMAKE_BUILD_TYPE}/bin)
+        ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin)
 endif()
 
 # ----------------------------------- SETTINGS ---------------------------------
@@ -52,13 +52,13 @@ file(
   LAMSCRIPT_TEST_SRC
   ${CMAKE_SOURCE_DIR}/tests/*.cpp)
 
-add_executable(lamscript_test ${LAMSCRIPT_TEST_SRC})
-add_test(NAME lamscript_test COMMAND lamscript_test)
+add_executable(lamscript_tests ${LAMSCRIPT_TEST_SRC})
+add_test(NAME lamscript_tests COMMAND lamscript_tests)
 
 target_link_libraries(
-    lamscript_test
+    lamscript_tests
     PUBLIC lamscript_lib gtest)
 
 target_include_directories(
-    lamscript_test
+    lamscript_tests
     PUBLIC ${CMAKE_SOURCE_DIR}/src)
