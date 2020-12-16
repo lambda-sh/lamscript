@@ -20,14 +20,17 @@ LAMBDA_INFO "Attempting to Compile a $LAMBDA_build for lamscript."
 
 # ----------------------------------- CMAKE ------------------------------------
 
+mkdir -p build
+pushd build > /dev/null
+
 if [ $LAMBDA_build = "Release" ] || [ $LAMBDA_build = "Debug" ]; then
-    cmake \
+    cmake .. \
         -DCMAKE_BUILD_TYPE="$LAMBDA_build" \
-        -DDISTRIBUTION_BUILD=False .
+        -DDISTRIBUTION_BUILD=False
 elif [ $LAMBDA_build = "Dist" ]; then
-    cmake \
+    cmake .. \
         -DCMAKE_BUILD_TYPE="Release" \
-        -DDISTRIBUTION_BUILD=True .
+        -DDISTRIBUTION_BUILD=True
 else
     LAMBDA_FATAL \
         "You need to pass a valid build type in order to compile lamscript."
@@ -36,10 +39,14 @@ fi
 LAMBDA_ASSERT_LAST_COMMAND_OK \
     "Couldn't generate the cmake file necessary for compiling lamscript."
 
+
 # ----------------------------------- BUILD ------------------------------------
 
 make -j $LAMBDA_cores
+
 LAMBDA_ASSERT_LAST_COMMAND_OK "Couldn't successfully compile lamscript."
+
+popd > /dev/null  # build
 
 LAMBDA_INFO "Successfully compiled lamscript."
 
