@@ -13,34 +13,43 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  build_and_test_on_linux:
+    name: Build & test Lamscript on linux
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-      - name: Install g++ 10.xx
-        run: sudo apt-get install g++-10
-
-      - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v1.4
-        with:
-          cmake-version: '3.16.x'
-
-      - name: Run project setup
+      - name: Run the projects setup.
         run: ./scripts/setup.sh --within-ci true
 
       - name: Compile a release build of lamscript
         run: ./scripts/compile_lamscript.sh \
             --build Release \
             --cpp-compiler g++-10 \
-            --cores 1
+            --cores 2
+
+      - name: Run all of lamscripts tests.
+        run: ./scripts/run_all_tests.sh --build Release
+
+  build_and_test_on_macos:
+    name: Build & test Lamscript on macos.
+    runs-on: macos-11.0
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Run the projects setup.
+        run: ./scripts/setup.sh --within-ci true
+
+      - name: Compile a release build of lamscript
+        run: ./scripts/compile_lamscript.sh \
+            --build Release \
+            --cpp-compiler g++-10 \
+            --cores 2
 
       - name: Run all of lamscripts tests.
         run: ./scripts/run_all_tests.sh --build Release
