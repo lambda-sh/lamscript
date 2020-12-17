@@ -41,6 +41,8 @@ LAMBDA_ASSERT_LAST_COMMAND_OK \
 
 
 # ----------------------------------- BUILD ------------------------------------
+pwd
+ls
 
 make -j $LAMBDA_cores
 
