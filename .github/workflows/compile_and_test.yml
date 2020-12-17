@@ -15,7 +15,7 @@ on:
 
 jobs:
   build_and_test_on_linux:
-    name: Build & test Lamscript on linux
+    name: Build & test Lamscript on Linux with G++.
     runs-on: ubuntu-latest
 
     steps:
@@ -35,8 +35,8 @@ jobs:
         run: ./scripts/run_all_tests.sh --build Release
 
   build_and_test_on_macos:
-    name: Build & test Lamscript on macos.
-    runs-on: macos-11.0
+    name: Build & test Lamscript on MacOS with G++.
+    runs-on: macos-latest
 
     steps:
       - name: Checkout Repository
@@ -52,4 +52,27 @@ jobs:
             --cores 2
 
       - name: Run all of lamscripts tests.
+        run: ./scripts/run_all_tests.sh --build Release
+
+  build_and_test_on_windows:
+    name: Build & test Lamscript on Windows.
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Run the projects setup.
+        shell: bash
+        run: ./scripts/setup.sh --within-ci true
+
+      - name: Compile a release build of lamscript
+        shell: bash
+        run: ./scripts/compile_lamscript.sh \
+            --build Release \
+            --cpp-compiler cl \
+            --cores 2
+
+      - name: Run all of lamscripts tests.
+        shell: bash
         run: ./scripts/run_all_tests.sh --build Release
