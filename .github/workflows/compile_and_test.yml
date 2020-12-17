@@ -2,7 +2,7 @@
 
 name: Compile and test Lamscript release
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
@@ -24,17 +24,17 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      
+
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v1.4
         with:
           cmake-version: '3.16.x'
-      
+
       - name: Run project setup
-        run: ./scripts/setup.sh --within-ci true
+        run: ./$GITHUB_WORKSPACE/scripts/setup.sh --within-ci true
 
       - name: Compile a release build of lamscript
-        run: ./scripts/compile_lamscript --build Release --cores 1  
-    
+        run: ./scripts/compile_lamscript.sh --build Release --cores 1
+
       - name: Run all of lamscripts tests.
         run: ./scripts/run_all_tests.sh --build Release
