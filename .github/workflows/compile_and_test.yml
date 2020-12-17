@@ -25,6 +25,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Install Cmake 10.2
+        run: sudo apt install g++10
+
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v1.4
         with:
@@ -34,7 +37,10 @@ jobs:
         run: ./scripts/setup.sh --within-ci true
 
       - name: Compile a release build of lamscript
-        run: ./scripts/compile_lamscript.sh --build Release --cores 1
+        run: ./scripts/compile_lamscript.sh \
+            --build Release \
+            --cpp-compiler g++ \
+            --cores 1
 
       - name: Run all of lamscripts tests.
         run: ./scripts/run_all_tests.sh --build Release
