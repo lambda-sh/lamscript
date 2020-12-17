@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Cmake 10.2
-        run: sudo apt install g++10
+        run: sudo apt-get install g++-10
 
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v1.4
