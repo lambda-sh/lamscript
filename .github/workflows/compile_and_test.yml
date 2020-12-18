@@ -1,4 +1,4 @@
-name: Compile and test Lamscript release
+name: compile_and_test
 
 on:
   push:
