@@ -79,4 +79,4 @@ jobs:
 
       - name: Run all of lamscripts tests.
         shell: bash
-        run: ./scripts/run_all_tests.sh" --build Release
+        run: ./scripts/run_all_tests.sh --build Release
