@@ -73,7 +73,7 @@ jobs:
 
       - name: Compile a release build of lamscript
         shell: msys2 {0}
-        run: sudo pacman --noconfirm -Syu gcc && ./scripts/compile_lamscript.sh \
+        run: pacman --noconfirm -Syu gcc && ./scripts/compile_lamscript.sh \
             --build Release \
             --cpp-compiler g++ \
             --cores 2
