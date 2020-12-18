@@ -9,6 +9,7 @@ pushd $ROOT_DIR > /dev/null
 source lambda-sh/lambda.sh
 
 LAMBDA_PARSE_ARG build Release "The type of build to produce."
+LAMBDA_PARSE_ARG os Linux "The operating system being built on."
 
 LAMBDA_COMPILE_ARGS $@
 
@@ -22,7 +23,12 @@ fi
 pushd $ROOT_DIR/build/$LAMBDA_build/bin > /dev/null
 
 LAMBDA_INFO "Running tests on a $LAMBDA_build build of lamscript."
-./lamscript_tests
+
+if [ $LAMBDA_os = "Linux" ] || [ $LAMBDA_os = "Macos" ]; then
+    ./lamscript_tests
+elif [ $LAMBDA_os = "Windows" ]; then
+    lamscript_tests.exe
+fi
 LAMBDA_INFO "Finished executing $LAMBDA_example"
 
 popd > /dev/null  # $ROOT_DIR/build/$LAMBDA_build/bin
