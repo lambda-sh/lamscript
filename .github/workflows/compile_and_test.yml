@@ -66,19 +66,25 @@ jobs:
         shell: bash
         run: ./scripts/setup.sh --within-ci true
 
-      - name: Install gcc 10.2.
-        shell: bash
-        run: echo $PATH && pacman --noconfirm -S base-devel gcc cmake make
+      - name: Install MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          release: false
+          install: >-
+            git
+            bash
+            cmake
+            make
+            gcc
+            base-devel
 
       - name: Compile a release build of lamscript
-        shell: bash
-        run: |
-          export PATH="msys64/usr/bin:$PATH"
-          scripts/compile_lamscript.sh \
+        shell: msys2 {0}
+        run: bash -E "scripts/compile_lamscript.sh" \
             --build Release \
             --cpp-compiler g++ \
             --cores 2
 
       - name: Run all of lamscripts tests.
-        shell: bash
-        run: ./scripts/run_all_tests.sh --build Release
+        shell: msys2 {0}
+        run: bash -E "scripts/run_all_tests.sh" --build Release
