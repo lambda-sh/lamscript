@@ -71,9 +71,14 @@ jobs:
         with:
           msystem: MINGW64
 
+
+      - name: Install gcc 10.2.
+        shell: msys2 {0}
+        run: pacman --noconfirm -Syu gcc
+
       - name: Compile a release build of lamscript
         shell: msys2 {0}
-        run: pacman --noconfirm -Syu gcc && ./scripts/compile_lamscript.sh \
+        run: ./scripts/compile_lamscript.sh \
             --build Release \
             --cpp-compiler g++ \
             --cores 2
