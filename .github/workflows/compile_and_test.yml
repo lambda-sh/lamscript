@@ -68,7 +68,7 @@ jobs:
 
       - name: Install gcc 10.2.
         shell: bash
-        run: pacman --noconfirm -S base-devel gcc cmake make
+        run: echo $PATH && pacman --noconfirm -S base-devel gcc cmake make
 
       - name: Compile a release build of lamscript
         shell: bash
