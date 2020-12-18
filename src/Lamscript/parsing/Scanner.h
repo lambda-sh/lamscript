@@ -1,7 +1,6 @@
 #ifndef SRC_LAMSCRIPT_PARSING_SCANNER_H_
 #define SRC_LAMSCRIPT_PARSING_SCANNER_H_
 
-#include <bits/stdc++.h>
 #include <cctype>
 #include <string>
 #include <vector>
