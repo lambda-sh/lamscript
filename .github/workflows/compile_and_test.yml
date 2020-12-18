@@ -79,7 +79,7 @@ jobs:
 
       - name: Update $PATH
         shell: bash
-        run: echo "msys64/usr/bin" >> $GITHUB_ENV
+        run: echo "msys64/usr/bin" >> $GITHUB_PATH
 
       - name: Compile a release build of lamscript
         shell: bash
