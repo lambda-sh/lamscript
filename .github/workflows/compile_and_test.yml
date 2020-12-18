@@ -66,15 +66,8 @@ jobs:
         shell: bash
         run: ./scripts/setup.sh --within-ci true
 
-      - name: Setup mingw64.
-        uses: msys2/setup-msys2@v2
-        with:
-          path-type: inherit
-          msystem: MINGW64
-
-
       - name: Install gcc 10.2.
-        shell: msys2 {0}
+        shell: bash
         run: pacman --noconfirm -S base-devel gcc cmake make
 
       - name: Compile a release build of lamscript
