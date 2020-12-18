@@ -28,6 +28,8 @@ if [ $LAMBDA_os = "Linux" ] || [ $LAMBDA_os = "Macos" ]; then
     ./lamscript_tests
 elif [ $LAMBDA_os = "Windows" ]; then
     pushd $ROOT_DIR/build/$LAMBDA_build/bin/$LAMBDA_build > /dev/null
+    pwd
+    ls
     lamscript_tests.exe
 else
     popd > /dev/null  # $ROOT_DIR/build/$LAMBDA_build/bin
