@@ -77,13 +77,11 @@ jobs:
         shell: msys2 {0}
         run: pacman --noconfirm -S base-devel gcc cmake make
 
-      - name: Update $PATH
-        shell: bash
-        run: echo "msys64/usr/bin" >> $GITHUB_PATH
-
       - name: Compile a release build of lamscript
         shell: bash
-        run: scripts/compile_lamscript.sh \
+        run: |
+          export PATH="msys64/usr/bin:$PATH"
+          scripts/compile_lamscript.sh \
             --build Release \
             --cpp-compiler g++ \
             --cores 2
