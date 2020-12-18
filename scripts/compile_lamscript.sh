@@ -46,7 +46,7 @@ LAMBDA_ASSERT_LAST_COMMAND_OK \
 if [ $LAMBDA_os = "Linux" ] || [ $LAMBDA_os = "Macos" ]; then
     make -j $LAMBDA_cores
 elif [ $LAMBDA_os = "Windows" ]; then
-    MSBuild.exe "lamscript.sln" //t:Rebuild
+    MSBuild.exe "lamscript.sln" //t:Rebuild //p:Configuration=$LAMBDA_build
 fi
 
 LAMBDA_ASSERT_LAST_COMMAND_OK "Couldn't successfully compile lamscript."
