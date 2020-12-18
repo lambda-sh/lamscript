@@ -1,4 +1,6 @@
 # Lamscript
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lambda-sh/lamscript/compile_and_test?style=plastic)
+
 An interpreted language aimed for productivity and simplicity.
 
 ## Description
