@@ -70,7 +70,7 @@ jobs:
         shell: bash
         run: ./scripts/compile_lamscript.sh \
             --build Release \
-            --cpp-compiler g++ \
+            --cpp-compiler x86_64-w64-mingw32-g++ \
             --cores 2
 
       - name: Run all of lamscripts tests.
