@@ -72,10 +72,10 @@ jobs:
           msystem: MINGW64
 
       - name: Compile a release build of lamscript
-        shell: bash
-        run: ./scripts/compile_lamscript.sh \
+        shell: msys2 {0}
+        run: sudo pacman --noconfirm -Syu gcc && ./scripts/compile_lamscript.sh \
             --build Release \
-            --cpp-compiler x86_64-w64-mingw64-g++ \
+            --cpp-compiler g++ \
             --cores 2
 
       - name: Run all of lamscripts tests.
