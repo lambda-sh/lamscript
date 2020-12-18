@@ -66,25 +66,17 @@ jobs:
         shell: bash
         run: ./scripts/setup.sh --within-ci true
 
-      - name: Install MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          release: false
-          install: >-
-            git
-            bash
-            cmake
-            make
-            gcc
-            base-devel
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
 
       - name: Compile a release build of lamscript
-        shell: msys2 {0}
-        run: bash -E "scripts/compile_lamscript.sh" \
+        shell: bash
+        run: ./scripts/compile_lamscript.sh \
             --build Release \
-            --cpp-compiler g++ \
-            --cores 2
+            --cpp-compiler cl \
+            --cores 2 \
+            --os Windows
 
       - name: Run all of lamscripts tests.
-        shell: msys2 {0}
-        run: bash -E "scripts/run_all_tests.sh" --build Release
+        shell: bash
+        run: ./scripts/run_all_tests.sh" --build Release
