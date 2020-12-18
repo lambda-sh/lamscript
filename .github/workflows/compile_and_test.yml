@@ -20,14 +20,14 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        compiler: [ g++ ]
+        compiler: [ g++-10 ]
         include:
           - os: ubuntu-latest
-            compiler: g++
+            compiler: g++-10
             target: Linux
 
           - os: macos-latest
-            compiler: g++
+            compiler: g++-10
             target: Macos
 
           - os: windows-latest
