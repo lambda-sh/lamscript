@@ -75,11 +75,15 @@ jobs:
 
       - name: Install gcc 10.2.
         shell: msys2 {0}
-        run: pacman --noconfirm -S gcc cmake
+        run: pacman --noconfirm -S base-devel gcc cmake make
+
+      - name: Update $PATH
+        shell: bash
+        run: echo "msys64/usr/bin" >> $GITHUB_ENV
 
       - name: Compile a release build of lamscript
-        shell: msys2 {0}
-        run: bash scripts/compile_lamscript.sh \
+        shell: bash
+        run: scripts/compile_lamscript.sh \
             --build Release \
             --cpp-compiler g++ \
             --cores 2
