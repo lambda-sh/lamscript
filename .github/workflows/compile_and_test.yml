@@ -42,7 +42,7 @@ jobs:
         run: ./scripts/setup.sh --within-ci true
 
       - name: Add msbuild to PATH
-        if: ${{ matrix.os == "windows-latest" }}
+        if: ${{ matrix.os == 'windows-latest' }}
         uses: microsoft/setup-msbuild@v1.0.2
 
       - name: Compile a release build of lamscript
