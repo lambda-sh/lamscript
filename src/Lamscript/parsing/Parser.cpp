@@ -1,9 +1,10 @@
 #include <Lamscript/parsing/Parser.h>
 
 #include <initializer_list>
+#include <memory>
+#include <random>
 #include <typeinfo>
 #include <vector>
-#include <memory>
 
 #include <Lamscript/errors/ParseError.h>
 #include <Lamscript/parsed/Expression.h>
