@@ -18,16 +18,16 @@ TEST(Scanner, ScanNumberLiteral) {
   ASSERT_EQ(tokens.size(), 3);
 
   const Token& number = tokens[0];
-  ASSERT_EQ(number.Type, TokenType::NUMBER);
-  ASSERT_EQ(number.Lexeme, "34");
+  EXPECT_EQ(number.Type, TokenType::NUMBER);
+  EXPECT_EQ(number.Lexeme, "34");
 
   const Token& semicolon = tokens[1];
-  ASSERT_EQ(semicolon.Type, TokenType::SEMICOLON);
-  ASSERT_EQ(semicolon.Lexeme, ";");
+  EXPECT_EQ(semicolon.Type, TokenType::SEMICOLON);
+  EXPECT_EQ(semicolon.Lexeme, ";");
 
   const Token& eof = tokens[2];
-  ASSERT_EQ(eof.Type, TokenType::END_OF_FILE);
-  ASSERT_EQ(eof.Lexeme, "");
+  EXPECT_EQ(eof.Type, TokenType::END_OF_FILE);
+  EXPECT_EQ(eof.Lexeme, "");
 }
 
 TEST(Scanner, ScanPrint) {
@@ -36,17 +36,17 @@ TEST(Scanner, ScanPrint) {
   ASSERT_EQ(tokens.size(), 4);
 
   const Token& print = tokens[0];
-  ASSERT_EQ(print.Type, TokenType::PRINT);
-  ASSERT_EQ(print.Lexeme, "print");
+  EXPECT_EQ(print.Type, TokenType::PRINT);
+  EXPECT_EQ(print.Lexeme, "print");
 
   const Token& literal = tokens[1];
-  ASSERT_EQ(literal.Type, TokenType::STRING);
-  ASSERT_EQ(literal.Lexeme, "\"Hello, world!\"");
+  EXPECT_EQ(literal.Type, TokenType::STRING);
+  EXPECT_EQ(literal.Lexeme, "\"Hello, world!\"");
 
   const Token& semicolon = tokens[2];
-  ASSERT_EQ(semicolon.Type, TokenType::SEMICOLON);
-  ASSERT_EQ(semicolon.Lexeme, ";");
+  EXPECT_EQ(semicolon.Type, TokenType::SEMICOLON);
+  EXPECT_EQ(semicolon.Lexeme, ";");
 
   const Token& eof = tokens[3];
-  ASSERT_EQ(eof.Type, TokenType::END_OF_FILE);
+  EXPECT_EQ(eof.Type, TokenType::END_OF_FILE);
 }
