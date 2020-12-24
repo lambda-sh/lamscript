@@ -3,9 +3,10 @@
 # This script is used to configure and compile lamscript.
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"
-pushd $ROOT_DIR > /dev/null
+pushd "$ROOT_DIR" > /dev/null
 
 # ----------------------------- LAMBDA-SH & ARGS ------------------------------
+
 source lambda-sh/lambda.sh
 
 LAMBDA_PARSE_ARG build Release "The type of build to produce."
@@ -15,7 +16,7 @@ LAMBDA_PARSE_ARG os Linux "The operating system being built on."
 
 LAMBDA_COMPILE_ARGS $@
 
-export CXX=$LAMBDA_cpp_compiler
+export CXX="$LAMBDA_cpp_compiler"
 
 LAMBDA_INFO "Attempting to Compile a $LAMBDA_build for lamscript."
 
@@ -24,11 +25,11 @@ LAMBDA_INFO "Attempting to Compile a $LAMBDA_build for lamscript."
 mkdir -p build
 pushd build > /dev/null
 
-if [ $LAMBDA_build = "Release" ] || [ $LAMBDA_build = "Debug" ]; then
+if [ "$LAMBDA_build" = "Release" ] || [ "$LAMBDA_build" = "Debug" ]; then
     cmake .. \
         -DCMAKE_BUILD_TYPE="$LAMBDA_build" \
         -DDISTRIBUTION_BUILD=False
-elif [ $LAMBDA_build = "Dist" ]; then
+elif [ "$LAMBDA_build" = "Dist" ]; then
     cmake .. \
         -DCMAKE_BUILD_TYPE="Release" \
         -DDISTRIBUTION_BUILD=True
@@ -38,21 +39,18 @@ else
 fi
 
 LAMBDA_ASSERT_LAST_COMMAND_OK \
-    "Couldn't generate the cmake file necessary for compiling lamscript."
-
+    "Couldn't generate the cmake files necessary for compiling lamscript."
 
 # ----------------------------------- BUILD ------------------------------------
 
-if [ $LAMBDA_os = "Linux" ] || [ $LAMBDA_os = "Macos" ]; then
+if [ "$LAMBDA_os" = "Linux" ] || [ "$LAMBDA_os" = "Macos" ]; then
     make -j $LAMBDA_cores
-elif [ $LAMBDA_os = "Windows" ]; then
-    MSBuild.exe "lamscript.sln" //t:Rebuild //p:Configuration=$LAMBDA_build
+elif [ "$LAMBDA_os" = "Windows" ]; then
+    MSBuild.exe "lamscript.sln" //t:Rebuild //p:Configuration="$LAMBDA_build"
 fi
 
 LAMBDA_ASSERT_LAST_COMMAND_OK "Couldn't successfully compile lamscript."
-
-popd > /dev/null  # build
-
 LAMBDA_INFO "Successfully compiled lamscript."
 
+popd > /dev/null  # build
 popd > /dev/null  # ROOT_DIR
