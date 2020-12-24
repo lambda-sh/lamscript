@@ -30,6 +30,31 @@ TEST(Scanner, ScanNumberLiteral) {
   EXPECT_EQ(eof.Lexeme, "");
 }
 
+TEST(Scanner, ScanBoolean) {
+  Scanner scanner("true and false;");
+  const std::vector<Token> tokens = scanner.ScanTokens();
+  ASSERT_EQ(tokens.size(), 5);
+
+  const Token& true_token = tokens[0];
+  EXPECT_EQ(true_token.Type, TokenType::TRUE);
+  EXPECT_EQ(true_token.Lexeme, "true");
+
+  const Token& and_token = tokens[1];
+  EXPECT_EQ(and_token.Type, TokenType::AND);
+  EXPECT_EQ(and_token.Lexeme, "and");
+
+  const Token& false_token = tokens[2];
+  EXPECT_EQ(false_token.Type, TokenType::FALSE);
+  EXPECT_EQ(false_token.Lexeme, "false");
+
+  const Token& semicolon = tokens[3];
+  EXPECT_EQ(semicolon.Type, TokenType::SEMICOLON);
+  EXPECT_EQ(semicolon.Lexeme, ";");
+
+  const Token& eof = tokens[4];
+  EXPECT_EQ(eof.Type, TokenType::END_OF_FILE);
+}
+
 TEST(Scanner, ScanPrint) {
   Scanner scanner("print \"Hello, world!\";");
   const std::vector<Token> tokens = scanner.ScanTokens();
