@@ -49,7 +49,7 @@ jobs:
         run: ./scripts/compile_lamscript.sh \
             --build Release \
             --cpp-compiler ${{ matrix.compiler }} \
-            --os ${{ matrix.target }}
+            --os ${{ matrix.target }} \
             --cores 2
 
       - name: Run all of lamscripts tests.
