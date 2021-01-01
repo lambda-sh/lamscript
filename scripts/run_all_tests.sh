@@ -20,19 +20,19 @@ if [ ! -d "$ROOT_DIR/build/$LAMBDA_build" ]; then
         "Please run './scripts/compile_and_run.sh --build $LAMBDA_build"
 fi
 
-
 LAMBDA_INFO "Running tests on a $LAMBDA_build build of lamscript."
 
 if [ $LAMBDA_os = "Linux" ] || [ $LAMBDA_os = "Macos" ]; then
-    pushd $ROOT_DIR/build/$LAMBDA_build/bin > /dev/null
+    pushd "$ROOT_DIR/build/$LAMBDA_build/bin" > /dev/null
+    cp -r "$ROOT_DIR/examples" examples
     ./lamscript_tests
-elif [ $LAMBDA_os = "Windows" ]; then
-    pushd $ROOT_DIR/build/$LAMBDA_build/bin/$LAMBDA_build > /dev/null
+elif [ "$LAMBDA_os" = "Windows" ]; then
+    pushd "$ROOT_DIR/build/$LAMBDA_build/bin/$LAMBDA_build" > /dev/null
+    cp -r "$ROOT_DIR/examples/" examples
     ./lamscript_tests.exe
 else
     LAMBDA_FATAL "--os needs to be Linux, Macos, or Windows."
 fi
-
 
 LAMBDA_INFO "Finished executing $LAMBDA_example"
 

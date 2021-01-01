@@ -1,11 +1,15 @@
+# setup.sh
+#
+# Setup the Lamscript workspace for development & building.
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 pushd $ROOT_DIR > /dev/null
 
+# ------------------------------ UPDATE SUBMODULES -----------------------------
 
-# Fetch submodules.
 git submodule update --init --recursive
 
-# Source lambda-sh for our bash scripts.
+# ------------------------------- LAMBDA-SH SETUP ------------------------------
+
 source lambda-sh/lambda.sh
 
 LAMBDA_INFO "Successfully installed submodules and setup lambda.sh"
@@ -17,6 +21,8 @@ LAMBDA_COMPILE_ARGS $@
 if [ "$LAMBDA_within_ci" = true ]; then
     exit
 fi
+
+# ------------------------------ PRE-COMMIT SETUP ------------------------------
 
 if command -v pre-commit > /dev/null; then
     pre-commit install > /dev/null
