@@ -3,9 +3,9 @@
 #include <Lamscript/parsing/Scanner.h>
 #include <Lamscript/parsing/Token.h>
 
-using lamscript::parsing::Scanner;
-using lamscript::parsing::Token;
-using lamscript::parsing::TokenType;
+using ::lamscript::parsing::Scanner;
+using ::lamscript::parsing::Token;
+using ::lamscript::parsing::TokenType;
 
 TEST(Scanner, ScanAnything) {
   Scanner scanner("print \"Hello, world!\"");
