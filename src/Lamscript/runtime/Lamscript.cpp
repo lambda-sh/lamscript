@@ -19,7 +19,7 @@ bool Lamscript::had_error_ = false;
 bool Lamscript::had_runtime_error_ = false;
 
 /// @brief Run the given source.
-void Lamscript::Run(const std::string& source) {
+ProgramResult Lamscript::Run(const std::string& source) {
   parsing::Scanner scanner = parsing::Scanner(source);
   std::vector<parsing::Token> tokens = scanner.ScanTokens();
 
@@ -28,7 +28,7 @@ void Lamscript::Run(const std::string& source) {
 
   if (had_error_) {
     had_error_ = false;
-    return;
+    return ProgramResult{ProgramStatus::FailedAtParser, 65};
   }
 
   parsing::Resolver resolver = parsing::Resolver(interpreter_);
@@ -36,16 +36,22 @@ void Lamscript::Run(const std::string& source) {
 
   if (had_error_) {
     had_error_ = false;
-    return;
+    return ProgramResult{ProgramStatus::FailedAtResolver, 65};
   }
 
   interpreter_->Interpret(statements);
+
+  if (had_runtime_error_) {
+    return ProgramResult{ProgramStatus::FailedAtInterpeter, 70};
+  }
+
+  return ProgramResult{ProgramStatus::Success, 0};
 }
 
 /// @brief Run a given file.
 ///
 /// This functions throws if it cannot successfully open the file.
-void Lamscript::RunFile(const std::string& file_path)  {
+ProgramResult Lamscript::RunFile(const std::string& file_path)  {
   std::ifstream source_file(file_path, std::ios::in | std::ios::binary);
   std::string source_code;
 
@@ -55,22 +61,14 @@ void Lamscript::RunFile(const std::string& file_path)  {
     source_file.seekg(0, std::ios::beg);
     source_file.read(&source_code[0], source_code.size());
   } else {
-    throw "The Input file could not be read";
+    return ProgramResult{ProgramStatus::FailedAtReadingFile, 1};
   }
 
-  Run(source_code);
-
-  if (had_error_) {
-    exit(65);
-  }
-
-  if (had_runtime_error_) {
-    exit(70);
-  }
+  return Run(source_code);
 }
 
 /// @brief Runs the prompt for the interpreter.
-void Lamscript::RunPrompt() {
+ProgramResult Lamscript::RunPrompt() {
   bool running = true;
   std::string source_line;
 
@@ -83,6 +81,7 @@ void Lamscript::RunPrompt() {
     }
     source_line.clear();
   }
+  return ProgramResult{ProgramStatus::Success, 0};
 }
 
 /// @brief Report an error
