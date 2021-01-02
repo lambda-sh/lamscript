@@ -2,62 +2,96 @@
 
 #include <Lamscript/runtime/Lamscript.h>
 
+using ::lamscript::runtime::ProgramStatus;
+using ::lamscript::runtime::ProgramResult;
+using ::lamscript::runtime::Lamscript;
+
 TEST(Examples, AnonymousClasses) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/anonymous.ls");
+  ProgramResult result = Lamscript::RunFile("examples/anonymous.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, Blocks) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/blocks.ls");
+  ProgramResult result = Lamscript::RunFile("examples/blocks.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, Classes) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/class.ls");
+  ProgramResult result = Lamscript::RunFile("examples/class.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, Closures) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/closure.ls");
+  ProgramResult result = Lamscript::RunFile("examples/closure.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, Conditionals) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/conditionals.ls");
+  ProgramResult result = Lamscript::RunFile("examples/conditionals.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, Functions) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/func.ls");
+  ProgramResult result = Lamscript::RunFile("examples/func.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, Getters) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/getters.ls");
+  ProgramResult result = Lamscript::RunFile("examples/getters.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, ClassInheritance) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/inheritance.ls");
+  ProgramResult result = Lamscript::RunFile("examples/inheritance.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, LogicalOperators) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/logical.ls");
+  ProgramResult result = Lamscript::RunFile("examples/logical.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, Loops) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/loops.ls");
+  ProgramResult result = Lamscript::RunFile("examples/loops.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, MathOperators) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/math.ls");
+  ProgramResult result = Lamscript::RunFile("examples/math.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, PrintStatement) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/print.ls");
+  ProgramResult result = Lamscript::RunFile("examples/print.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, Recursion) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/recursion.ls");
+  ProgramResult result = Lamscript::RunFile("examples/recursion.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, SuperExpression) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/super.ls");
+  ProgramResult result = Lamscript::RunFile("examples/super.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
 
 TEST(Examples, Variables) {
-  ::lamscript::runtime::Lamscript::RunFile("examples/variable.ls");
+  ProgramResult result = Lamscript::RunFile("examples/variable.ls");
+  ASSERT_EQ(result.Status, ProgramStatus::Success);
+  EXPECT_EQ(result.ReturnCode, 0);
 }
