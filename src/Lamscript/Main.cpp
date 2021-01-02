@@ -9,8 +9,9 @@ int main(int argc, char** argv) {
     std::cout << "Usage: lamscript [script]" << std::endl;
     exit(64);
   } else if (argc == 2) {
-    lamscript::runtime::Lamscript::RunFile(argv[1]);
-    exit(0);
+    lamscript::runtime::ProgramResult result =
+        lamscript::runtime::Lamscript::RunFile(argv[1]);
+    exit(result.ReturnCode);
   } else {
     lamscript::runtime::Lamscript::RunPrompt();
     exit(0);
