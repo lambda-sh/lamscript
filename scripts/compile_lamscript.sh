@@ -27,12 +27,10 @@ pushd build > /dev/null
 
 if [ "$LAMBDA_build" = "Release" ] || [ "$LAMBDA_build" = "Debug" ]; then
     cmake .. \
-        -DCMAKE_BUILD_TYPE="$LAMBDA_build" \
-        -DDISTRIBUTION_BUILD=False
+        -DCMAKE_BUILD_TYPE="$LAMBDA_build"
 elif [ "$LAMBDA_build" = "Dist" ]; then
     cmake .. \
         -DCMAKE_BUILD_TYPE="Release" \
-        -DDISTRIBUTION_BUILD=True
 else
     LAMBDA_FATAL \
         "You need to pass a valid build type in order to compile lamscript."
