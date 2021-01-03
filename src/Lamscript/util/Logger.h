@@ -1,9 +1,5 @@
-/**
- * @file Log.h
- * @brief The engines util utility.
- *
- * Can be used both in the engine and client application.
- */
+/// @file Logger.h
+/// @brief The languages lightweight logging utility.
 #ifndef SRC_LAMSCRIPT_UTIL_LOGGER_H_
 #define SRC_LAMSCRIPT_UTIL_LOGGER_H_
 
@@ -28,6 +24,9 @@ class Log {
 
 }  // namespace util
 }  // namespace lamscript
+
+
+#ifdef LAMSCRIPT_LOGGING_ENABLED
 
 /// @def LAMSCRIPT_TRACE
 /// @brief Log tracing information within the engine.
@@ -56,5 +55,7 @@ class Log {
 #define LAMSCRIPT_FATAL(...) \
     SPDLOG_LOGGER_FATAL( \
         ::lamscript::util::Log::GetLogger(), __VA_ARGS__);
+
+#endif  // LAMSCRIPT_LOGGING_ENABLED
 
 #endif  // SRC_LAMSCRIPT_UTIL_LOGGER_H_
