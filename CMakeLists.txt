@@ -43,7 +43,7 @@ target_include_directories(lamscript_lib PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
 target_link_libraries(lamscript_lib spdlog::spdlog)
 
-if (CMAKE_BUILD_TYPE EQUAL Debug)
+if (${CMAKE_BUILD_TYPE} EQUAL Debug)
     target_compile_definitions(
         lamscript
         PUBLIC LAMSCRIPT_LOGGING_ENABLED)
