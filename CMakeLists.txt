@@ -50,7 +50,7 @@ if (CMAKE_BUILD_TYPE EQUALS Debug)
     target_compile_definitions(
         lamscript_lib
         PUBLIC LAMSCRIPT_LOGGING_ENABLED)
-endif(
+endif()
 
 # ----------------------------------- TESTING ----------------------------------
 
