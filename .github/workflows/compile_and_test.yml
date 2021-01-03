@@ -1,4 +1,4 @@
-name: compile_and_test
+name: Compile and test Release & Debug builds
 
 on:
   push:
@@ -15,7 +15,9 @@ defaults:
 
 jobs:
   build_and_test:
-    name: Build & test Lamscript on ${{ matrix.os }} with ${{ matrix.compiler }}.
+    name: >
+      Build and test a {{matrix.build}} version of Lamscript on ${{ matrix.os }}
+      with ${{ matrix.compiler }}.
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
