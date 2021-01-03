@@ -56,6 +56,13 @@ class Log {
     SPDLOG_LOGGER_FATAL( \
         ::lamscript::util::Log::GetLogger(), __VA_ARGS__);
 
+#else
+
+#define LAMSCRIPT_TRACE(...)
+#define LAMSCRIPT_INFO(...)
+#define LAMSCRIPT_ERROR(...)
+#define LAMSCRIPT_FATAL(...)
+
 #endif  // LAMSCRIPT_LOGGING_ENABLED
 
 #endif  // SRC_LAMSCRIPT_UTIL_LOGGER_H_
