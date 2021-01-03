@@ -21,18 +21,16 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         compiler: [ g++-10 ]
+        build: [Release, Debug]
         include:
-          - os: ubuntu-latest
-            compiler: g++-10
-            target: Linux
-
-          - os: macos-latest
-            compiler: g++-10
-            target: Macos
-
           - os: windows-latest
             compiler: cl
             target: Windows
+            build: Release
+          - os: windows-latest
+            compiler: cl
+            target: Windows
+            build: Debug
 
     steps:
       - name: Checkout Repository
@@ -47,7 +45,7 @@ jobs:
 
       - name: Compile a release build of lamscript
         run: ./scripts/compile_lamscript.sh \
-            --build Release \
+            --build ${{ matrix.build }} \
             --cpp-compiler ${{ matrix.compiler }} \
             --os ${{ matrix.target }} \
             --cores 2
