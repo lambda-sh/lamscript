@@ -23,6 +23,11 @@ jobs:
         compiler: [ g++-10 ]
         build: [Release, Debug]
         include:
+          - os: ubuntu-latest
+            target: Linux
+          - os: macos-latest
+            target: Macos
+
           - os: windows-latest
             compiler: cl
             target: Windows
