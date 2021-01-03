@@ -43,6 +43,15 @@ target_include_directories(lamscript_lib PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
 target_link_libraries(lamscript_lib spdlog::spdlog)
 
+if (CMAKE_BUILD_TYPE EQUALS Debug)
+    target_compile_definitions(
+        lamscript
+        PUBLIC LAMSCRIPT_LOGGING_ENABLED)
+    target_compile_definitions(
+        lamscript_lib
+        PUBLIC LAMSCRIPT_LOGGING_ENABLED)
+endif(
+
 # ----------------------------------- TESTING ----------------------------------
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/googletest)

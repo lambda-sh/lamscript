@@ -7,6 +7,7 @@
 #include <Lamscript/parsing/Parser.h>
 #include <Lamscript/parsing/Resolver.h>
 #include <Lamscript/parsing/Scanner.h>
+#include <Lamscript/util/Logger.h>
 
 namespace lamscript {
 namespace runtime {
@@ -22,6 +23,8 @@ bool Lamscript::had_runtime_error_ = false;
 ProgramResult Lamscript::Run(const std::string& source) {
   parsing::Scanner scanner = parsing::Scanner(source);
   std::vector<parsing::Token> tokens = scanner.ScanTokens();
+
+  LAMSCRIPT_TRACE("Finished scanning tokens.")
 
   parsing::Parser parser = parsing::Parser(tokens);
   std::vector<std::unique_ptr<parsed::Statement>> statements = parser.Parse();
