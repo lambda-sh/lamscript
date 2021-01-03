@@ -8,20 +8,16 @@ pushd $ROOT_DIR > /dev/null
 # ----------------------------- LAMBDA-SH & ARGS ------------------------------
 source lambda-sh/lambda.sh
 
-LAMBDA_PARSE_ARG build Release "The type of build to use for compiling lamscript."
-LAMBDA_PARSE_ARG example "" "The name of the example file located in examples/ to run."
-LAMBDA_PARSE_ARG with-gdb false "Determines whether or not to run the example inside of gdb."
+LAMBDA_PARSE_ARG example "" "The name of the example file located in examples/ \
+    to run."
+LAMBDA_PARSE_ARG with-gdb false "Determines whether or not to run the example \
+    inside of gdb."
 
 LAMBDA_COMPILE_ARGS $@
 
 # ----------------------------- RUN THE EXAMPLE ------------------------------
 
-if [ ! -d "$ROOT_DIR/build/$LAMBDA_build" ]; then
-    LAMBDA_FATAL "The interpreter for $LAMBDA_build hasn't been built yet."\
-        "Please run './scripts/compile_and_run.sh --build $LAMBDA_build"
-fi
-
-pushd $ROOT_DIR/build/$LAMBDA_build/bin > /dev/null
+pushd "$ROOT_DIR/build/bin" > /dev/null
 
 LAMBDA_INFO "Running a $LAMBDA_build build on example $LAMBDA_example."
 
