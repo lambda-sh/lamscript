@@ -29,7 +29,6 @@ jobs:
             target: Linux
           - os: macos-latest
             target: Macos
-
           - os: windows-latest
             compiler: cl
             target: Windows
@@ -59,3 +58,17 @@ jobs:
 
       - name: Run all of lamscripts tests.
         run: ./scripts/run_all_tests.sh --os ${{ matrix.target }}
+
+      - uses: actions/setup-ruby@v1
+      - name: Send Webhook Notification for build status.
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          WEBHOOK_URL: ${{ secrets.LAMBDA_DISCORD_WEBHOOK }}
+          HOOK_OS_NAME: ${{ runner.os }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+          JOB_ID: ${{ github.job }}
+        run: |
+          git clone https://github.com/dhinakg/github-actions-discord-webhook.git webhook
+          bash webhook/send.sh $JOB_STATUS $WEBHOOK_URL
+        shell: bash
