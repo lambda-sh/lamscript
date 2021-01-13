@@ -23,7 +23,7 @@ BUILD_COMMAND="make -j $LAMBDA_cores"
 
 if [ "$LAMBDA_os" = "Windows" ]; then
     BUILD_GENERATOR="Visual Studio 16 2019"
-    BUILD_COMMAND="MSBuild.exe \"lamscript.sln\" //t:Rebuild //p:Configuration=$LAMBDA_build"
+    BUILD_COMMAND="MSBuild.exe lamscript.sln //t:Rebuild //p:Configuration=$LAMBDA_build"
 fi
 
 LAMBDA_INFO "Attempting to Compile a $LAMBDA_build for lamscript."
