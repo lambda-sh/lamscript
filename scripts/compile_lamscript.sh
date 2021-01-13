@@ -18,14 +18,13 @@ LAMBDA_COMPILE_ARGS $@
 
 export CXX="$LAMBDA_cpp_compiler"
 
-BUILD_GENERATOR="cmake"
+BUILD_GENERATOR="Unix Makefiles"
 BUILD_COMMAND="make -j $LAMBDA_cores"
 
 if [ "$LAMBDA_os" = "Windows" ]; then
-    BUILD_GENERATOR="cmake.exe"
+    BUILD_GENERATOR="Visual Studio 16 2019"
     BUILD_COMMAND="MSBuild.exe \"lamscript.sln\" //t:Rebuild //p:Configuration=$LAMBDA_build"
 fi
-
 
 LAMBDA_INFO "Attempting to Compile a $LAMBDA_build for lamscript."
 
@@ -35,10 +34,12 @@ mkdir -p build
 pushd build > /dev/null
 
 if [ "$LAMBDA_build" = "Release" ] || [ "$LAMBDA_build" = "Debug" ]; then
-    $BUILD_GENERATOR .. \
+    cmake .. \
+        -G "$BUILD_GENERATOR" \
         -DCMAKE_BUILD_TYPE="$LAMBDA_build"
 elif [ "$LAMBDA_build" = "Dist" ]; then
-    $BUILD_GENERATOR .. \
+    cmake .. \
+        -G "$BUILD_GENERATOR" \
         -DCMAKE_BUILD_TYPE=Release
 else
     LAMBDA_FATAL \
