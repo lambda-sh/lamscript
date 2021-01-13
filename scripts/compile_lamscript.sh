@@ -18,6 +18,15 @@ LAMBDA_COMPILE_ARGS $@
 
 export CXX="$LAMBDA_cpp_compiler"
 
+BUILD_GENERATOR="cmake"
+BUILD_COMMAND="make -j $LAMBDA_cores"
+
+if [ "$LAMBDA_os" = "Windows" ]; then
+    BUILD_GENERATOR="cmake.exe"
+    BUILD_COMMAND="MSBuild.exe \"lamscript.sln\" //t:Rebuild //p:Configuration=$LAMBDA_build"
+fi
+
+
 LAMBDA_INFO "Attempting to Compile a $LAMBDA_build for lamscript."
 
 # ----------------------------------- CMAKE ------------------------------------
@@ -26,11 +35,11 @@ mkdir -p build
 pushd build > /dev/null
 
 if [ "$LAMBDA_build" = "Release" ] || [ "$LAMBDA_build" = "Debug" ]; then
-    cmake .. \
+    $BUILD_GENERATOR .. \
         -DCMAKE_BUILD_TYPE="$LAMBDA_build"
 elif [ "$LAMBDA_build" = "Dist" ]; then
-    cmake .. \
-        -DCMAKE_BUILD_TYPE="Release" \
+    $BUILD_GENERATOR .. \
+        -DCMAKE_BUILD_TYPE=Release
 else
     LAMBDA_FATAL \
         "You need to pass a valid build type in order to compile lamscript."
@@ -41,11 +50,7 @@ LAMBDA_ASSERT_LAST_COMMAND_OK \
 
 # ----------------------------------- BUILD ------------------------------------
 
-if [ "$LAMBDA_os" = "Linux" ] || [ "$LAMBDA_os" = "Macos" ]; then
-    make -j $LAMBDA_cores
-elif [ "$LAMBDA_os" = "Windows" ]; then
-    MSBuild.exe "lamscript.sln" //t:Rebuild //p:Configuration="$LAMBDA_build"
-fi
+$BUILD_COMMAND
 
 LAMBDA_ASSERT_LAST_COMMAND_OK "Couldn't successfully compile lamscript."
 LAMBDA_INFO "Successfully compiled lamscript."
