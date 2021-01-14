@@ -13,61 +13,77 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
+# ----------------------------------- OPTIONS ---------------------------------
+
+option(LAMSCRIPT_BUILD_EXECUTABLE "Build lamscript as an executable" ON)
+option(LAMSCRIPT_BUILD_LIBRARY "Build lamscript as a static library" ON)
+option(
+    LAMSCRIPT_BUILD_TESTS
+    "Build the tests for lamscript. (Must be building as a library)"
+    ON)
+
 # ----------------------------------- LAMSCRIPT --------------------------------
 
-project(lamscript)
+if (LAMSCRIPT_BUILD_EXECUTABLE)
+    project(lamscript)
 
-file(
-    GLOB_RECURSE
-    LAMSCRIPT_SRC
-    ${CMAKE_SOURCE_DIR}/src/Lamscript/*.cpp
-    ${CMAKE_SOURCE_DIR}/src/Lamscript/*.h)
+    file(
+        GLOB_RECURSE
+        LAMSCRIPT_SRC
+        ${CMAKE_SOURCE_DIR}/src/Lamscript/*.cpp
+        ${CMAKE_SOURCE_DIR}/src/Lamscript/*.h)
 
-add_executable(lamscript ${LAMSCRIPT_SRC})
+    add_executable(lamscript ${LAMSCRIPT_SRC})
 
-target_compile_definitions(
-    lamscript
-    PUBLIC LAMSCRIPT_BUILD_AS_EXECUTABLE)
+    target_compile_definitions(
+        lamscript
+        PUBLIC LAMSCRIPT_BUILD_AS_EXECUTABLE)
 
-target_include_directories(lamscript PUBLIC ${CMAKE_SOURCE_DIR}/src)
-
-# ----------------------------------- SPDLOG --------------------------------
-
-add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/spdlog)
-target_link_libraries(lamscript spdlog::spdlog)
+    target_include_directories(lamscript PUBLIC ${CMAKE_SOURCE_DIR}/src)
+endif()
 
 # -------------------------------- LAMSCRIPT LIB -------------------------------
 
-add_library(lamscript_lib STATIC ${LAMSCRIPT_SRC})
-target_include_directories(lamscript_lib PUBLIC ${CMAKE_SOURCE_DIR}/src)
+if (LAMSCRIPT_BUILD_LIBRARY)
+    add_library(lamscript_lib STATIC ${LAMSCRIPT_SRC})
+    target_include_directories(lamscript_lib PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
-target_link_libraries(lamscript_lib spdlog::spdlog)
+    target_link_libraries(lamscript_lib spdlog::spdlog)
 
-if (${CMAKE_BUILD_TYPE} EQUAL Debug)
-    target_compile_definitions(
-        lamscript
-        PUBLIC LAMSCRIPT_LOGGING_ENABLED)
-    target_compile_definitions(
-        lamscript_lib
-        PUBLIC LAMSCRIPT_LOGGING_ENABLED)
+    if (${CMAKE_BUILD_TYPE} EQUAL Debug)
+        target_compile_definitions(
+            lamscript
+            PUBLIC LAMSCRIPT_LOGGING_ENABLED)
+        target_compile_definitions(
+            lamscript_lib
+            PUBLIC LAMSCRIPT_LOGGING_ENABLED)
+    endif()
 endif()
 
 # ----------------------------------- TESTING ----------------------------------
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/googletest)
+if (LAMSCRIPT_BUILD_TESTS)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/googletest)
 
-file(
-  GLOB_RECURSE
-  LAMSCRIPT_TEST_SRC
-  ${CMAKE_SOURCE_DIR}/tests/*.cpp)
+    file(
+      GLOB_RECURSE
+      LAMSCRIPT_TEST_SRC
+      ${CMAKE_SOURCE_DIR}/tests/*.cpp)
 
-add_executable(lamscript_tests ${LAMSCRIPT_TEST_SRC})
-add_test(NAME lamscript_tests COMMAND lamscript_tests)
+    add_executable(lamscript_tests ${LAMSCRIPT_TEST_SRC})
+    add_test(NAME lamscript_tests COMMAND lamscript_tests)
 
-target_link_libraries(
-    lamscript_tests
-    PUBLIC lamscript_lib gtest)
+    target_link_libraries(
+        lamscript_tests
+        PUBLIC lamscript_lib gtest)
 
-target_include_directories(
-    lamscript_tests
-    PUBLIC ${CMAKE_SOURCE_DIR}/src)
+    target_include_directories(
+        lamscript_tests
+        PUBLIC ${CMAKE_SOURCE_DIR}/src)
+endif()
+
+# ---------------------------------- DEPENDENCIES ------------------------------
+
+# SPDLog -- Utilized for fast logging output and control.
+add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/spdlog)
+target_link_libraries(lamscript spdlog::spdlog)
