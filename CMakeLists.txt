@@ -1,5 +1,6 @@
 # ----------------------------------- SETTINGS ---------------------------------
 
+project(lamscript)
 cmake_minimum_required(VERSION 3.0.0)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -13,7 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-# ----------------------------------- OPTIONS ---------------------------------
+# ----------------------------------- OPTIONS ----------------------------------
 
 option(LAMSCRIPT_BUILD_EXECUTABLE "Build lamscript as an executable" ON)
 option(LAMSCRIPT_BUILD_LIBRARY "Build lamscript as a static library" ON)
@@ -22,11 +23,14 @@ option(
     "Build the tests for lamscript. (Must be building as a library)"
     ON)
 
+# -------------------------------- DEPENDENCIES --------------------------------
+
+# SPDLog -- Utilized for fast logging output and control.
+add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/spdlog)
+
 # ----------------------------------- LAMSCRIPT --------------------------------
 
 if (LAMSCRIPT_BUILD_EXECUTABLE)
-    project(lamscript)
-
     file(
         GLOB_RECURSE
         LAMSCRIPT_SRC
@@ -34,6 +38,7 @@ if (LAMSCRIPT_BUILD_EXECUTABLE)
         ${CMAKE_SOURCE_DIR}/src/Lamscript/*.h)
 
     add_executable(lamscript ${LAMSCRIPT_SRC})
+    target_link_libraries(lamscript spdlog::spdlog)
 
     target_compile_definitions(
         lamscript
@@ -81,9 +86,3 @@ if (LAMSCRIPT_BUILD_TESTS)
         lamscript_tests
         PUBLIC ${CMAKE_SOURCE_DIR}/src)
 endif()
-
-# ---------------------------------- DEPENDENCIES ------------------------------
-
-# SPDLog -- Utilized for fast logging output and control.
-add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/spdlog)
-target_link_libraries(lamscript spdlog::spdlog)
