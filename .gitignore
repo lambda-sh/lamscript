@@ -1,3 +1,7 @@
+# Ignore visual studio & vscode related folders.
+.vs
+.vscode
+
 .cache
 
 # The output folder for all builds.
