@@ -1,7 +1,7 @@
 # ----------------------------------- SETTINGS ---------------------------------
 
-project(lamscript)
 cmake_minimum_required(VERSION 3.0.0)
+project(lamscript)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -86,3 +86,17 @@ if (LAMSCRIPT_BUILD_TESTS)
         lamscript_tests
         PUBLIC ${CMAKE_SOURCE_DIR}/src)
 endif()
+
+
+# ------------------------------- LAMSCRIPTEN ----------------------------------
+
+project(lamscripten)
+
+file(
+    GLOB_RECURSE
+    LAMSCRIPTEN_SRC
+    ${CMAKE_SOURCE_DIR}/src/Lamscripten/*.cpp
+    ${CMAKE_SOURCE_DIR}/src/Lamscripten/*.h)
+
+add_executable(lamscripten ${LAMSCRIPTEN_SRC})
+target_include_directories(lamscripten PUBLIC ${CMAKE_SOURCE_DIR}/src)
