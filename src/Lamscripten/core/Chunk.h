@@ -2,7 +2,7 @@
 #define SRC_LAMSCRIPTEN_CORE_CHUNK_H_
 
 #include <algorithm>
-#include <stdint.h>
+#include <cstdint>
 
 #include <Lamscripten/core/Memory.h>
 
@@ -19,12 +19,12 @@ class Chunk {
   Chunk() : count_(0), capacity_(0), opcode_array_(nullptr) {}
 
   /// @brief Write bytes into the current chunk.
-  void WriteByte(uint8_t byte) {
+  void WriteByte(std::uint8_t byte) {
     if (capacity_ < count_ + 1) {
       size_t old_capacity = capacity_;
-      capacity_ = (capacity_ < 10) ? 10 : capacity_ * 2;
+      capacity_ = (capacity_ < 8) ? 8 : capacity_ * 2;
 
-      opcode_array_ = ReallocateArray<uint8_t>(
+      opcode_array_ = ReallocateArray<std::uint8_t>(
           opcode_array_, old_capacity, capacity_);
     }
 
@@ -32,11 +32,10 @@ class Chunk {
     count_ += 1;
   }
 
-
  private:
   size_t count_;
   size_t capacity_;
-  uint8_t* opcode_array_;
+  std::uint8_t* opcode_array_;
 };
 
 }  // namespace lamscripten::core
