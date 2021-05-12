@@ -1,6 +1,7 @@
 # ----------------------------------- SETTINGS ---------------------------------
 
 cmake_minimum_required(VERSION 3.0.0)
+
 project(lamscript)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -89,8 +90,6 @@ endif()
 
 
 # ------------------------------- LAMSCRIPTEN ----------------------------------
-
-project(lamscripten)
 
 file(
     GLOB_RECURSE
