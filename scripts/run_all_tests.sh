@@ -8,6 +8,8 @@ pushd $ROOT_DIR > /dev/null
 # ----------------------------- LAMBDA-SH & ARGS ------------------------------
 source lambda-sh/lambda.sh
 
+LAMBDA_PARSE_ARG build Release "The type of build to run tests for."
+
 LAMBDA_PARSE_ARG os Linux "The operating system being built on."
 
 LAMBDA_COMPILE_ARGS $@
