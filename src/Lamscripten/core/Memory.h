@@ -10,7 +10,7 @@ template<class ArrayType>
 ArrayType* ReallocateArray(
     ArrayType* array, size_t old_size, size_t new_size) {
   if (new_size == 0) {
-      delete[] pointer;
+      delete[] array;
       return NULL;
   }
 
