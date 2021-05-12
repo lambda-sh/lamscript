@@ -17,6 +17,9 @@ enum class OpCode {
 class Chunk {
  public:
   Chunk() : count_(0), capacity_(0), opcode_array_(nullptr) {}
+  ~Chunk() {
+    FreeArray<std::uint8_t>(opcode_array_, count_);
+  }
 
   /// @brief Write bytes into the current chunk.
   void WriteByte(std::uint8_t byte) {
