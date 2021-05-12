@@ -43,11 +43,11 @@ class Chunk {
     return opcode_array_[index];
   }
 
-  auto begin() const {
+  [[nodiscard]] auto begin() const {
     return opcode_array_;
   }
 
-  auto end() const {
+  [[nodiscard]] auto end() const {
     return opcode_array_ + capacity_;
   }
 
