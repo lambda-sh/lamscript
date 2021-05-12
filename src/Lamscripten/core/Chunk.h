@@ -16,7 +16,7 @@ enum class OpCode {
 ///@brief A dynamic array of opcodes
 class Chunk {
  public:
-  Chunk() : count_(0), capacity_(10), opcode_array_(NULL) {}
+  Chunk() : count_(0), capacity_(0), opcode_array_(nullptr) {}
 
   /// @brief Write bytes into the current chunk.
   void WriteByte(uint8_t byte) {
@@ -31,6 +31,7 @@ class Chunk {
     opcode_array_[count_] = byte;
     count_ += 1;
   }
+
 
  private:
   size_t count_;
