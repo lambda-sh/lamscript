@@ -3,14 +3,14 @@
 
 #include <algorithm>
 
-/// @brief Reallocate memory for an array that wants to change in size. 
+/// @brief Reallocate memory for an array that wants to change in size.
 /// @tparam ArrayType The array type to allocate new memory for.
 template<class ArrayType>
 ArrayType* ReallocateArray(
     ArrayType* array, size_t old_count, size_t new_count) {
   if (new_count == 0) {
-      delete[] array;
-      return NULL;
+    delete[] array;
+    return NULL;
   }
 
   ArrayType* new_array = new ArrayType[new_count];
@@ -18,12 +18,12 @@ ArrayType* ReallocateArray(
 
   // If the old array still exists, delete it.
   [[likely]] if (array) {
-      delete[] array;
+    delete[] array;
   }
 
   // If allocation fails, exit.
   [[unlikely]] if (new_array == NULL) {
-      exit(1);
+    exit(1);
   }
 
   return new_array;
