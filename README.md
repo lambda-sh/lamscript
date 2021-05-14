@@ -105,6 +105,39 @@ it out and prove me wrong!
 Not directly supported yet, but should be the same as linux assuming you have a
 bash shell and access to a c++ compiler from it.
 
+## Experimental features
+If building lamscript from source, you can enable experimental features that
+are being being developed on but are not stable. This requires passing the flag
+```bash
+// If building inside of a directory inside the repo, using cmake to generate
+// build files would look like:
+cmake .. -DLAMSCRIPT_ENABLE_EXPERIMENTATION=ON
+
+// Lamscripten requires experimentation to be enabled.
+cmake .. -DLAMSCRIPT_ENABLE_EXPERIMENTATION=ON -DLAMSCRIPTEN_BUILD_EXECUTABLE
+
+```
+### Lamscripten
+Lamscripten is the successor language to lamscript and will feature a wide
+variety of added features and improvements. It is currently just a prototype
+and is highly unstable/experimental.
+
+To build, utilize these flags within cmake:
+```bash
+// Lamscripten requires experimentation to be enabled.
+cmake .. -DLAMSCRIPT_ENABLE_EXPERIMENTATION=ON -DLAMSCRIPTEN_BUILD_EXECUTABLE
+```
+
+If you're using bash, you can run:
+```bash
+./scripts/compile_lamscripten.sh
+```
+This will generate a release build of lamscripten with experimentation flags
+turned on.
+
+Lamscripten can currently only be built as an executable and not a library, but
+there is no user interaction with said executable just yet.
+
 ## Resources I used to implement this langauge
 * [Crafting interpreters](http://craftinginterpreters.com/inheritance.html) was
 used for learning the theory behind how languages work. Unfortunately, their
