@@ -24,6 +24,15 @@ option(
     "Build the tests for lamscript. (Must be building as a library)"
     ON)
 
+option(
+    LAMSCRIPT_ENABLE_EXPERIMENTATION
+    "Enable experimentation features."
+    OFF)
+
+option(
+    LAMSCRIPTEN_BUILD_EXECUTABLE
+    "Build lamscripten. Requires LAMSCRIPT_INCLUDE_EXPERIMENTATION to be ON."
+    ON)
 # -------------------------------- DEPENDENCIES --------------------------------
 
 # SPDLog -- Utilized for fast logging output and control.
@@ -89,13 +98,17 @@ if (LAMSCRIPT_BUILD_TESTS)
 endif()
 
 
-# ------------------------------- LAMSCRIPTEN ----------------------------------
+# ----------------------------- EXPERIMENTATION --------------------------------
 
-file(
-    GLOB_RECURSE
-    LAMSCRIPTEN_SRC
-    ${CMAKE_SOURCE_DIR}/src/Lamscripten/*.cpp
-    ${CMAKE_SOURCE_DIR}/src/Lamscripten/*.h)
+if (LAMSCRIPT_ENABLE_EXPERIMENTATION)
+    if (LAMSCRIPTEN_BUILD_EXECUTABLE)
+        file(
+            GLOB_RECURSE
+            LAMSCRIPTEN_SRC
+            ${CMAKE_SOURCE_DIR}/src/Lamscripten/*.cpp
+            ${CMAKE_SOURCE_DIR}/src/Lamscripten/*.h)
 
-add_executable(lamscripten ${LAMSCRIPTEN_SRC})
-target_include_directories(lamscripten PUBLIC ${CMAKE_SOURCE_DIR}/src)
+        add_executable(lamscripten ${LAMSCRIPTEN_SRC})
+        target_include_directories(lamscripten PUBLIC ${CMAKE_SOURCE_DIR}/src)
+    endif()
+endif()
