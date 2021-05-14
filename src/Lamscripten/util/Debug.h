@@ -3,6 +3,7 @@
 
 #include <string>
 #include <string_view>
+#include <iostream>
 
 #include <Lamscripten/core/Chunk.h>
 
@@ -10,21 +11,24 @@ namespace lamscripten::util {
 
 [[nodiscard]] inline int DisassembleInstruction(
     const core::Chunk& chunk, size_t opcode_index) {
-  printf("%04d ", opcode_index); 
+  std::cout << opcode_index << ":";
 
   core::OpCode code = chunk.GetOpcodeAt(opcode_index);
-  switch(code) {
+  switch (code) {
     case core::OpCode::Return:
-      printf("%s\n", "OP_RETURN");
-
+      std::cout << "OP_RETURN" << std::endl;
+      break;
   }
 }
 
 inline void DisassembleChunk(
     const core::Chunk& chunk, std::string_view name) {
-  printf("== %s ==\n", name.data());
-  for (size_t current_opcode = 0; current_opcode < chunk.GetCount(); current_opcode++) {
-      DisassembleInstruction(chunk, current_opcode);
+  std::cout << "== " << name << " ==" << std::endl;
+  for (
+      size_t current_opcode = 0;
+      current_opcode < chunk.GetCount();
+      current_opcode++) {
+    DisassembleInstruction(chunk, current_opcode);
   }
 }
 

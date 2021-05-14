@@ -11,23 +11,18 @@ class Array {
   Array()
       : count_(0),
       capacity_(0),
-      element_size_(sizeof(ValueType)),
-      elements_(NULL) {}
-
-  ~Array() {
-    elements_ = ReallocateArray<ValueType>(elements_, count_, 0);
-  }
+      elements_(nullptr) {}
 
   /// @brief Push an item into the array.
-  void Push(const ValueType& val) {
-    if (capacity_ < count_ + 2) {
+  void Push(ValueType val) {
+    if (ShouldResize()) {
       size_t old_capacity = capacity_;
       capacity_ = capacity_ < 8 ? 8 : capacity_ * 2;
       elements_ = ReallocateArray<ValueType>(
           elements_, old_capacity, capacity_);
     }
 
-    elements_[count_] = ValueType(val);
+    elements_[count_] = val;
     count_ += 1;
   }
 
@@ -39,17 +34,24 @@ class Array {
     }
 
     // Dereference and copy.
-    ValueType& val = elements_[count_ - 1];
+    ValueType val = elements_[count_ - 1];
     count_ -= 1;
 
     return val;
   }
 
+  size_t GetElementSize() const {
+    return sizeof(ValueType);
+  }
+
  private:
   size_t count_;
   size_t capacity_;
-  size_t element_size_;
   ValueType* elements_;
+
+  bool ShouldResize() const {
+    return capacity_ < count_ + 1;
+  }
 };
 
 }  // namespace lamscripten::core

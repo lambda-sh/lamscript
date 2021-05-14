@@ -8,18 +8,15 @@
 
 namespace lamscripten::core {
 
-///@brief Opcode types
+/// @brief Opcode types
 enum class OpCode {
   Return = 0,
 };
 
-///@brief A dynamic array of opcodes
+/// @brief A dynamic array of opcodes
 class Chunk {
  public:
   Chunk() : count_(0), capacity_(0), opcode_array_(nullptr) {}
-  ~Chunk() {
-    FreeArray<OpCode>(opcode_array_, count_);
-  }
 
   /// @brief Write bytes into the current chunk.
   void WriteOpCode(OpCode code) {
@@ -34,7 +31,7 @@ class Chunk {
     opcode_array_[count_] = code;
     count_ += 1;
   }
-  
+
   [[nodiscard]] size_t GetCount() const {
     return count_;
   }

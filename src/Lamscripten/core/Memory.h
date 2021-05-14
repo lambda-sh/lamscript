@@ -10,7 +10,7 @@ ArrayType* ReallocateArray(
     ArrayType* array, size_t old_count, size_t new_count) {
   if (new_count == 0) {
     delete[] array;
-    return NULL;
+    return nullptr;
   }
 
   ArrayType* new_array = new ArrayType[new_count];
@@ -22,7 +22,7 @@ ArrayType* ReallocateArray(
   }
 
   // If allocation fails, exit.
-  [[unlikely]] if (new_array == NULL) {
+  [[unlikely]] if (new_array == nullptr) {
     exit(1);
   }
 
@@ -31,7 +31,7 @@ ArrayType* ReallocateArray(
 
 template<class ArrayType>
 void FreeArray(ArrayType* array, size_t current_count) {
-    ReallocateArray<ArrayType>(array, current_count, 0);
+  ReallocateArray<ArrayType>(array, current_count, 0);
 }
 
 #endif  // SRC_LAMSCRIPTEN_CORE_MEMORY_H_

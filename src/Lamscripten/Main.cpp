@@ -11,9 +11,7 @@ int main(int argc, const char* argv[]) {
   lamscripten::core::Array<int> int_array;
   int_array.Push(20);
   int val = int_array.Pop().value_or(222);
-  printf("%d", val);
   int val2 = int_array.Pop().value_or(5000);
-  printf("%d %d", val, val2);
 
   lamscripten::util::DisassembleChunk(chunk, "Disassembled opcode chunk");
   return 0;
