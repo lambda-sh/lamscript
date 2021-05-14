@@ -1,7 +1,6 @@
 #ifndef SRC_LAMSCRIPTEN_CORE_TYPES_H_
 #define SRC_LAMSCRIPTEN_CORE_TYPES_H_
 
-#include <Lamscripten/core/Error.h>
 #include <Lamscripten/core/Memory.h>
 
 namespace lamscripten::core {
