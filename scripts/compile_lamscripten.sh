@@ -1,6 +1,6 @@
 # compile_lamscripten.sh
 #
-# This script is used to configure and compile lamscript.
+# This script is used to configure and compile lamscripten.
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 pushd "$ROOT_DIR" > /dev/null
@@ -26,7 +26,7 @@ if [ "$LAMBDA_os" = "Windows" ]; then
     BUILD_COMMAND="MSBuild.exe lamscript.sln //t:Rebuild //p:Configuration=$LAMBDA_build"
 fi
 
-LAMBDA_INFO "Attempting to Compile a $LAMBDA_build for lamscript."
+LAMBDA_INFO "Attempting to Compile a $LAMBDA_build for lamscripten."
 
 # ----------------------------------- CMAKE ------------------------------------
 
@@ -51,11 +51,11 @@ elif [ "$LAMBDA_build" = "Dist" ]; then
         -DLAMSCRIPT_ENABLE_EXPERIMENTATION=ON
 else
     LAMBDA_FATAL \
-        "You need to pass a valid build type in order to compile lamscript."
+        "You need to pass a valid build type in order to compile lamscripten."
 fi
 
 LAMBDA_ASSERT_LAST_COMMAND_OK \
-    "Couldn't generate the cmake files necessary for compiling lamscript."
+    "Couldn't generate the cmake files necessary for compiling lamscripten."
 
 # ----------------------------------- BUILD ------------------------------------
 
