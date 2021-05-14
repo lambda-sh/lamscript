@@ -64,7 +64,7 @@ jobs:
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
-          WEBHOOK_URL: ${{ secrets.LAMBDA_DISCORD_WEBHOOK }}
+          WEBHOOK_URL: ${{ secrets.LAMSCRIPT_DISCORD_WEBHOOK }}
           HOOK_OS_NAME: ${{ runner.os }}
           WORKFLOW_NAME: ${{ github.workflow }}
           JOB_ID: ${{ github.job }}
