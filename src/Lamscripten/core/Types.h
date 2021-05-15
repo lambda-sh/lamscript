@@ -14,12 +14,10 @@ class Array {
       elements_(nullptr) {}
 
   /// @brief Push an item into the array.
-  void Push(ValueType val) {
+  [[nodiscard]] size_t Push(ValueType val) {
     if (ShouldResize()) {
-      size_t old_capacity = capacity_;
-      capacity_ = capacity_ < 8 ? 8 : capacity_ * 2;
-      elements_ = ReallocateArray<ValueType>(
-          elements_, old_capacity, capacity_);
+      size_t new_size = capacity_ < 8 ? 8 : capacity_ * 2;
+      ResizeTo(new_size);
     }
 
     elements_[count_] = val;
@@ -29,7 +27,6 @@ class Array {
   /// @brief Pop an item off of the array.
   std::optional<ValueType> Pop() {
     [[unlikely]] if (count_ == 0) {
-      printf("here null opt pop\n");
       return std::nullopt;
     }
 
@@ -40,8 +37,47 @@ class Array {
     return val;
   }
 
+  void GrowTo(size_t new_size) {
+    [[unlikely]] if (new_size < count_) {
+      return;
+    }
+    ResizeTo(new_size);
+  }
+
+  void ShrinkTo(size_t new_size) {
+    [[unlikely]] if (new_size > count_) {
+      return;
+    }
+    ResizeTo(new_size);
+  }
+
+  void ResizeTo(size_t new_size) {
+    size_t old_capacity = capacity_;
+    capacity_ = new_size;
+    elements_ = ReallocateArray<ValueType>(elements_, old_capacity, capacity_);
+  }
+
   size_t GetElementSize() const {
     return sizeof(ValueType);
+  }
+
+  size_t GetCount() const {
+    return count_;
+  }
+
+  [[nodiscard]] auto begin() const {
+    return elements_;
+  }
+
+  [[nodiscard]] auto end() const {
+    return elements_ + count_;
+  }
+
+  [[nodiscard]] std::optional<ValueType> GetAtIndex(size_t index) const {
+    if (index <= count_) {
+      return elements_[index];
+    }
+    return std::nullopt;
   }
 
  private:
