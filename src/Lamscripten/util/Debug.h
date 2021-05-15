@@ -12,11 +12,14 @@ namespace lamscripten::util {
 [[nodiscard]] inline int DisassembleInstruction(
     const core::Chunk& chunk, size_t opcode_index) {
   std::cout << opcode_index << ":";
-
   core::OpCode code = chunk.GetOpcodeAt(opcode_index);
+
   switch (code) {
     case core::OpCode::Return:
       std::cout << "OP_RETURN" << std::endl;
+      break;
+    case core::OpCode::InvalidOpLookup:
+      std::cout << "INVALID_OP_LOOKUP " << std::endl;
       break;
   }
 }
@@ -26,7 +29,7 @@ inline void DisassembleChunk(
   std::cout << "== " << name << " ==" << std::endl;
   for (
       size_t current_opcode = 0;
-      current_opcode < chunk.GetCount();
+      current_opcode < chunk.GetOpCodeCount();
       current_opcode++) {
     DisassembleInstruction(chunk, current_opcode);
   }
