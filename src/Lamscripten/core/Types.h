@@ -6,9 +6,9 @@
 namespace lamscripten::core {
 
 template<class ValueType>
-class Array {
+class DynamicArray {
  public:
-  Array()
+  DynamicArray()
       : count_(0),
       capacity_(0),
       elements_(nullptr) {}
@@ -88,6 +88,13 @@ class Array {
   bool ShouldResize() const {
     return capacity_ < count_ + 1;
   }
+};
+
+/// @brief Allocate an array of data on the stack.
+template<class ValueType, size_t Size>
+class FixedArray {
+ private:
+  ValueType array_[Size];
 };
 
 }  // namespace lamscripten::core

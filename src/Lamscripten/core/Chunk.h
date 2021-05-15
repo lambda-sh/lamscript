@@ -10,10 +10,16 @@
 namespace lamscripten::core {
 
 /// @brief Opcode types
-enum class OpCode {
+enum class Operation {
   InvalidOpLookup,
   Return,
   Constant,
+};
+
+struct OpCode {
+ public:
+  Operation Type;
+  FixedArray<uint8_t, 8> Data;
 };
 
 /// @brief A dynamic array of opcodes
@@ -37,7 +43,8 @@ class Chunk {
   }
 
   [[nodiscard]] OpCode GetOpcodeAt(size_t index) const {
-    return opcode_array_.GetAtIndex(index).value_or(OpCode::InvalidOpLookup);
+    return opcode_array_.GetAtIndex(index).value_or({
+      OpCode::InvalidOpLookup, {}})
   }
 
   [[nodiscard]] auto begin() const {
@@ -51,8 +58,8 @@ class Chunk {
  private:
   size_t count_;
   size_t capacity_;
-  Array<OpCode> opcode_array_;
-  Array<double> constants_;
+  DynamicArray<Op> opcode_array_;
+  DynamicArray<double> constants_;
 };
 
 }  // namespace lamscripten::core

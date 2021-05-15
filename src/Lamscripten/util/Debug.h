@@ -21,6 +21,9 @@ namespace lamscripten::util {
     case core::OpCode::InvalidOpLookup:
       std::cout << "INVALID_OP_LOOKUP " << std::endl;
       break;
+    case core::OpCode::Constant:
+      std::cout << "" << std::endl;
+      break;
   }
 }
 
