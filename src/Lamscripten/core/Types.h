@@ -13,6 +13,24 @@ class DynamicArray {
       capacity_(0),
       elements_(nullptr) {}
 
+  /// @brief Allocate an array double the size of the input list
+  explicit DynamicArray(std::initializer_list<ValueType> values)
+      : count_(0), capacity_(0), elements_(nullptr) {
+    for (auto value : values) {
+      Push(value);
+    }
+  }
+
+  explicit DynamicArray(const DynamicArray& array)
+      : count_(array.count_),
+        capacity_(array.capacity_),
+        elements_(array.elements_) {}
+
+  explicit DynamicArray(DynamicArray&& array) :
+      count_(std::move(array.count_)),
+      capacity_(std::move(array.capacity_)),
+      elements_(array.elements_) {}
+
   /// @brief Push an item into the array.
   [[nodiscard]] size_t Push(ValueType val) {
     if (ShouldResize()) {
@@ -22,7 +40,32 @@ class DynamicArray {
 
     elements_[count_] = val;
     count_ += 1;
+    return count_ - 1;
   }
+
+  [[nodiscard]] size_t Push(const ValueType& val) {
+    if (ShouldResize()) {
+      size_t new_size = capacity_ < 8 ? 8 : capacity_ * 2;
+      ResizeTo(new_size);
+    }
+
+    elements_[count_] = ValueType(val);
+    count_ += 1;
+    return count_ - 1;
+  }
+
+  [[nodiscard]] size_t Push(ValueType&& val) {
+    if (ShouldResize()) {
+      size_t new_size = capacity_ < 8 ? 8 : capacity_ * 2;
+      ResizeTo(new_size);
+    }
+
+    elements_[count_] = std::move(val);
+    count_ += 1;
+
+    return count_ - 1;
+  }
+
 
   /// @brief Pop an item off of the array.
   std::optional<ValueType> Pop() {
@@ -74,7 +117,7 @@ class DynamicArray {
   }
 
   [[nodiscard]] std::optional<ValueType> GetAtIndex(size_t index) const {
-    if (index <= count_) {
+    if (index < count_) {
       return elements_[index];
     }
     return std::nullopt;
