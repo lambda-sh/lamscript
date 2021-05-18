@@ -14,10 +14,10 @@ int main(int argc, const char* argv[]) {
 
   auto index = static_cast<uint8_t>(chunk.WriteConstant(1.2));
 
-  chunk.WriteOpCode(OpCode(OpType::Constant, DynamicArray({index})));
+  chunk.WriteOpCode(OpCode(OpType::Constant, {index}));
 
   lamscripten::core::DynamicArray<int> int_array;
-  int_array.Push(20);
+  int_array.PushMemory(20);
   int val = int_array.Pop().value_or(222);
   int val2 = int_array.Pop().value_or(5000);
 
