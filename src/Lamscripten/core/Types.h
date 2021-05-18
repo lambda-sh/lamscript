@@ -17,22 +17,34 @@ class DynamicArray {
   explicit DynamicArray(std::initializer_list<ValueType> values)
       : count_(0), capacity_(0), elements_(nullptr) {
     for (auto value : values) {
-      Push(value);
+      PushCopy(value);
     }
   }
 
-  explicit DynamicArray(const DynamicArray& array)
-      : count_(array.count_),
-        capacity_(array.capacity_),
-        elements_(array.elements_) {}
+  /// @brief Copy the array elements. Creates new memory for the newly
+  /// constructed
+  DynamicArray(const DynamicArray& array)
+      : count_(0), capacity_(0), elements_(nullptr) {
+    ResizeTo(array.capacity_);
+    for (auto value : array) {
+      PushCopy(value);
+    }
+  }
 
-  explicit DynamicArray(DynamicArray&& array) :
+  DynamicArray(DynamicArray&& array) :
       count_(std::move(array.count_)),
       capacity_(std::move(array.capacity_)),
-      elements_(array.elements_) {}
+      elements_(std::move(array.elements_)) {}
+
+
+  void operator=(const DynamicArray& array) {
+    count_ = array.count_;
+    capacity_ = array.capacity_;
+    elements_ = array.elements_;
+  }
 
   /// @brief Push an item into the array.
-  [[nodiscard]] size_t Push(ValueType val) {
+  [[nodiscard]] size_t PushCopy(ValueType val) {
     if (ShouldResize()) {
       size_t new_size = capacity_ < 8 ? 8 : capacity_ * 2;
       ResizeTo(new_size);
@@ -43,29 +55,16 @@ class DynamicArray {
     return count_ - 1;
   }
 
-  [[nodiscard]] size_t Push(const ValueType& val) {
+  [[nodiscard]] size_t PushMemory(ValueType&& val) {
     if (ShouldResize()) {
       size_t new_size = capacity_ < 8 ? 8 : capacity_ * 2;
       ResizeTo(new_size);
     }
 
-    elements_[count_] = ValueType(val);
+    elements_[count_] = val;
     count_ += 1;
     return count_ - 1;
   }
-
-  [[nodiscard]] size_t Push(ValueType&& val) {
-    if (ShouldResize()) {
-      size_t new_size = capacity_ < 8 ? 8 : capacity_ * 2;
-      ResizeTo(new_size);
-    }
-
-    elements_[count_] = std::move(val);
-    count_ += 1;
-
-    return count_ - 1;
-  }
-
 
   /// @brief Pop an item off of the array.
   std::optional<ValueType> Pop() {
