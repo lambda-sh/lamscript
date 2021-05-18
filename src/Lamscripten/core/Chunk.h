@@ -23,13 +23,19 @@ enum class OpType {
 class OpCode {
  public:
   OpCode() : type_(OpType::NoOp), bytes_() {}
+
   OpCode(OpType type, const DynamicArray<uint8_t>& bytes)
-      : type_(type),
-      bytes_(bytes) {}
+      : type_(type), bytes_(bytes) {}
 
-  explicit OpCode(const OpCode& opcode)
-      : type_(opcode.type_), bytes_(opcode.bytes_) {}
+  OpCode(OpType type, std::initializer_list<uint8_t> bytes)
+    : type_(type), bytes_(bytes) {}
 
+  OpCode(const OpCode& opcode) : type_(opcode.type_), bytes_(opcode.bytes_) {}
+
+  void operator=(const OpCode& opcode) {
+    type_ = opcode.type_;
+    bytes_ = opcode.bytes_;
+  }
 
   bool HasRawBytes() const {
     return bytes_.GetCount() > 0;
@@ -55,22 +61,23 @@ class Chunk {
 
   /// @brief Write an opcode with no byte information.
   [[nodiscard]] size_t WriteOpCode(OpType type) {
-    size_t index = opcode_array_.Push(OpCode(type, DynamicArray<uint8_t>()));
+    size_t index = opcode_array_.PushMemory(
+        OpCode(type, DynamicArray<uint8_t>()));
     return index;
   }
 
   [[nodiscard]] size_t WriteOpCode(const OpCode& code) {
-    size_t index = opcode_array_.Push(code);
+    size_t index = opcode_array_.PushCopy(code);
     return index;
   }
 
   [[nodiscard]] size_t WriteBytes(const DynamicArray<uint8_t>& bytes) {
-    size_t index = opcode_array_.Push(OpCode(OpType::RawBytes, bytes));
+    size_t index = opcode_array_.PushMemory(OpCode(OpType::RawBytes, bytes));
     return index;
   }
 
   [[nodsicard]] size_t WriteConstant(double value) {
-    size_t index = constants_.Push(value);
+    size_t index = constants_.PushCopy(value);
     return index;
   }
 
