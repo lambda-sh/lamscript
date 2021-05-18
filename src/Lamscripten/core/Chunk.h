@@ -12,7 +12,6 @@ namespace lamscripten::core {
 /// @brief Opcode types
 enum class OpType {
   NoOp,
-  InvalidOpLookup,
   Return,
   Constant,
   RawBytes,
@@ -57,22 +56,22 @@ class OpCode {
 /// @brief A dynamic array of opcodes
 class Chunk {
  public:
-  Chunk() : count_(0), capacity_(0), opcode_array_(), constants_() {}
+  Chunk() : count_(0), capacity_(0), opcodes_(), constants_() {}
 
   /// @brief Write an opcode with no byte information.
   [[nodiscard]] size_t WriteOpCode(OpType type) {
-    size_t index = opcode_array_.PushMemory(
+    size_t index = opcodes_.PushMemory(
         OpCode(type, DynamicArray<uint8_t>()));
     return index;
   }
 
   [[nodiscard]] size_t WriteOpCode(const OpCode& code) {
-    size_t index = opcode_array_.PushCopy(code);
+    size_t index = opcodes_.PushCopy(code);
     return index;
   }
 
   [[nodiscard]] size_t WriteBytes(const DynamicArray<uint8_t>& bytes) {
-    size_t index = opcode_array_.PushMemory(OpCode(OpType::RawBytes, bytes));
+    size_t index = opcodes_.PushMemory(OpCode(OpType::RawBytes, bytes));
     return index;
   }
 
@@ -82,26 +81,29 @@ class Chunk {
   }
 
   [[nodiscard]] size_t GetOpCodeCount() const {
-    return opcode_array_.GetCount();
+    return opcodes_.GetCount();
   }
 
-  [[nodiscard]] OpCode GetOpcodeAt(size_t index) const {
-    return opcode_array_.GetAtIndex(index).value_or(
-        OpCode(OpType::InvalidOpLookup, DynamicArray<uint8_t>()));
+  [[nodiscard]] std::optional<OpCode> GetOpcodeAt(size_t index) const {
+    return opcodes_.GetAtIndex(index);
+  }
+
+  [[nodiscard]] std::optional<double> GetConstantAt(size_t index) const {
+    return constants_.GetAtIndex(index);
   }
 
   [[nodiscard]] auto begin() const {
-    return opcode_array_.begin();
+    return opcodes_.begin();
   }
 
   [[nodiscard]] auto end() const {
-    return opcode_array_.end();
+    return opcodes_.end();
   }
 
  private:
   size_t count_;
   size_t capacity_;
-  DynamicArray<OpCode> opcode_array_;
+  DynamicArray<OpCode> opcodes_;
   DynamicArray<double> constants_;
 };
 
