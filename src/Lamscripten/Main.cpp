@@ -5,16 +5,16 @@
 #include <Lamscripten/util/Debug.h>
 
 using lamscripten::core::OpCode;
-using lamscripten::core::OpType;
 using lamscripten::core::DynamicArray;
 
 int main(int argc, const char* argv[]) {
   lamscripten::core::Chunk chunk;
-  size_t _ = chunk.WriteOpCode(OpType::Return);
+  size_t _ = chunk.WriteOpCode(OpCode::Return);
 
   auto location = static_cast<uint8_t>(chunk.AddConstant(1.2));
 
-  _ = chunk.WriteOpCode(OpCode(OpType::Constant, { location }));
+  chunk.WriteOpCode(OpCode::Constant);
+  chunk.WriteBytes({location});
 
   lamscripten::core::DynamicArray<int> int_array;
   _ = int_array.PushMemory(20);
