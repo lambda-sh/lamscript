@@ -21,33 +21,31 @@ namespace lamscripten::util {
     return -1;
   }
 
-  core::OpCode op = op_or_null.value();
+  auto op = core::OpCode(op_or_null.value());
 
-  switch (op.GetType()) {
-    case core::OpType::Return:
+  switch (op) {
+    case core::OpCode::Return:
       std::cout << "OP_RETURN" << std::endl;
-      break;
-    case core::OpType::Constant:
-      int const_index = op.GetBytes().GetAtIndex(0).value();
+      return opcode_index + 1;
+    case core::OpCode::Constant:
+      uint8_t const_index = chunk.GetOpcodeAt(opcode_index + 1).value_or(0);
       std::cout
           << "OP_CONSTANT @ index "
           << const_index
           << " with a value of: "
           << chunk.GetConstantAt(const_index).value_or(0)
           << std::endl;
-      break;
+      return opcode_index + 2;
   }
-  return 0;
 }
 
 inline void DisassembleChunk(
     const core::Chunk& chunk, std::string_view name) {
   std::cout << "== " << name << " ==" << std::endl;
-  for (
-      size_t current_opcode = 0;
-      current_opcode < chunk.GetOpCodeCount();
-      current_opcode++) {
-    auto chunk_status = DisassembleInstruction(chunk, current_opcode);
+
+  size_t chunk_index = 0;
+  while (chunk_index < chunk.GetOpCodeCount()) {
+    chunk_index = DisassembleInstruction(chunk, chunk_index);
   }
 }
 
