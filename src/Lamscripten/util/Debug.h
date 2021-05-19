@@ -12,7 +12,7 @@ namespace lamscripten::util {
 
 [[nodiscard]] inline int DisassembleInstruction(
     const core::Chunk& chunk, size_t opcode_index) {
-  std::cout << opcode_index << ":";
+  std::cout << "\t" << opcode_index << ":";
 
   auto op_or_null = chunk.GetOpcodeAt(opcode_index);
 
@@ -28,15 +28,16 @@ namespace lamscripten::util {
       std::cout << "OP_RETURN" << std::endl;
       break;
     case core::OpType::Constant:
-      int const_index = op.GetBytes().GetAtIndex(0).value_or(100);
+      int const_index = op.GetBytes().GetAtIndex(0).value();
       std::cout
-          << "OP_CONSTANT @ "
+          << "OP_CONSTANT @ index "
           << const_index
-          << ":"
-          << chunk.GetConstantAt(0).value_or(0)
+          << " with a value of: "
+          << chunk.GetConstantAt(const_index).value_or(0)
           << std::endl;
       break;
   }
+  return 0;
 }
 
 inline void DisassembleChunk(
@@ -46,7 +47,7 @@ inline void DisassembleChunk(
       size_t current_opcode = 0;
       current_opcode < chunk.GetOpCodeCount();
       current_opcode++) {
-    DisassembleInstruction(chunk, current_opcode);
+    auto chunk_status = DisassembleInstruction(chunk, current_opcode);
   }
 }
 

@@ -10,14 +10,14 @@ using lamscripten::core::DynamicArray;
 
 int main(int argc, const char* argv[]) {
   lamscripten::core::Chunk chunk;
-  chunk.WriteOpCode(OpType::Return);
+  size_t _ = chunk.WriteOpCode(OpType::Return);
 
-  auto index = static_cast<uint8_t>(chunk.WriteConstant(1.2));
+  auto location = static_cast<uint8_t>(chunk.AddConstant(1.2));
 
-  chunk.WriteOpCode(OpCode(OpType::Constant, {index}));
+  _ = chunk.WriteOpCode(OpCode(OpType::Constant, { location }));
 
   lamscripten::core::DynamicArray<int> int_array;
-  int_array.PushMemory(20);
+  _ = int_array.PushMemory(20);
   int val = int_array.Pop().value_or(222);
   int val2 = int_array.Pop().value_or(5000);
 

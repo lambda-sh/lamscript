@@ -75,7 +75,7 @@ class Chunk {
     return index;
   }
 
-  [[nodsicard]] size_t WriteConstant(double value) {
+  [[nodsicard]] size_t AddConstant(double value) {
     size_t index = constants_.PushCopy(value);
     return index;
   }
