@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <optional>
 
 #include <Lamscripten/core/Memory.h>
 #include <Lamscripten/core/Types.h>
@@ -14,13 +15,15 @@ enum class OpCode : std::uint8_t {
   NoOp,
   Return,
   Constant,
+  NextLine
 };
 
 /// @brief A dynamic array of opcodes
 class Chunk {
  public:
-  Chunk() : count_(0), capacity_(0), opcodes_(), constants_() {}
+  Chunk() : opcodes_(), constants_() {}
 
+  /// @brief Writes an OpCode into the chunk.
   [[nodiscard]] size_t WriteOpCode(OpCode code) {
     size_t index = opcodes_.PushMemory(static_cast<uint8_t>(code));
     return index;
@@ -47,6 +50,25 @@ class Chunk {
     return opcodes_.GetCount();
   }
 
+  [[nodiscard]] DynamicArray<uint8_t> GetBytesFromLine(size_t line) {
+    DynamicArray<uint8_t> bytes;
+    size_t line_count = 0;
+    for (auto& byte : opcodes_) {
+      if (line == line_count) {
+        bytes.PushCopy(byte);
+      }
+      if (line > line_count) {
+        return bytes;
+      }
+
+      if (static_cast<OpCode>(byte) == OpCode::NextLine) {
+        line_count += 1;
+      }
+    }
+
+    return bytes;
+  }
+
   [[nodiscard]] std::optional<uint8_t> GetOpcodeAt(size_t index) const {
     return opcodes_.GetAtIndex(index);
   }
@@ -64,10 +86,9 @@ class Chunk {
   }
 
  private:
-  size_t count_;
-  size_t capacity_;
   DynamicArray<uint8_t> opcodes_;
   DynamicArray<double> constants_;
+  size_t line_count_;
 };
 
 }  // namespace lamscripten::core

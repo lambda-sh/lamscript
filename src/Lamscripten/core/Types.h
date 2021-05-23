@@ -1,6 +1,8 @@
 #ifndef SRC_LAMSCRIPTEN_CORE_TYPES_H_
 #define SRC_LAMSCRIPTEN_CORE_TYPES_H_
 
+#include <optional>
+
 #include <Lamscripten/core/Memory.h>
 
 namespace lamscripten::core {
@@ -34,7 +36,7 @@ class DynamicArray {
   DynamicArray(DynamicArray&& array) :
       count_(std::move(array.count_)),
       capacity_(std::move(array.capacity_)),
-      elements_(std::move(array.elements_)) {}
+      elements_(std::exchange(array.elements_, nullptr)) {}
 
 
   void operator=(const DynamicArray& array) {
@@ -45,7 +47,7 @@ class DynamicArray {
 
   /// @brief Push an item into the array.
   [[nodiscard]] size_t PushCopy(ValueType val) {
-    if (ShouldResize()) {
+    [[unlikely]] if (ShouldResize()) {
       size_t new_size = capacity_ < 8 ? 8 : capacity_ * 2;
       ResizeTo(new_size);
     }
@@ -80,14 +82,14 @@ class DynamicArray {
   }
 
   void GrowTo(size_t new_size) {
-    [[unlikely]] if (new_size < count_) {
+    [[unlikely]] if (new_size < count_ || new_size < capacity_) {
       return;
     }
     ResizeTo(new_size);
   }
 
   void ShrinkTo(size_t new_size) {
-    [[unlikely]] if (new_size > count_) {
+    [[unlikely]] if (new_size > count_ || new_size < capacity_) {
       return;
     }
     ResizeTo(new_size);

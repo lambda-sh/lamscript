@@ -28,10 +28,10 @@ namespace lamscripten::util {
       std::cout << "OP_RETURN" << std::endl;
       return opcode_index + 1;
     case core::OpCode::Constant:
-      uint8_t const_index = chunk.GetOpcodeAt(opcode_index + 1).value_or(0);
+      uint8_t const_index = chunk.GetOpcodeAt(opcode_index + 1).value();
       std::cout
           << "OP_CONSTANT @ index "
-          << const_index
+          << static_cast<int>(const_index)
           << " with a value of: "
           << chunk.GetConstantAt(const_index).value_or(0)
           << std::endl;
