@@ -15,6 +15,10 @@ class DynamicArray {
       capacity_(0),
       elements_(nullptr) {}
 
+  ~DynamicArray() {
+    FreeArray<ValueType>(elements_, count_);
+  }
+
   /// @brief Allocate an array double the size of the input list
   explicit DynamicArray(std::initializer_list<ValueType> values)
       : count_(0), capacity_(0), elements_(nullptr) {
