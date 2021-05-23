@@ -11,7 +11,7 @@
 namespace lamscripten::core {
 
 /// @brief Opcode types
-enum class OpCode : std::uint8_t {
+enum class OpCode : std::uint16_t {
   NoOp,
   Return,
   Constant,
@@ -25,13 +25,13 @@ class Chunk {
 
   /// @brief Writes an OpCode into the chunk.
   [[nodiscard]] size_t WriteOpCode(OpCode code) {
-    size_t index = opcodes_.PushMemory(static_cast<uint8_t>(code));
+    size_t index = opcodes_.PushMemory(static_cast<uint16_t>(code));
     return index;
   }
 
   /// @brief Returns the start index of where the bytes are written to within
   /// the chunk.
-  [[nodiscard]] size_t WriteBytes(std::initializer_list<uint8_t> bytes) {
+  [[nodiscard]] size_t WriteBytes(std::initializer_list<uint16_t> bytes) {
     size_t start_index = opcodes_.GetCount() - 1;
 
     for (auto byte : bytes) {
@@ -50,9 +50,10 @@ class Chunk {
     return opcodes_.GetCount();
   }
 
-  [[nodiscard]] DynamicArray<uint8_t> GetBytesFromLine(size_t line) {
-    DynamicArray<uint8_t> bytes;
+  [[nodiscard]] DynamicArray<uint16_t> GetBytesFromLine(size_t line) {
+    DynamicArray<uint16_t> bytes;
     size_t line_count = 0;
+
     for (auto& byte : opcodes_) {
       if (line == line_count) {
         bytes.PushCopy(byte);
@@ -69,7 +70,7 @@ class Chunk {
     return bytes;
   }
 
-  [[nodiscard]] std::optional<uint8_t> GetOpcodeAt(size_t index) const {
+  [[nodiscard]] std::optional<uint16_t> GetOpcodeAt(size_t index) const {
     return opcodes_.GetAtIndex(index);
   }
 
@@ -86,7 +87,7 @@ class Chunk {
   }
 
  private:
-  DynamicArray<uint8_t> opcodes_;
+  DynamicArray<uint16_t> opcodes_;
   DynamicArray<double> constants_;
   size_t line_count_;
 };
